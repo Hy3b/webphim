@@ -1,5 +1,5 @@
-import React from 'react';
-import Header from '../../components/layout/Header/header.jsx'; // Adjust path based on actual file name
+import Header from '../components/layout/Header/header.jsx';
+import Footer from '../components/layout/Footer/Footer.jsx';
 import { Outlet } from 'react-router-dom';
 
 const ClientLayout = () => {
@@ -9,10 +9,7 @@ const ClientLayout = () => {
             <main>
                 <Outlet />
             </main>
-            <footer>
-                {/* Footer content */}
-                <p>© 2024 WebPhim</p>
-            </footer>
+            <Footer />
         </div>
     );
 };

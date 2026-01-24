@@ -1,5 +1,5 @@
 import React from 'react';
-import MovieCard from './components/MovieCard/movie_card.jsx'; // Adjust path if needed
+// import MovieCard from './components/MovieCard/movie_card.jsx';
 
 const HomePage = () => {
     return (
