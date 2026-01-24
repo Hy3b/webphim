@@ -32,7 +32,6 @@ export default function Header() {
                             <li><Link to="/">LỊCH CHIẾU</Link></li>
                             <li><Link to="/">PHIM</Link></li>
                             <li><Link to="/">GIÁ VÉ</Link></li>
-                            <li><Link to="/">TIN MỚI & ƯU ĐÃI</Link></li>
                             <li><Link to="/">NHƯỢNG QUYỀN</Link></li>
                             <li><Link to="/">THÀNH VIÊN</Link></li>
                         </ul>
