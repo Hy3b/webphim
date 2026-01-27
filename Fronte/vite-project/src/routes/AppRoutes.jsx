@@ -4,7 +4,7 @@ import ClientLayout from '../layouts/ClientLayout';
 import HomePage from '../features/client/home/HomePage';
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
-
+import LichChieu from '../features/client/Schedule/LichChieu';
 const AppRoutes = () => {
     return (
         <Routes>
@@ -12,6 +12,7 @@ const AppRoutes = () => {
                 <Route index element={<HomePage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
+                <Route path="lichchieu" element={<LichChieu />} />
             </Route>
         </Routes>
     );

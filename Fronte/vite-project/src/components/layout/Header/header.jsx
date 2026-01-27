@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './header.css';
-
 export default function Header() {
     return (
         <div className="header-wrapper">
@@ -12,6 +11,7 @@ export default function Header() {
                         <Link to="/login">Đăng nhập</Link>
                         <span className="divider">|</span>
                         <Link to="/register">Đăng ký</Link>
+
                     </div>
                 </div>
             </div>
@@ -22,14 +22,14 @@ export default function Header() {
                     {/* Logo Section */}
                     <div className="logo">
                         <Link to="/">
-                            <h1 className="logo-text">MY<span className="logo-highlight">CINEMA</span></h1>
+                            <h1 clfileassName="logo-text">MY<span className="logo-highlight">CINEMA</span></h1>
                         </Link>
                     </div>
 
                     {/* Navigation Menu */}
                     <nav className="main-nav">
                         <ul>
-                            <li><Link to="/">LỊCH CHIẾU</Link></li>
+                            <li><Link to="/lichchieu">LỊCH CHIẾU</Link></li>
                             <li><Link to="/">PHIM</Link></li>
                             <li><Link to="/">GIÁ VÉ</Link></li>
                             <li><Link to="/">NHƯỢNG QUYỀN</Link></li>
