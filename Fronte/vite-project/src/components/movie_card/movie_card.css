@@ -1,0 +1,102 @@
+.movie-card {
+    width: 280px; 
+    flex-shrink: 0;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    position: relative;
+    /* Xóa bỏ div lồng nhau thừa thãi nếu có */
+}
+
+/* Phần ảnh poster */
+.movie-poster {
+    position: relative;
+    width: 100%;
+    height: 400px; /* Chiều cao cố định cho ảnh đều nhau */
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+/* Hiệu ứng hover: Phóng to ảnh */
+.movie-card:hover .movie-poster img {
+    transform: scale(1.05);
+}
+
+/* Overlay */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Đậm hơn xíu cho rõ chữ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.movie-card:hover .overlay {
+    opacity: 1;
+}
+
+/* Style riêng cho nút Mua Vé (dựa trên Button component) */
+.btn-buy-ticket {
+    background-color: transparent !important; /* Nền trong suốt */
+    color: #fff !important;
+    border: 2px solid #fff !important;
+    padding: 10px 25px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.btn-buy-ticket:hover {
+    background-color: #034EA2 !important; /* Xanh Beta */
+    border-color: #034EA2 !important;
+}
+
+/* Thông tin phim */
+.movie-info {
+    padding-top: 15px;
+}
+
+.movie-name {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1.4;
+    text-transform: uppercase; /* Tên phim in hoa cho đẹp */
+}
+
+.movie-name a {
+    color: #333;
+    transition: color 0.2s;
+    text-decoration: none;
+}
+
+.movie-name a:hover {
+    color: #034EA2;
+}
+
+.movie-details {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #666;
+    display: flex;
+    justify-content: space-between; /* Đẩy 2 bên cho thoáng */
+}
+
+.movie-genre {
+    font-weight: bold;
+}

@@ -82,7 +82,7 @@ a {
 .main-nav ul {
     display: flex;
     gap: 30px;
-    padding-right: 200px;
+    padding-right: 300px;
     
 }
 
@@ -91,10 +91,29 @@ a {
     font-weight: 700;
     font-size: 14px;
     text-transform: uppercase;
+    padding: 20px;
 }
 
 .main-nav a:hover {
     color: #034EA2;
+}
+
+.tab-btn{
+    color: #333;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px; /* Đè lên border-bottom của cha */
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #FF6600; /* Màu cam nổi bật */
 }
 
 .logo{
