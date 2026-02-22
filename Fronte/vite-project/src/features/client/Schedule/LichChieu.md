@@ -1,18 +1,24 @@
 # Tài liệu Module Lịch Chiếu (Schedule)
 
-> **Module**: Schedule (`LichChieu`)  
-> **Mục đích**: Hiển thị lịch chiếu phim được tổ chức theo các tab ngày.  
+> **Module**: `LichChieu`
+> **Mục đích**: Hiển thị lịch chiếu phim được tổ chức theo các tab ngày (7 ngày tính từ hôm nay).
 > **Đường dẫn**: `src/features/client/Schedule/`
 
 ---
 
 ## 1. Tổng quan
-Module `LichChieu` là một tính năng hoàn chỉnh chịu trách nhiệm hiển thị lịch chiếu phim. Module này tuân theo mô hình **Container-Presentation** (Container - Hiển thị), trong đó component chính `LichChieu.jsx` quản lý state (trạng thái) và điều phối dữ liệu, trong khi các components con nhỏ hơn chịu trách nhiệm hiển thị giao diện cụ thể.
 
-Thiết kế này cho phép bạn:
-- **Thêm thuộc tính mới cho phim** mà không làm vỡ giao diện.
-- **Thêm các tab/ngày mới** mà không cần thay đổi logic của component.
-- **Chuyển sang dùng dữ liệu API** chỉ bằng cách sửa đổi container cha.
+Module `LichChieu` là một tính năng hoàn chỉnh theo mô hình **Container–Presentation**:
+
+- **Container** (`LichChieu.jsx`): Quản lý state `activeTab`, tiêu thụ dữ liệu từ `data/fakeData.js`.
+- **Presentation** (các component con): Chỉ nhận props và render giao diện, không có state riêng.
+
+Dữ liệu lịch chiếu được sinh tự động bởi hàm `generateSchedule()` trong `fakeData.js`, tạo ra **7 ngày** liên tiếp từ thời điểm hiện tại, mỗi ngày đi kèm 2 bộ phim mẫu với suất chiếu ngẫu nhiên.
+
+Thiết kế này cho phép:
+- **Thêm ngày mới**: Chỉ cần thay đổi logic trong `fakeData.js`, không cần chạm vào component.
+- **Thêm phim mới**: Thêm object vào mảng `movies` bên trong vòng lặp của `generateSchedule()`.
+- **Kết nối API thật**: Thay thế `scheduleData` bằng dữ liệu fetch từ server mà không cần sửa component nào.
 
 ---
 
@@ -20,51 +26,73 @@ Thiết kế này cho phép bạn:
 
 ```text
 Schedule/
-├── components/          # Các components con có thể tái sử dụng
-│   ├── DateSelector.jsx # Xử lý các tab ngày (Ngày 1, Ngày 2,...)
-│   ├── MovieItem.jsx    # Hiển thị chi tiết một bộ phim & các suất chiếu
-│   └── NoteSection.jsx  # Hiển thị phần ghi chú/thông báo
-├── LichChieu.css        # Styles riêng cho module này
-├── LichChieu.jsx        # Container chính (Chứa State & Nguồn dữ liệu)
-└── LichChieu.md         # File tài liệu này
+├── components/             # Các presentation components (không có state)
+│   ├── DateSelector.jsx    # Thanh tab chọn ngày
+│   ├── MovieItem.jsx       # Một hàng hiển thị thông tin phim + các suất chiếu
+│   └── NoteSection.jsx     # Thanh ghi chú/thông báo phía trên danh sách phim
+├── data/
+│   └── fakeData.js         # Nguồn dữ liệu tĩnh (data source duy nhất của module)
+├── LichChieu.css           # Styles riêng cho toàn bộ module
+├── LichChieu.jsx           # Container chính (quản lý state & data flow)
+└── LichChieu.md            # File tài liệu này
 ```
 
 ---
 
 ## 3. Mô hình Dữ liệu (Data Models)
-Để thêm nội dung mới, hãy tuân theo các JSON schema dưới đây.
 
-### 3.1. Đối tượng Ngày/Tab (`days`)
-Được sử dụng trong `LichChieu.jsx` để tạo ra các tab.
+Toàn bộ dữ liệu đến từ `data/fakeData.js` dưới dạng một **mảng `scheduleData`**, mỗi phần tử là một `ScheduleEntry`.
 
-```json
+### 3.1. Cấu trúc tổng thể — `ScheduleEntry[]`
+
+```javascript
+// export const scheduleData: ScheduleEntry[]
+[
+  {
+    day: DayObject,       // Thông tin ngày (dùng cho tab)
+    movies: Movie[]       // Danh sách phim của ngày đó
+  },
+  // ... 6 ngày tiếp theo
+]
+```
+
+### 3.2. Đối tượng Ngày — `DayObject`
+
+Được `LichChieu.jsx` map ra để tạo các tab, và truyền vào `DateSelector`.
+
+```javascript
 {
-  "id": "unique-tab-id",       // ID duy nhất cho logic nội bộ (bắt buộc)
-  "dayNumber": "DD",           // Số ngày hiển thị lớn (ví dụ: "14")
-  "monthYear": "/MM - Day"     // Phần đuôi hiển thị (ví dụ: "/02 - Thứ 2")
+  id: "tab-id-1",         // ID duy nhất (tab-id-1 → tab-id-7)
+  dayNumber: "22",        // Ngày (2 chữ số), dùng cho font lớn trong tab
+  monthYear: "/02 - T7"   // Tháng + tên thứ hiển thị cạnh dayNumber
 }
 ```
 
-### 3.2. Đối tượng Phim (`movies`)
-Được sử dụng để đổ dữ liệu cho component `MovieItem`.
+### 3.3. Đối tượng Phim — `Movie`
 
-```json
+Được truyền vào `MovieItem` qua prop `movie`.
+
+```javascript
 {
-  "id": 1,                     // ID duy nhất
-  "title": "Tên Phim",         // Tên hiển thị
-  "imageUrl": "/path/to/img",  // Ảnh poster
-  "ratingUrl": "/path/to/icon",// Icon phân loại (P, C13, C18)
-  "link": "/movie-detail",     // Đường dẫn khi click vào
-  "genre": "Hành động, Drama", // Chuỗi text thể loại
-  "duration": "120",           // Thời lượng phút (số hoặc chuỗi)
-  "type": "2D/3D",             // Loại hình chiếu
-  "showtimes": [               // Mảng các suất chiếu
-    {
-      "time": "19:00",         // Giờ chiếu (hiển thị chính)
-      "date": "14/02",         // Ngày chiếu (hiển thị nhỏ)
-      "seats": "50"            // Số ghế trống
-    }
-  ]
+  id: "mb-tab-id-1",        // ID duy nhất (kết hợp slug phim + dayId)
+  title: "Mắt Biếc",        // Tên phim — hiển thị dưới dạng <h1>
+  imageUrl: "/assets/...",   // Đường dẫn ảnh poster
+  ratingUrl: "https://...",  // URL icon phân loại độ tuổi (P, C13, C16, C18)
+  link: "#",                 // Href khi click vào tên phim
+  genre: "Tình Cảm",        // Thể loại — hiển thị trong danh sách .blog-info
+  duration: "117",           // Thời lượng (phút)
+  type: "2D Digital",        // Loại hình chiếu — hiển thị dạng label
+  showtimes: Showtime[]      // Các suất chiếu trong ngày
+}
+```
+
+### 3.4. Đối tượng Suất Chiếu — `Showtime`
+
+```javascript
+{
+  time: "18:00",   // Giờ chiếu — hiển thị chính trong nút bấm
+  date: "22/02",   // Ngày chiếu — hiển thị nhỏ bên dưới (hiện đang ẩn bằng CSS)
+  seats: 34        // Số ghế trống — hiển thị dưới nút (dạng "34 ghế trống")
 }
 ```
 
@@ -72,63 +100,213 @@ Schedule/
 
 ## 4. Kiến trúc Component
 
-### `LichChieu.jsx` (Container)
-- **Vai trò**: Điểm bắt đầu. Quản lý state `activeTab` và giữ dữ liệu (`days`, `movies`).
-- **Logic**: Dùng vòng lặp `map` qua mảng `days` để tạo các tab và phần nội dung tương ứng.
-- **Tùy biến**: 
-  - Cập nhật mảng `days` để thay đổi các tab ngày.
-  - Cập nhật mảng `movies` để thay đổi nội dung phim.
-  - Trong thực tế: Thay thế các mảng dữ liệu giả bằng các gọi hàm `fetch` trong `useEffect`.
+### `LichChieu.jsx` — Container chính
 
-### `DateSelector.jsx` (Giao diện)
-- **Props**: `{ days, activeTab, onTabChange }`
-- **Vai trò**: Render thanh điều hướng (navigation bar). Là pure component (không có state riêng).
+```
+Props nhận vào : (không có — self-contained)
+State nội bộ   : activeTab (string) — ID của tab đang được chọn
 
-### `MovieItem.jsx` (Giao diện)
-- **Props**: `{ movie }`
-- **Vai trò**: Render một hàng thông tin phim. Xử lý bố cục cho poster, thông tin phim, và các nút suất chiếu.
-- **Styling**: Phụ thuộc vào các class `.product-item`, `.col-xxx` từ file css.
+Data flow:
+  scheduleData (fakeData.js)
+       │
+       ├─── .map(item => item.day) ──► DateSelector (days, activeTab, onTabChange)
+       │
+       └─── .map(item => ...) ──► tab-pane (filter theo activeTab)
+                                         └─► NoteSection
+                                         └─► MovieItem[] (item.movies)
+```
 
----
-
-## 5. Hướng dẫn Mở rộng (How-To)
-
-### ✅ Cách thêm một Ngày mới
-1. Mở file `LichChieu.jsx`.
-2. Tìm hằng số `days`.
-3. Thêm một object mới vào mảng:
-   ```javascript
-   { id: 'tab-id-3', dayNumber: '15', monthYear: '/02 - Thứ 3' },
-   ```
-   *Không cần thay đổi dòng code nào khác.*
-
-### ✅ Cách thêm một Phim mới
-1. Mở file `LichChieu.jsx`.
-2. Tìm hằng số `movies`.
-3. Thêm một object mới tuân theo **Mô hình Dữ liệu (Movie Object)** ở trên.
-
-### ✅ Cách kết nối với API
-1. Xóa các mảng tĩnh `days` và `movies` trong `LichChieu.jsx`.
-2. Thêm `useState` để chứa dữ liệu:
-   ```javascript
-   const [movies, setMovies] = useState([]);
-   const [days, setDays] = useState([]);
-   ```
-3. Fetch dữ liệu trong `useEffect` và format nó khớp với Schemas ở Mục 3.
-4. Truyền các biến state vào component con như cũ.
-
-### ✅ Cách thêm một Trường mới (Ví dụ: Đạo diễn)
-1. **Cập nhật Dữ liệu**: Thêm `director: 'Tên Đạo diễn'` vào object `movies` trong `LichChieu.jsx`.
-2. **Cập nhật Giao diện**: Mở file `components/MovieItem.jsx`.
-   - Destructure `director` từ props: `const { ..., director } = movie;`
-   - Thêm JSX để hiển thị nó: `<li>Đạo diễn: {director}</li>` vào bên trong danh sách `.blog-info`.
+**Điểm quan trọng:**
+- `activeTab` mặc định là `scheduleData[0]?.day.id` (ngày đầu tiên).
+- Danh sách phim được render trong `div` có `overflowY: auto` + `maxHeight` để cuộn nội dung.
+- Nếu một ngày không có phim (`movies.length === 0`), hiển thị thông báo "Không có suất chiếu nào."
 
 ---
 
-## 6. Styling (Giao diện)
-Các styles được định nghĩa trong `LichChieu.css`.
-- **Hệ thống Grid**: Sử dụng hệ thống grid 16-cột tùy chỉnh (`.col-xs-16`).
-- **Tabs**: Style tùy chỉnh cho tab `.tab-style-1`.
-- **Responsive**: Các `@media` queries xử lý việc thay đổi bố cục trên các màn hình khác nhau.
+### `DateSelector.jsx` — Thanh tab chọn ngày
 
-> **Lưu ý**: Để thay đổi màu sắc toàn cục, hãy sửa các biến CSS hoặc sửa trực tiếp trong `LichChieu.css` (ví dụ: `.nav-tabs>li.active>a` để sửa màu tab đang chọn).
+| Prop | Kiểu | Mô tả |
+|---|---|---|
+| `days` | `DayObject[]` | Mảng các ngày để render thành tab |
+| `activeTab` | `string` | ID tab đang active |
+| `onTabChange` | `(id: string) => void` | Callback khi click tab |
+
+- Render `<ul class="nav nav-tabs dayofweek">`.
+- Mỗi tab hiển thị `dayNumber` (font lớn `.font-38`) kèm `monthYear`.
+- Click tab gọi `e.preventDefault()` rồi `onTabChange(day.id)`.
+
+---
+
+### `MovieItem.jsx` — Card một bộ phim
+
+| Prop | Kiểu | Mô tả |
+|---|---|---|
+| `movie` | `Movie` | Object phim đầy đủ |
+
+**Bố cục bên trong (dùng hệ thống grid 16 cột):**
+
+```
+row
+├── col-lg-5 (poster)
+│     ├── ratingUrl (icon phân loại — absolute top-left)
+│     ├── imageUrl  (ảnh poster, .border-radius-20)
+│     └── nút play trailer (#trailer-pop-up, fancybox)
+└── col-lg-11 (thông tin + showtimes)
+      ├── <h1> title → <a href={link}>
+      ├── <ul class="blog-info">
+      │     ├── <li> icon tags + genre
+      │     └── <li> icon clock + duration phút
+      ├── type label (font-transform-uppercase)
+      └── showtimes.map → nút <a class="btn default">
+            ├── time (font 13px)
+            ├── date (font 10px, hiện ẩn)
+            └── seats ghế trống (font-smaller)
+```
+
+- Nút suất chiếu dẫn đến `#product-pop-up` qua fancybox (hiện là placeholder).
+
+---
+
+### `NoteSection.jsx` — Thanh ghi chú
+
+- **Không có props.**
+- Hiển thị 1 ô màu `#B3C9E9` và text `[Ghi chú/Thông báo]` — hiện là placeholder.
+- Dùng flexbox, nằm trên cùng của mỗi tab pane, phân cách bởi `border-bottom`.
+
+---
+
+## 5. Hướng dẫn Mở Rộng
+
+### ✅ Thêm ngày (thay đổi số ngày hiển thị)
+
+Mở `data/fakeData.js`, sửa điều kiện vòng lặp:
+
+```javascript
+// Hiện tại: 7 ngày
+for (let i = 0; i < 7; i++) { ... }
+
+// Muốn 14 ngày:
+for (let i = 0; i < 14; i++) { ... }
+```
+
+*Không cần sửa file nào khác.*
+
+---
+
+### ✅ Thêm phim mới vào mỗi ngày
+
+Mở `data/fakeData.js`, thêm object vào mảng `movies` bên trong vòng lặp:
+
+```javascript
+const movies = [
+  { /* Mắt Biếc — đã có */ },
+  { /* Bố Già — đã có */ },
+  {
+    id: `new-${dayId}`,
+    title: 'Phim Mới',
+    imageUrl: '/assets/images/phim-moi.png',
+    ratingUrl: 'https://img.icons8.com/.../Age-Rating-18.png',
+    link: '/phim-moi',
+    genre: 'Hành Động',
+    duration: '135',
+    type: '3D IMAX',
+    showtimes: [
+      { time: '10:00', date: `${dayNum}/${month}`, seats: 80 }
+    ]
+  }
+];
+```
+
+---
+
+### ✅ Thêm trường mới cho phim (ví dụ: Đạo diễn)
+
+**Bước 1** — Thêm trường vào data trong `fakeData.js`:
+```javascript
+{ ..., director: 'Victor Vũ' }
+```
+
+**Bước 2** — Hiển thị trong `components/MovieItem.jsx`:
+```jsx
+// Destructure thêm trường mới
+const { ..., director } = movie;
+
+// Thêm vào danh sách .blog-info
+<li><i className="fa fa-user"></i>{director}</li>
+```
+
+---
+
+### ✅ Kết nối API thật
+
+**Bước 1** — Xóa import `scheduleData` trong `LichChieu.jsx`.
+
+**Bước 2** — Thêm state và fetch:
+```jsx
+import { useState, useEffect } from 'react';
+
+const [scheduleData, setScheduleData] = useState([]);
+
+useEffect(() => {
+  fetch('/api/schedule')
+    .then(res => res.json())
+    .then(data => setScheduleData(data)); // Đảm bảo data khớp ScheduleEntry[]
+}, []);
+```
+
+**Bước 3** — Cập nhật fallback cho `activeTab`:
+```jsx
+const [activeTab, setActiveTab] = useState('');
+
+useEffect(() => {
+  if (scheduleData.length > 0 && !activeTab) {
+    setActiveTab(scheduleData[0].day.id);
+  }
+}, [scheduleData]);
+```
+
+*Không cần thay đổi bất kỳ component con nào.*
+
+---
+
+## 6. Styling (`LichChieu.css`)
+
+| Class / Selector | Vai trò |
+|---|---|
+| `.tab-style-1` | Wrapper toàn bộ khu vực tabs + content |
+| `.nav.nav-tabs.dayofweek` | Thanh tab ngang — border, padding, active style |
+| `li.active > a.dayofweek` | Màu sắc & viền tab đang được chọn |
+| `.tab-pane.fade.in.active` | Hiển thị nội dung tab đang active |
+| `.product-item` | Card bao bọc poster phim |
+| `.pi-img-wrapper` | Wrapper ảnh poster (relative position cho icon rating) |
+| `.blog-info` | Danh sách thông tin phim (genre, duration) |
+| `.col-xs-{n}` | Hệ thống grid **16 cột** tùy chỉnh (khác Bootstrap 12 cột) |
+| `@media` queries | Responsive breakpoints cho mobile/tablet |
+
+> **Lưu ý quan trọng**: Module dùng hệ thống **16 cột** (`.col-xs-16`, `.col-md-16`), **không phải** 12 cột Bootstrap thông thường. Khi thêm layout mới, hãy dùng tổng cột = 16.
+
+---
+
+## 7. Luồng Render (Render Flow)
+
+```
+App mount
+  └─► LichChieu()
+        ├─ import scheduleData từ fakeData.js (7 phần tử)
+        ├─ useState(activeTab = scheduleData[0].day.id = "tab-id-1")
+        ├─ days = scheduleData.map(item => item.day)      // [7 DayObject]
+        │
+        ├─► <DateSelector days={days} activeTab onTabChange />
+        │     └─ render 7 tab, tab "tab-id-1" có class "in active"
+        │
+        └─► scheduleData.map(item => <tab-pane>)          // 7 pane, 6 pane ẩn
+              └─ pane "tab-id-1" (visible):
+                    ├─► <NoteSection />
+                    └─► item.movies.map(movie => <MovieItem movie={movie} />)
+                          ├─► MovieItem { Mắt Biếc }
+                          └─► MovieItem { Bố Già }
+
+User click tab "tab-id-2"
+  └─► setActiveTab("tab-id-2")
+        └─► Re-render: pane "tab-id-2" hiển thị, pane "tab-id-1" ẩn
+```
