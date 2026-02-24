@@ -4,12 +4,10 @@ import ClientLayout from '../layouts/ClientLayout';
 import HomePage from '../features/client/home/HomePage';
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
-<<<<<<< HEAD
-import MovieDetail from '../features/client/movie/MovieDetail';
-=======
+import LichChieu from '../features/client/Schedule/LichChieu';
 import BookingPage from '../features/client/booking/BookingPage/BookingPage';
 import PaymentPage from '../features/client/payment/PaymentPage';
->>>>>>> Long
+import MovieDetail from '../features/client/movie/MovieDetail';
 
 const AppRoutes = () => {
     return (
@@ -18,12 +16,10 @@ const AppRoutes = () => {
                 <Route index element={<HomePage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
-<<<<<<< HEAD
-                <Route path="movie/:id" element={<MovieDetail />} />
-=======
+                <Route path="lichchieu" element={<LichChieu />} />
                 <Route path="booking/:id" element={<BookingPage />} />
                 <Route path="payment" element={<PaymentPage />} />
->>>>>>> Long
+                <Route path="movie/:id" element={<MovieDetail />} />
             </Route>
         </Routes>
     );
