@@ -1,7 +1,6 @@
 import React, { useState } from 'react'; // 1. Import useState
 import { Link } from 'react-router-dom';
 import './header.css';
-
 export default function Header() {
     // 2. Khởi tạo biến Active Tab
     const [activeTab, setActiveTab] = useState(''); 
@@ -15,6 +14,7 @@ export default function Header() {
                         <Link to="/login">Đăng nhập</Link>
                         <span className="divider">|</span>
                         <Link to="/register">Đăng ký</Link>
+
                     </div>
                 </div>
             </div>
@@ -31,10 +31,17 @@ export default function Header() {
                         <ul>
                             {/* 3. Sửa lại logic active cho từng mục */}
                             <li>
-                                <Link to="/" 
+                                <Link to="/lichchieu" 
                                     className={`tab-btn ${activeTab === 'lich_chieu' ? 'active' : ''}`} 
                                     onClick={() => setActiveTab('lich_chieu')}>
                                     LỊCH CHIẾU
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/" 
+                                    className={`tab-btn ${activeTab === 'phim' ? 'active' : ''}`} 
+                                    onClick={() => setActiveTab('phim')}>
+                                    PHIM
                                 </Link>
                             </li>
                             <li>
