@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    image: mysql:8.0
+    container_name: webphim_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: webphim_db
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # timezone: Thiết lập múi giờ Việt Nam
+    command: --default-time-zone='+07:00'
+
+volumes:
+  mysql_data:
