@@ -1,327 +1,58 @@
-/* Base Layout */
-.container {
+/* LichChieu.css - Main Page Wrapper */
+.schedule-page-wrapper {
+    background-color: #F8FAFC; /* Light gray background to distinguish content */
+    min-height: calc(100vh - 80px); /* Assuming header is 80px */
+    padding: 40px 16px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.schedule-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 0 15px;
+    background: transparent;
 }
 
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-left: -15px;
-    margin-right: -15px;
+.schedule-content {
+    background: transparent;
+    padding: 0;
 }
 
-[class^="col-"] {
-    position: relative;
-    min-height: 1px;
-    padding-left: 15px;
-    padding-right: 15px;
-    width: 100%;
-}
-
-/* 16-Column Grid System Approximation */
-/* Large screens */
-@media (min-width: 1200px) {
-    .col-lg-2 {
-        width: 12.5%;
-    }
-
-    /* 2/16 */
-    .col-lg-5 {
-        width: 31.25%;
-    }
-
-    /* 5/16 */
-    .col-lg-8 {
-        width: 50%;
-    }
-
-    /* 8/16 */
-    .col-lg-11 {
-        width: 68.75%;
-    }
-
-    /* 11/16 */
-}
-
-/* Medium screens */
-@media (min-width: 992px) {
-    .col-md-5 {
-        width: 31.25%;
-    }
-
-    .col-md-7 {
-        width: 43.75%;
-    }
-
-    .col-md-8 {
-        width: 50%;
-    }
-
-    .col-md-11 {
-        width: 68.75%;
-    }
-
-    .col-md-16 {
-        width: 100%;
-    }
-}
-
-/* Small screens */
-@media (min-width: 768px) {
-    .col-sm-5 {
-        width: 31.25%;
-    }
-
-    .col-sm-11 {
-        width: 68.75%;
-    }
-
-    .col-sm-16 {
-        width: 100%;
-    }
-}
-
-/* Extra small screens */
-.col-xs-6 {
-    width: 37.5%;
-}
-
-/* 6/16 */
-.col-xs-7 {
-    width: 43.75%;
-}
-
-/* 7/16 */
-.col-xs-10 {
-    width: 62.5%;
-}
-
-/* 10/16 */
-.col-xs-16 {
-    width: 100%;
-}
-
-/* Utility Classes */
-.margin-bottom-35 {
-    margin-bottom: 35px;
-}
-
-.margin-bottom-40 {
-    margin-bottom: 40px;
-}
-
-.margin-left-0 {
-    margin-left: 0 !important;
-}
-
-.margin-right-0 {
-    margin-right: 0 !important;
-}
-
-.no-margin {
-    margin: 0 !important;
-}
-
-.no-padding {
-    padding: 0 !important;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.border-radius-20 {
-    border-radius: 20px;
-}
-
-/* Tabs */
-.tab-style-1 {
-    background: #fff;
-    border-radius: 8px;
-    /* padding: 20px; */
-}
-
-.nav-tabs {
-    display: flex;
-    border-bottom: 2px solid #eee;
-    padding-left: 0;
-    margin-bottom: 20px;
-    list-style: none;
-    gap: 10px;
-}
-
-.nav-tabs>li {
-    margin-bottom: -2px;
-}
-
-.nav-tabs>li>a {
-    display: block;
-    padding: 10px 20px;
-    border-bottom: 2px solid transparent;
-    color: #555;
-    font-size: 16px;
-    text-transform: uppercase;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.nav-tabs>li>a:hover,
-.nav-tabs>li.active>a {
-    color: #d11515;
-    /* Active/Hover color - Red as per typical cinema themes, or use Blue #005198 */
-    border-bottom-color: #d11515;
-}
-
-/* User used blue colors in inline styles, let's use blue */
-.nav-tabs>li.active>a {
-    color: #005198;
-    border-bottom-color: #005198;
-}
-
-
-.dayofweek {
-    position: relative;
-}
-
-.font-38 {
-    font-size: 38px;
-    line-height: 1;
-    display: block;
-}
-
-.font-s-35 {
-    font-size: 35px;
-}
-
-/* Tab Content */
-.tab-content {
-    background: #fff;
-    padding: 20px 0;
-}
-
-.tab-pane {
+.schedule-tab-pane {
     display: none;
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.4s ease-in-out;
 }
 
-.tab-pane.active {
+.schedule-tab-pane.active {
     display: block;
     opacity: 1;
+    animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Movie/Product Item */
-.product-item {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.pi-img-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.pi-img-wrapper img {
-    width: 100%;
-    height: auto;
-    transition: transform 0.3s ease;
-}
-
-.product-item:hover .pi-img-wrapper img {
-    transform: scale(1.05);
-}
-
-.pi-img-wrapper div {
-    /* The overlay with play button */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transition: opacity 0.3s;
+.movies-list {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    gap: 32px;
 }
 
-.product-item:hover .pi-img-wrapper div {
-    opacity: 1;
-}
-
-.pi-img-wrapper i.fa-play-circle {
-    font-size: 50px;
-    color: #fff;
-}
-
-/* Movie Info */
-h1 a,
-h3 a {
-    color: #333;
-    text-decoration: none;
-    font-size: 20px;
-    font-weight: 700;
-    transition: color 0.2s;
-}
-
-h1 a:hover,
-h3 a:hover {
-    color: #005198;
-}
-
-.blog-info {
-    display: flex;
-    gap: 15px;
-    color: #777;
-    font-size: 13px;
-    margin: 10px 0;
-    padding: 0;
-    list-style: none;
-}
-
-.blog-info li {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.font-transform-uppercase {
-    text-transform: uppercase;
-}
-
-.bold {
-    font-weight: 700;
-}
-
-.font-lg {
+.empty-state {
+    text-align: center;
+    padding: 64px 20px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    color: #6B7280;
     font-size: 16px;
+    font-weight: 500;
 }
 
-/* Booking Button/Time */
-.btn.default {
-    background: #f1f1f1;
-    color: #333;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    transition: all 0.2s;
-    text-decoration: none;
-}
-
-.btn.default:hover {
-    background: #005198;
-    color: #fff;
-    border-color: #005198;
-}
-
-.font-smaller {
-    font-size: 11px;
-    color: #888;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

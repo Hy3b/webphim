@@ -2,70 +2,67 @@
 .homepage-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 30px 15px;
-    font-family: Arial, sans-serif;
+    padding: 40px 16px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Thanh Navigation Tab */
 .tab-navigation {
     display: flex;
-    justify-content: center; /* Căn giữa các nút Tab */
-    gap: 40px; /* Khoảng cách giữa 2 nút */
-    margin-bottom: 40px;
-    border-bottom: 1px solid #ddd; /* Đường gạch mờ ở dưới */
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 48px;
+    border-bottom: 2px solid #E5E7EB; /* Lighter modern border */
 }
 
 /* Nút Tab */
 .tab-btn {
-    background: none;
+    background: transparent;
     border: none;
+    border-bottom: 2px solid transparent;
     font-size: 20px;
-    font-weight: bold;
-    color: #888; /* Màu xám cho tab chưa chọn */
-    padding-bottom: 10px;
+    font-weight: 700;
+    color: #6B7280; /* Neutral gray */
+    padding: 0 16px 16px 16px;
     cursor: pointer;
     position: relative;
-    transition: color 0.3s;
+    transition: all 0.2s ease-out;
+    margin-bottom: -2px; /* Overlap border */
 }
 
 /* Hiệu ứng khi hover vào tab */
 .tab-btn:hover {
-    color: #034EA2;
+    color: #111827;
 }
 
 /* Tab đang Active (đang chọn) */
 .tab-btn.active {
-    color: #034EA2; /* Màu xanh thương hiệu */
-}
-
-/* Đường gạch chân màu cam cho Tab Active */
-.tab-btn.active::after {
-    content: "";
-    position: absolute;
-    bottom: -1px; /* Đè lên border-bottom của cha */
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: #FF6600; /* Màu cam nổi bật */
+    color: #D11515; /* Premium brand red */
+    border-bottom-color: #D11515;
 }
 
 /* Lưới hiển thị danh sách phim */
 .movie-grid {
     display: grid;
     /* Tự động chia cột: Tối thiểu 250px, còn lại tự co giãn */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-    gap: 30px; /* Khoảng cách giữa các thẻ phim */
-    justify-items: center; /* Căn giữa thẻ phim trong ô lưới */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 36px; /* Khoảng cách giữa các thẻ phim */
 }
 
 /* Reponsive cho mobile */
 @media (max-width: 768px) {
     .tab-btn {
         font-size: 16px;
-        gap: 20px;
+        gap: 16px;
+        padding: 0 8px 12px 8px;
     }
     
     .movie-grid {
-        gap: 20px;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Allow two per row on mobile */
+    }
+    
+    .homepage-container {
+        padding: 24px 16px;
     }
 }

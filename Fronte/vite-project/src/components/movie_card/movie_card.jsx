@@ -13,11 +13,16 @@ const MovieCard = ({movie}) => {
                 
                 {/* Lớp phủ đen (Overlay) */}
                 <div className="overlay">
-                    {/* Chỉ hiện nút MUA VÉ nếu phim đang chiếu */}
-                    {movie.status === 'now_showing' && (
+                    {movie.status === 'showing' ? (
                         <Link to={`/movie/${movie.id}`}>
                             <Button className="btn-buy-ticket">
                                 MUA VÉ
+                            </Button>
+                        </Link>
+                    ) : (
+                        <Link to={`/movie/${movie.id}`}>
+                            <Button className="btn-buy-ticket" style={{ backgroundColor: '#4B5563', boxShadow: '0 8px 20px rgba(75, 85, 99, 0.3)' }}>
+                                CHI TIẾT
                             </Button>
                         </Link>
                     )}
@@ -25,12 +30,12 @@ const MovieCard = ({movie}) => {
             </div>
             {/* Phần thông tin phim */}
             <div className="movie-info">
-                <h3 className="movie-name">
+                <h3 className="movie-card-name">
                     <Link to={`/movie/${movie.id}`}>{movie.name}</Link>
                 </h3>
-                <div className="movie-details">
-                    <span className="movie-genre">{movie.genre}</span>
-                    <span className="movie-duration">{movie.duration} phút</span>
+                <div className="movie-card-details">
+                    <span className="movie-card-genre">{movie.genre}</span>
+                    <span className="movie-card-duration">{movie.duration} phút</span>
                 </div>
             </div>
         </div>

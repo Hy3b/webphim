@@ -40,7 +40,7 @@ const generateSchedule = () => {
             {
                 id: `bg-${dayId}`,
                 title: 'Bố Già',
-                imageUrl: 'https://upload.wikimedia.org/wikipedia/vi/5/5a/Bo_Gia_poster.jpg', // Placeholder distinct movie
+                imageUrl: 'https://image.tmdb.org/t/p/w500/uUjEqrS2f88sF9iVfI4wY9T2mC3.jpg', // Valid TMDB Poster
                 ratingUrl: 'https://img.icons8.com/color/48/Age-Rating-16.png',
                 link: '#',
                 genre: 'Gia Đình, Hài',

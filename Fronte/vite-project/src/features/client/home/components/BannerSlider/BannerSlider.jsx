@@ -3,7 +3,7 @@ import './BannerSlider.css';
 
 const BannerSlider = ({ movies }) => {
     // Chỉ lấy những phim ĐANG CHIẾU để làm Slide
-    const trendingMovies = movies.filter(m => m.status === 'now_showing').slice(0, 5); // Lấy tối đa 5 phim
+    const trendingMovies = movies.filter(m => m.status === 'showing').slice(0, 5); // Lấy tối đa 5 phim
     
     const [currentIndex, setCurrentIndex] = useState(0);
 

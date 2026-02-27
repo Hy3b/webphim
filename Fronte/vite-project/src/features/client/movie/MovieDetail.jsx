@@ -1,33 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MovieCard from '../../../components/movie_card/movie_card.jsx';
+import DateSelector from '../Schedule/components/DateSelector/DateSelector';
+import ShowtimeGrid from '../../../components/common/ShowtimeGrid/ShowtimeGrid';
+import { scheduleData } from '../Schedule/data/fakeData';
 import './MovieDetail.css'; 
 
 const MovieDetail = () => {
     const { id } = useParams(); // Lấy ID từ URL (ví dụ: /movie/1 -> id = 1)
 
-    // Dữ liệu giả mô phỏng 1 bộ phim chi tiết
-    const movie = {
-        id: id,
-        name: "ĐỒI CÂM LẶNG: ÁC MỘNG TRONG SƯƠNG",
-        originalName: "Return to Silent Hill",
-        poster: "https://upload.wikimedia.org/wikipedia/vi/8/87/Mai_2024_poster.jpg", // Tạm dùng ảnh cũ
-        banner: "https://homepage.momocdn.net/img/momo-upload-api-240412154407-889899.jpg", // Ảnh banner ngang
-        genre: "Kinh Dị, Tâm Lý",
-        duration: 106,
-        releaseDate: "22/01/2026",
-        director: "Christophe Gans",
-        cast: "Radha Mitchell, Laurie Holden, Sean Bean",
-        ageRating: "T18",
-        rating: 7.0,
-        plot: "Sau khi nhận được lá thư bí ẩn từ người bạn gái đã mất, James Sunderland cảm thấy bị thu hút bởi thị trấn Silent Hill và quyết định đặt chân đến đó. Một thị trấn từng quen thuộc nay đã chìm trong bóng tối..."
-    };
+    // State cho thanh Chọn Ngày (Vẫn xài data ảo ngầm định)
+    const [activeTab, setActiveTab] = useState(scheduleData[0]?.day.id || 'tab-id-1');
+    const days = scheduleData.map(item => item.day);
+    const activeDayData = scheduleData.find(item => item.day.id === activeTab);
+    const showtimes = activeDayData?.movies[0]?.showtimes || [];
 
-    // Dữ liệu giả cho Sidebar
-    const relatedMovies = [
-        { id: 2, name: "BỐ GIÀ TRỞ LẠI", poster: "https://upload.wikimedia.org/wikipedia/vi/8/87/Mai_2024_poster.jpg", genre: "Hành động", duration: 120, status: 'now_showing' },
-        { id: 3, name: "TIỂU YÊU QUÁI", poster: "https://upload.wikimedia.org/wikipedia/vi/8/87/Mai_2024_poster.jpg", genre: "Hoạt Hình", duration: 90, status: 'now_showing' }
-    ];
+    // State lưu dữ liệu phim thật
+    const [movie, setMovie] = useState(null);
+    const [relatedMovies, setRelatedMovies] = useState([]);
+
+    useEffect(() => {
+        // 1. Fetch dữ liệu chi tiết của phim dựa vào ID từ đường dẫn
+        fetch(`http://localhost:8080/api/movies/${id}`)
+            .then(res => res.json())
+            .then(data => setMovie(data))
+            .catch(err => console.error("Lỗi tải phim: ", err));
+
+        // 2. Fetch danh sách tất cả các phim để làm Sidebar (Gợi ý phim khác)
+        fetch(`http://localhost:8080/api/movies`)
+            .then(res => res.json())
+            .then(data => {
+                // Chỉ lấy phim "Đang chiếu" & Khác với phim đang xem hiện tại
+                const filtered = data.filter(m => m.status === 'showing' && m.id.toString() !== id.toString());
+                setRelatedMovies(filtered.slice(0, 3)); // Lấy tối đa 3 phim
+            })
+            .catch(err => console.error("Lỗi tải danh sách phim: ", err));
+    }, [id]); // Đặt dependency là id để mỗi khi bấm qua phim khác, nó sẽ fetch lại data!
+
+    // Nếu dữ liệu chưa về kịp, hiển thị dòng Loading
+    if (!movie) {
+        return <div style={{textAlign: 'center', padding: '100px', color: '#fff'}}>Đang tải dữ liệu phim...</div>;
+    }
 
     return (
         <div className="movie-detail-container">
@@ -51,7 +64,7 @@ const MovieDetail = () => {
                         </h1>
                         <div className="meta-info">
                             <p><span className="meta-label">Đạo diễn:</span> {movie.director}</p>
-                            <p><span className="meta-label">Diễn viên:</span> {movie.cast}</p>
+                            <p><span className="meta-label">Diễn viên:</span> {movie.castMembers}</p>
                             <p><span className="meta-label">Thể loại:</span> {movie.genre}</p>
                             <p><span className="meta-label">Khởi chiếu:</span> {movie.releaseDate}</p>
                             <p><span className="meta-label">Thời lượng:</span> {movie.duration} phút</p>
@@ -66,11 +79,26 @@ const MovieDetail = () => {
                     <p>{movie.plot}</p>
                 </div>
 
-                {/* 4. Lịch chiếu (Sẽ làm ở bước tiếp theo) */}
-                <div className="showtime-section" style={{marginTop: '40px', background: '#f9f9f9', padding: '20px'}}>
-                    <h3 className="section-title">LỊCH CHIẾU</h3>
-                    <p><i>(Phần chọn ngày giờ sẽ hiển thị ở đây...)</i></p>
-                </div>
+                {/* 4. Lịch chiếu */}
+                {movie.status === 'showing' ? (
+                    <div className="showtimes-container">
+                        <h3 className="section-title">LỊCH CHIẾU</h3>
+                        <DateSelector 
+                            days={days} 
+                            activeTab={activeTab} 
+                            onTabChange={setActiveTab} 
+                        />
+                        
+                        <ShowtimeGrid showtimes={showtimes} />
+                    </div>
+                ) : (
+                    <div className="showtimes-container">
+                        <h3 className="section-title">LỊCH CHIẾU</h3>
+                        <div style={{ textAlign: 'center', padding: '40px', background: '#F9FAFB', borderRadius: '12px', marginTop: '20px' }}>
+                            <p style={{ color: '#6B7280', fontSize: '16px', fontWeight: '500', margin: 0 }}>Hệ thống chưa mở bán vé cho phim này. Vui lòng quay lại sau!</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Cột Phải: Sidebar phim đang chiếu */}

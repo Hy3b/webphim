@@ -39,7 +39,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); /* Restored exact centering */
     width: 60px;
     height: 60px;
     background: rgba(255,255,255,0.8);
@@ -147,4 +147,11 @@
     .info-box {
         padding-top: 20px;
     }
+}
+
+/* Lịch chiếu Detail Styles */
+.showtimes-container {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #E5E7EB;
 }
