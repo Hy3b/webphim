@@ -1,7 +1,7 @@
 import React from 'react';
 import './BookingSummary.css';
 
-const BookingSummary = ({ movie, selectedSeats, totalPrice, onConfirm }) => {
+const BookingSummary = ({ movie, selectedSeats, totalPrice, onConfirm, isLoading, error }) => {
     return (
         <div className="booking-summary">
             <div className="summary-header">
@@ -47,12 +47,16 @@ const BookingSummary = ({ movie, selectedSeats, totalPrice, onConfirm }) => {
                 </div>
 
                 <button
-                    className="continue-btn"
-                    disabled={selectedSeats.length === 0}
+                    className={`continue-btn ${isLoading ? 'loading' : ''}`}
+                    disabled={selectedSeats.length === 0 || isLoading}
                     onClick={onConfirm}
                 >
-                    TIẾP TỤC
+                    {isLoading ? 'Đang xử lý...' : 'TIẾP TỤC'}
                 </button>
+
+                {error && (
+                    <p className="booking-error-msg">{error}</p>
+                )}
             </div>
         </div>
     );

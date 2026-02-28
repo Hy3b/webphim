@@ -133,6 +133,24 @@
     background-color: #43a047;
 }
 
+.confirm-payment-btn.polling {
+    background-color: #1976d2;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.confirm-payment-btn:disabled {
+    cursor: not-allowed;
+}
+
+.poll-hint {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+    font-style: italic;
+}
+
 .error-state {
     flex-direction: column;
     text-align: center;

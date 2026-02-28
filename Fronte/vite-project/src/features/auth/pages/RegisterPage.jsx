@@ -94,7 +94,7 @@ const RegisterPage = () => {
                                 className="toggle-pw"
                                 onClick={() => setShowPassword(!showPassword)}
                             >
-                                {showPassword ? '-.-' : '👁' }
+                                {showPassword ? '-.-' : '👁'}
                             </button>
                         </div>
                     </div>
@@ -111,8 +111,8 @@ const RegisterPage = () => {
                             required
                             style={{
                                 borderColor: passwordMatch ? '#2ecc71'
-                                           : passwordNotMatch ? '#e74c3c'
-                                           : undefined
+                                    : passwordNotMatch ? '#e74c3c'
+                                        : undefined
                             }}
                         />
                         {passwordNotMatch && (

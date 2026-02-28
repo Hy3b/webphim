@@ -8,6 +8,7 @@ import LichChieu from '../features/client/Schedule/LichChieu';
 import BookingPage from '../features/client/booking/BookingPage/BookingPage';
 import PaymentPage from '../features/client/payment/PaymentPage';
 import MovieDetail from '../features/client/movie/MovieDetail';
+import TicketPage from '../features/client/ticket/TicketPage';
 
 const AppRoutes = () => {
     return (
@@ -19,6 +20,7 @@ const AppRoutes = () => {
                 <Route path="lichchieu" element={<LichChieu />} />
                 <Route path="booking/:id" element={<BookingPage />} />
                 <Route path="payment" element={<PaymentPage />} />
+                <Route path="ticket" element={<TicketPage />} />
                 <Route path="movie/:id" element={<MovieDetail />} />
             </Route>
         </Routes>

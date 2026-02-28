@@ -106,3 +106,20 @@
     cursor: not-allowed;
     color: #90a4ae;
 }
+
+.continue-btn.loading {
+    background-color: #1565c0;
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.booking-error-msg {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: #d32f2f;
+    background: #fff3f3;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ffcdd2;
+}
