@@ -5,10 +5,10 @@ INSERT INTO users (username, password_hash, email, full_name, phone_number, role
 VALUES ('testuser', '$2a$10$dummyhash...', 'user@test.com', 'Test User', '0123456789', 'customer');
 
 -- 2. Create movies
-INSERT INTO movies (title, description, duration_minutes, poster_url, status, banner, genre, release_date, director, cast_members, age_rating, rating)
+INSERT INTO movies (title, description, duration_minutes, poster_url, status)
 VALUES 
-('Dune: Part Two', 'Paul Atreides unites with...', 166, 'https://example.com/dune2.jpg', 'showing', 'https://example.com/dune_banner.jpg', 'Hành động, Viễn tưởng', '2024-03-01', 'Denis Villeneuve', 'Timothée Chalamet, Zendaya', 'T13', 8.8),
-('Kung Fu Panda 4', 'Po must train a new warrior...', 94, 'https://example.com/kfp4.jpg', 'showing', 'https://example.com/kfp4_banner.jpg', 'Hoạt hình, Hài', '2024-03-08', 'Mike Mitchell', 'Jack Black, Awkwafina', 'P', 7.5);
+('Dune: Part Two', 'Paul Atreides unites with...', 166, 'https://example.com/dune2.jpg', 'showing'),
+('Kung Fu Panda 4', 'Po must train a new warrior...', 94, 'https://example.com/kfp4.jpg', 'showing');
 
 -- 3. Create a room
 INSERT INTO rooms (name, total_seats)

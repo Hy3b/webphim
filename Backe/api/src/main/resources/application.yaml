@@ -2,18 +2,23 @@ spring:
   application:
     name: api
   datasource:
-    url: jdbc:mysql://localhost:3306/Cinema_DB?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: 123456
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:Cinema_DB}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USER:root}
+    password: ${DB_PASS:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop # Xóa DB cũ và làm lại từ đầu để apply schema mới nhất
+      ddl-auto: create
     show-sql: true
     defer-datasource-initialization: true # Chạy file data.sql sau khi Hibernate tạo bảng xong
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
   sql:
     init:
       mode: always # Luôn chạy file data.sql khi khởi động
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:webphim_redis_pass}

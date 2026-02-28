@@ -1,11 +1,17 @@
 package team.api.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "movies")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Movie {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movie_id")
@@ -17,7 +23,7 @@ public class Movie {
     @Column(name = "description", columnDefinition = "TEXT")
     private String plot;
 
-    @Column(name = "duration_minutes")
+    @Column(name = "duration_minutes", nullable = false)
     private Integer duration;
 
     @Column(name = "poster_url", length = 255)
@@ -25,53 +31,29 @@ public class Movie {
 
     // Các trường tự do lưu tạm dạng nullable để frontend xài đủ data
     private String banner;
+
+    @Builder.Default
     private String genre = "Chưa cập nhật";
+
+    @Builder.Default
     private String releaseDate = "Chưa cập nhật";
+
     private String director;
+
     private String castMembers;
+
+    @Builder.Default
     private String ageRating = "P";
+
+    @Builder.Default
     private Double rating = 0.0;
 
-    @Column(length = 50)
-    private String status = "showing"; // 'showing' hoặc 'coming'
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(columnDefinition = "enum('showing', 'coming') default 'showing'")
+    private Status status = Status.showing;
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getPlot() { return plot; }
-    public void setPlot(String plot) { this.plot = plot; }
-
-    public Integer getDuration() { return duration; }
-    public void setDuration(Integer duration) { this.duration = duration; }
-
-    public String getPoster() { return poster; }
-    public void setPoster(String poster) { this.poster = poster; }
-
-    public String getBanner() { return banner; }
-    public void setBanner(String banner) { this.banner = banner; }
-
-    public String getGenre() { return genre; }
-    public void setGenre(String genre) { this.genre = genre; }
-
-    public String getReleaseDate() { return releaseDate; }
-    public void setReleaseDate(String releaseDate) { this.releaseDate = releaseDate; }
-
-    public String getDirector() { return director; }
-    public void setDirector(String director) { this.director = director; }
-
-    public String getCastMembers() { return castMembers; }
-    public void setCastMembers(String castMembers) { this.castMembers = castMembers; }
-
-    public String getAgeRating() { return ageRating; }
-    public void setAgeRating(String ageRating) { this.ageRating = ageRating; }
-
-    public Double getRating() { return rating; }
-    public void setRating(Double rating) { this.rating = rating; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public enum Status {
+        showing, coming
+    }
 }
