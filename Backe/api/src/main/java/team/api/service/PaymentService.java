@@ -45,7 +45,7 @@ public class PaymentService {
 
         Booking booking = bookingOpt.get();
 
-        if (!"pending".equals(booking.getStatus())) {
+        if (!Booking.Status.pending.equals(booking.getStatus())) {
             log.info("Booking '{}' đã ở trạng thái '{}', bỏ qua.", bookingId, booking.getStatus());
             return;
         }
@@ -54,7 +54,7 @@ public class PaymentService {
         int compareResult = request.getTransferAmount().compareTo(booking.getTotalAmount());
 
         if (compareResult >= 0) { // If amount is sufficient or overpaid
-            booking.setStatus("paid");
+            booking.setStatus(Booking.Status.paid);
             bookingRepository.save(booking);
 
             if (compareResult == 0) {
@@ -98,11 +98,11 @@ public class PaymentService {
         }
 
         Booking booking = bookingOpt.get();
-        boolean isPaid = "paid".equalsIgnoreCase(booking.getStatus());
+        boolean isPaid = Booking.Status.paid.equals(booking.getStatus());
 
         return BookingStatusResponse.builder()
                 .bookingId(bookingId)
-                .status(booking.getStatus())
+                .status(booking.getStatus().name())
                 .paid(isPaid)
                 .build();
     }

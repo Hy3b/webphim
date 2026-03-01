@@ -7,39 +7,36 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Booking {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
     private Integer bookingId;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_booking_user"))
+    private User user;
 
-    @Column(name = "showtime_id", nullable = false)
-    private Integer showtimeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "showtime_id", nullable = false, foreignKey = @ForeignKey(name = "fk_booking_showtime"))
+    private Showtime showtime;
 
-    @Column(name = "booking_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "booking_date", insertable = false, updatable = false)
     private LocalDateTime bookingDate;
 
-    @Column(name = "total_amount", nullable = false)
+    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('pending','paid','cancelled') default 'pending'")
+    private Status status;
 
-    @PrePersist
-    protected void onCreate() {
-        if (bookingDate == null) {
-            bookingDate = LocalDateTime.now();
-        }
-        if (status == null) {
-            status = "pending";
-        }
+    public enum Status {
+        pending, paid, cancelled
     }
 }

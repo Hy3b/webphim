@@ -2,9 +2,9 @@ spring:
   application:
     name: api
   datasource:
-    url: jdbc:mysql://localhost:3306/Cinema_DB?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh
-    username: root
-    password: "123456" # <-- ĐIỀN MẬT KHẨU MYSQL CỦA BẠN VÀO ĐÂY (nếu có)
+    url: ${DB_URL:jdbc:mysql://localhost:3306/Cinema_DB?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh}
+    username: ${DB_USER:root}
+    password: ${DB_PASS:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -13,10 +13,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6380}
+    password: ${REDIS_PASSWORD:webphim-secret-redis}
 
 # Cấu hình tích hợp SePay
 sepay:
-  merchant-id: SP-TEST-DVG6A78A # Lấy ở bước 2 trên màn hình SePay
-  secret-key: spsk_test_4pAQ8JhbRHjD7jYqn9L6G5ApmcPiwdjz # Bấm vào nút copy (con mắt) ở ô Secret Key trên SePay dán vào đây
-  bank-account: 0398800105 # Số tài khoản ngân hàng của bạn
-  bank-name: MB # Tên viết tắt ngân hàng (VCB, MB, ACB, BIDV...)
+  merchant-id: SP-TEST-DVG6A78A
+  secret-key: spsk_test_4pAQ8JhbRHjD7jYqn9L6G5ApmcPiwdjz
+  bank-account: 0398800105
+  bank-name: MB
