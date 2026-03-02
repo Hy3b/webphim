@@ -9,7 +9,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.api.dto.request.BookingRequest;
-import team.api.dto.response.BookingResponse;
+import team.api.dto.response.CreateBookingResponse;
 import team.api.entity.*;
 import team.api.repository.*;
 
@@ -31,14 +31,15 @@ public class BookingService {
     private final BookingSeatRepository bookingSeatRepository;
 
     @Transactional
-    public BookingResponse bookSeats(BookingRequest request) {
+    public CreateBookingResponse bookSeats(BookingRequest request) {
         // 1. Validate basic info
         Showtime showtime = showtimeRepository.findById(request.getShowtimeId())
                 .orElseThrow(() -> new RuntimeException("Showtime not found"));
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Seat> seatsToBook = seatRepository.findAllById(request.getSeatIds());
+        List<Seat> seatsToBook = seatRepository.findByRoomIdAndSeatKeyIn(showtime.getRoom().getRoomId(),
+                request.getSeatIds());
         if (seatsToBook.size() != request.getSeatIds().size()) {
             throw new RuntimeException("Some seats are invalid");
         }
@@ -115,9 +116,14 @@ public class BookingService {
             }
             bookingSeatRepository.saveAll(bookingSeats);
 
-            return BookingResponse.builder()
+            String orderCode = "DH" + booking.getBookingId();
+            log.info("✅ Tạo booking mới qua Redisson: bookingId={}, orderCode={}, amount={}",
+                    booking.getBookingId(), orderCode, booking.getTotalAmount());
+
+            return CreateBookingResponse.builder()
                     .bookingId(booking.getBookingId())
-                    .message("Seats successfully locked for 10 minutes awaiting payment.")
+                    .orderCode(orderCode)
+                    .status(booking.getStatus().name())
                     .build();
 
         } catch (InterruptedException e) {

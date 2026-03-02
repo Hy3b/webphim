@@ -1,10 +1,72 @@
-import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import './PaymentPage.css';
+
+const SEPAY_ACCOUNT = "0398800105";
+const SEPAY_BANK = "MB";
+const POLL_INTERVAL_MS = 3000; // kiểm tra mỗi 3 giây
 
 const PaymentPage = () => {
     const location = useLocation();
-    const { movie, selectedSeats, totalPrice } = location.state || {};
+    const navigate = useNavigate();
+    const { movie, selectedSeats, totalPrice, bookingId, orderCode: stateOrderCode } = location.state || {};
+
+    // Dùng orderCode từ state (do BookingService tạo = "DH{id}") hoặc fallback random
+    const orderCode = stateOrderCode ?? `DONHANG_${Math.floor(Math.random() * 100000)}`;
+
+    // bookingId thật từ DB (được trả về sau POST /api/bookings)
+    const resolvedBookingId = bookingId ?? null;
+
+    const qrUrl = `https://qr.sepay.vn/img?acc=${SEPAY_ACCOUNT}&bank=${SEPAY_BANK}&amount=${totalPrice}&des=${orderCode}`;
+
+    const [pollStatus, setPollStatus] = useState('idle');   // idle | polling | paid | error
+    const [dotCount, setDotCount] = useState(0);
+    const intervalRef = useRef(null);
+    const dotRef = useRef(null);
+
+    // Animation cho "Đang kiểm tra..."
+    useEffect(() => {
+        if (pollStatus === 'polling') {
+            dotRef.current = setInterval(() => setDotCount(d => (d + 1) % 4), 500);
+        } else {
+            clearInterval(dotRef.current);
+        }
+        return () => clearInterval(dotRef.current);
+    }, [pollStatus]);
+
+    // Polling: gọi API mỗi 3 giây
+    const startPolling = () => {
+        if (intervalRef.current) return;
+        setPollStatus('polling');
+
+        intervalRef.current = setInterval(async () => {
+            try {
+                const res = await fetch(`http://localhost:8080/api/payment/status/${resolvedBookingId}`); if (!res.ok) throw new Error('Lỗi kết nối backend');
+                const data = await res.json();
+
+                if (data.paid) {
+                    clearInterval(intervalRef.current);
+                    setPollStatus('paid');
+
+                    navigate('/ticket', {
+                        state: {
+                            movie,
+                            selectedSeats,
+                            totalPrice,
+                            orderCode,
+                            bookingId: resolvedBookingId,
+                            paidAt: new Date().toISOString()
+                        }
+                    });
+                }
+            } catch {
+                // Giữ polling, không dừng vì lỗi mạng tạm thời
+            }
+        }, POLL_INTERVAL_MS);
+    };
+
+    // Dọn interval khi unmount
+    useEffect(() => () => clearInterval(intervalRef.current), []);
 
     if (!location.state) {
         return (
@@ -20,27 +82,24 @@ const PaymentPage = () => {
             <div className="payment-container">
                 <div className="payment-header">
                     <h2>Thanh Toán Đơn Hàng</h2>
-                    <p>Vui lòng quét mã QR bên dưới để hoàn tất thanh toán</p>
+                    <p>Quét mã QR rồi bấm <strong>"Tôi đã thanh toán"</strong> để hệ thống xác nhận tự động</p>
                 </div>
 
                 <div className="payment-content">
+                    {/* QR Code */}
                     <div className="qr-section">
                         <div className="qr-frame">
-                            {/* PLACEHOLDER FOR PAYOS QR CODE */}
-                            {/* Bạn có thể thay đổi src bên dưới bằng URL từ API PayOS */}
-                            <img
-                                src="https://via.placeholder.com/300x300?text=QR+Code+PayOS"
-                                alt="Mã QR Thanh Toán"
-                                className="qr-image"
-                            />
-                            {/* END PLACEHOLDER */}
+                            <img src={qrUrl} alt="Mã QR Thanh Toán SePay" className="qr-image" />
                         </div>
                         <div className="payment-instructions">
                             <p>Mở ứng dụng ngân hàng để quét mã QR</p>
-                            <p className="timer-note">Mã QR sẽ hết hạn sau 10 phút</p>
+                            <p className="timer-note">
+                                Nội dung chuyển khoản: <strong>{orderCode}</strong>
+                            </p>
                         </div>
                     </div>
 
+                    {/* Chi tiết đơn hàng */}
                     <div className="order-details">
                         <h3>Thông tin vé</h3>
                         <div className="detail-row">
@@ -69,9 +128,25 @@ const PaymentPage = () => {
                             <span className="total-amount">{totalPrice.toLocaleString()}đ</span>
                         </div>
 
-                        <button className="confirm-payment-btn" onClick={() => alert('Chức năng kiểm tra thanh toán sẽ được tích hợp sau.')}>
-                            Tôi đã thanh toán
+                        {/* Nút kiểm tra thanh toán */}
+                        <button
+                            id="confirm-payment-btn"
+                            className={`confirm-payment-btn ${pollStatus === 'polling' ? 'polling' : ''}`}
+                            onClick={startPolling}
+                            disabled={pollStatus === 'polling' || pollStatus === 'paid'}
+                        >
+                            {pollStatus === 'polling'
+                                ? `Đang xác nhận${'.'.repeat(dotCount)}`
+                                : pollStatus === 'paid'
+                                    ? '✅ Đã thanh toán!'
+                                    : 'Tôi đã thanh toán'}
                         </button>
+
+                        {pollStatus === 'polling' && (
+                            <p className="poll-hint">
+                                Hệ thống đang tự động kiểm tra mỗi 3 giây. Vui lòng chờ...
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

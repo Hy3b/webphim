@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.api.dto.request.BookingRequest;
-import team.api.dto.response.BookingResponse;
+import team.api.dto.response.CreateBookingResponse;
 import team.api.service.BookingService;
 
 @RestController
@@ -18,9 +18,9 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity<?> bookSeats(@RequestBody BookingRequest request) {
+    public ResponseEntity<?> createBooking(@RequestBody BookingRequest request) {
         try {
-            BookingResponse response = bookingService.bookSeats(request);
+            CreateBookingResponse response = bookingService.bookSeats(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

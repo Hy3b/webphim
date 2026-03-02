@@ -34,5 +34,5 @@ VALUES
 -- 6. Create showtimes
 INSERT INTO showtimes (movie_id, room_id, start_time, base_price)
 VALUES 
-(1, 1, DATE_ADD(NOW(), INTERVAL 1 DAY), 80000.00), -- Tomorrow
-(2, 1, DATE_ADD(NOW(), INTERVAL 2 DAY), 75000.00); -- The day after tomorrow
+(1, 1, DATE_ADD(NOW(), INTERVAL 1 DAY), 50000.00), -- Tomorrow
+(2, 1, DATE_ADD(NOW(), INTERVAL 2 DAY), 50000.00); -- The day after tomorrow

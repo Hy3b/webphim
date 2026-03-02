@@ -6,6 +6,7 @@ import './BookingPage.css';
 
 const BookingPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [seats, setSeats] = useState([]);
     const [movie, setMovie] = useState(null);
@@ -84,17 +85,55 @@ const BookingPage = () => {
         }, 0);
     };
 
-    const navigate = useNavigate();
+    const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+    const [bookingError, setBookingError] = useState(null);
 
-    const handleConfirmBooking = () => {
-        // Navigate to payment page with booking details
-        navigate('/payment', {
-            state: {
-                movie: movie,
-                selectedSeats: selectedSeats,
-                totalPrice: calculateTotal()
+    const handleConfirmBooking = async () => {
+        if (selectedSeats.length === 0) return;
+        setIsCreatingBooking(true);
+        setBookingError(null);
+
+        const payload = {
+            userId: 1,
+            showtimeId: Number(id),
+            totalAmount: calculateTotal(),
+            seatIds: selectedSeats
+        };
+        console.log('📤 Gửi booking request:', payload);
+
+        try {
+            const res = await fetch('http://localhost:8080/api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            console.log('📥 Response status:', res.status);
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('❌ Backend trả lỗi:', res.status, errorText);
+                throw new Error(`Server lỗi ${res.status}: ${errorText}`);
             }
-        });
+
+            const data = await res.json();
+            console.log('✅ Booking thành công:', data);
+
+            navigate('/payment', {
+                state: {
+                    movie,
+                    selectedSeats,
+                    totalPrice: calculateTotal(),
+                    bookingId: data.bookingId,
+                    orderCode: data.orderCode
+                }
+            });
+        } catch (err) {
+            console.error('❌ Lỗi đặt vé:', err.message);
+            setBookingError(`Đặt vé thất bại: ${err.message}`);
+        } finally {
+            setIsCreatingBooking(false);
+        }
     };
 
     if (!movie) return <div className="loading-screen">Loading...</div>;
@@ -150,6 +189,8 @@ const BookingPage = () => {
                         selectedSeats={selectedSeats}
                         totalPrice={calculateTotal()}
                         onConfirm={handleConfirmBooking}
+                        isLoading={isCreatingBooking}
+                        error={bookingError}
                     />
                 </div>
             </div>

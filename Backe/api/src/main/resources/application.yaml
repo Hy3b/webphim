@@ -20,5 +20,12 @@ spring:
       mode: always # Luôn chạy file data.sql khi khởi động
   redis:
     host: ${REDIS_HOST:127.0.0.1}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:webphim_redis_pass}
+    port: ${REDIS_PORT:6380}
+    password: ${REDIS_PASSWORD:webphim-secret-redis}
+
+# Cấu hình tích hợp SePay
+sepay:
+  merchant-id: SP-TEST-DVG6A78A
+  secret-key: spsk_test_4pAQ8JhbRHjD7jYqn9L6G5ApmcPiwdjz
+  bank-account: 0398800105
+  bank-name: MB

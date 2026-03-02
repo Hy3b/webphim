@@ -13,4 +13,7 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
 
     @Query("SELECT s FROM Seat s JOIN FETCH s.seatType WHERE s.room.roomId = :roomId")
     List<Seat> findByRoomIdWithSeatType(@Param("roomId") Integer roomId);
+
+    @Query("SELECT s FROM Seat s WHERE s.room.roomId = :roomId AND CONCAT(s.rowName, s.seatNumber) IN :seatKeys")
+    List<Seat> findByRoomIdAndSeatKeyIn(@Param("roomId") Integer roomId, @Param("seatKeys") List<String> seatKeys);
 }
