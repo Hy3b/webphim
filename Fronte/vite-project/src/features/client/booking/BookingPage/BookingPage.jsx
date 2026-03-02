@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import SeatMap from '../SeatMap/SeatMap';
 import BookingSummary from '../BookingSummary/BookingSummary';
@@ -11,6 +11,9 @@ const BookingPage = () => {
     const [seats, setSeats] = useState([]);
     const [movie, setMovie] = useState(null);
     const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
+
+    const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+    const [bookingError, setBookingError] = useState(null);
 
     // Countdown Timer Logic
     useEffect(() => {
@@ -26,14 +29,57 @@ const BookingPage = () => {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
-    // Mock data initialization
+    // Hàm gọi API lấy ghế hoặc fallback mock data
+    const fetchSeats = useCallback(async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/showtimes/${id}/seats`);
+            if (response.ok) {
+                const data = await response.json();
+                const mappedSeats = data.map(seat => ({
+                    id: `${seat.rowName}${seat.seatNumber}`, // Backend nhận List<String> dạng "A1", "B2"
+                    row: seat.rowName,
+                    number: seat.seatNumber.toString().padStart(2, '0'),
+                    status: seat.status === 'AVAILABLE' ? 'available' : 'booked',
+                    price: seat.seatTypeName === 'VIP' ? 70000 : 50000, // VIP 70k, Thường 50k
+                    type: seat.seatTypeName.toLowerCase() === 'vip' ? 'vip' : 'standard'
+                }));
+                // Tốt nhất nếu data đầy đủ thì gán, không thì lấy map
+                if (mappedSeats.length > 0) {
+                    setSeats(mappedSeats);
+                    return;
+                }
+            }
+            throw new Error("Không có data cấu trúc chuẩn");
+        } catch (error) {
+            console.error("Lỗi tải ghế/Server chưa chuẩn bị API, dùng mock data:", error);
+            const mockSeats = [];
+            const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+            rows.forEach((row, rowIndex) => {
+                for (let i = 1; i <= 14; i++) {
+                    const isBooked = Math.random() < 0.1;
+                    const price = rowIndex > 5 ? 70000 : 50000;
+
+                    mockSeats.push({
+                        id: `${row}${i}`,
+                        row: row,
+                        number: i.toString().padStart(2, '0'),
+                        status: isBooked ? 'booked' : 'available',
+                        price: price,
+                        type: 'standard'
+                    });
+                }
+            });
+            setSeats(mockSeats);
+        }
+    }, [id]);
+
     useEffect(() => {
-        // Enhanced Mock movie data
         setMovie({
             id: id,
             title: "Yêu quái vùng Yên Lãng",
             originalTitle: "Yeu Quai Vung Yen Lang",
-            poster: "https://image.tmdb.org/t/p/w600_and_h900_face/5Xtwoju2GOlgXRkEtPO2BA5WNTw.jpg", // Valid placeholder URL from BHD or similar
+            poster: "https://image.tmdb.org/t/p/w600_and_h900_face/5Xtwoju2GOlgXRkEtPO2BA5WNTw.jpg",
             showtime: "23:00",
             showDate: "26/01/2026",
             theater: "Beta TRMall Phú Quốc",
@@ -44,31 +90,13 @@ const BookingPage = () => {
             ageRating: "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên"
         });
 
-        // Mock seats data (Rows A-H, 14 seats per row roughly to create a grid)
-        const mockSeats = [];
-        const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-
-        rows.forEach((row, rowIndex) => {
-            for (let i = 1; i <= 14; i++) {
-                // Randomly mark some seats as booked
-                const isBooked = Math.random() < 0.1;
-                // Simple price logic: Back rows expensive
-                const price = rowIndex > 5 ? 70000 : 50000;
-
-                mockSeats.push({
-                    id: `${row}${i}`,
-                    row: row,
-                    number: i.toString().padStart(2, '0'), // 01, 02...
-                    status: isBooked ? 'booked' : 'available',
-                    price: price,
-                    type: 'standard' // standard or vip
-                });
-            }
-        });
-        setSeats(mockSeats);
-    }, [id]);
+        // 1. NGAY LÚC MỞ TRANG: GỌI API BẢN ĐỒ GHẾ
+        fetchSeats();
+    }, [id, fetchSeats]);
 
     const handleSeatSelect = (seat) => {
+        if (seat.status === 'booked') return;
+        
         setSelectedSeats(prev => {
             if (prev.includes(seat.id)) {
                 return prev.filter(s => s !== seat.id);
@@ -85,21 +113,21 @@ const BookingPage = () => {
         }, 0);
     };
 
-    const [isCreatingBooking, setIsCreatingBooking] = useState(false);
-    const [bookingError, setBookingError] = useState(null);
-
+    // 3. HÀM XÁC NHẬN ĐẶT GHẾ (GỌI POST REQUEST REDIS LOCK)
     const handleConfirmBooking = async () => {
-        if (selectedSeats.length === 0) return;
+        if (selectedSeats.length === 0) {
+            setBookingError("Vui lòng chọn ít nhất 1 ghế!");
+            return;
+        }
         setIsCreatingBooking(true);
         setBookingError(null);
 
         const payload = {
-            userId: 1,
-            showtimeId: Number(id),
-            totalAmount: calculateTotal(),
-            seatIds: selectedSeats
+            userId: 1, // Fix cứng user 1 trước
+            showtimeId: parseInt(id),
+            seatIds: selectedSeats,
+            totalAmount: calculateTotal()
         };
-        console.log('📤 Gửi booking request:', payload);
 
         try {
             const res = await fetch('http://localhost:8080/api/bookings', {
@@ -108,29 +136,32 @@ const BookingPage = () => {
                 body: JSON.stringify(payload)
             });
 
-            console.log('📥 Response status:', res.status);
-
+            // Nếu Backend trả về 400 (Redis block vì khách khác vừa hẫng tay trên)
             if (!res.ok) {
                 const errorText = await res.text();
-                console.error('❌ Backend trả lỗi:', res.status, errorText);
-                throw new Error(`Server lỗi ${res.status}: ${errorText}`);
+                throw new Error(errorText || "Ghế đã bị người khác khóa. Vui lòng chọn ghế khác!");
             }
 
             const data = await res.json();
-            console.log('✅ Booking thành công:', data);
-
+            
+            // THÀNH CÔNG: Chuyển thẳng sang trang Payment
             navigate('/payment', {
                 state: {
                     movie,
                     selectedSeats,
                     totalPrice: calculateTotal(),
-                    bookingId: data.bookingId,
-                    orderCode: data.orderCode
+                    bookingInfo: data,
+                    bookingId: data?.bookingId || Math.floor(Math.random() * 100000),
+                    orderCode: data?.orderCode || `DH${Date.now()}`
                 }
             });
         } catch (err) {
-            console.error('❌ Lỗi đặt vé:', err.message);
-            setBookingError(`Đặt vé thất bại: ${err.message}`);
+            // XỬ LÝ LỖI REDIS QUĂNG RA VÀ HIỆN UI
+            setBookingError(err.message);
+            // Xoá trắng các ghế đang chọn hiện tại bắt người dùng chọn lại
+            setSelectedSeats([]);
+            // Cập nhật lại sơ đồ ghế xem đứa nào vừa lấy mất
+            await fetchSeats();
         } finally {
             setIsCreatingBooking(false);
         }
@@ -152,6 +183,9 @@ const BookingPage = () => {
 
             <div className="booking-main-layout">
                 <div className="seat-selection-area">
+                    {/* Hiển thị lỗi nếu có (Blocker màu đỏ) */}
+                    {bookingError && <div className="error-banner" style={{ background: '#ffebee', color: '#c62828', padding: '15px', borderRadius: '4px', marginBottom: '15px' }}>{bookingError}</div>}
+                    
                     <SeatMap
                         seats={seats}
                         selectedSeats={selectedSeats}
@@ -159,9 +193,7 @@ const BookingPage = () => {
                     />
 
                     <div className="bottom-bar-info">
-                        <div className="legend-group">
-                            {/* Legend moved to SeatMap or kept here, let's keep it simple here or handled in SeatMap */}
-                        </div>
+                        <div className="legend-group"></div>
                         <div className="total-time-info">
                             <div className="info-block">
                                 <span className="label">Ghế thường</span>

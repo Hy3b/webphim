@@ -9,7 +9,15 @@ const POLL_INTERVAL_MS = 3000; // kiểm tra mỗi 3 giây
 const PaymentPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { movie, selectedSeats, totalPrice, bookingId, orderCode: stateOrderCode } = location.state || {};
+    const { movie, selectedSeats, totalPrice, bookingId, orderCode: stateOrderCode, bookingInfo } = location.state || {};
+
+    // Bảo vệ route như hướng dẫn: Nếu không có state -> Đuổi về trang chủ
+    useEffect(() => {
+        if (!location.state) {
+            alert("Bạn chưa chọn ghế nào!");
+            navigate("/");
+        }
+    }, [location.state, navigate]);
 
     // Dùng orderCode từ state (do BookingService tạo = "DH{id}") hoặc fallback random
     const orderCode = stateOrderCode ?? `DONHANG_${Math.floor(Math.random() * 100000)}`;
@@ -41,7 +49,8 @@ const PaymentPage = () => {
 
         intervalRef.current = setInterval(async () => {
             try {
-                const res = await fetch(`http://localhost:8080/api/payment/status/${resolvedBookingId}`); if (!res.ok) throw new Error('Lỗi kết nối backend');
+                const res = await fetch(`http://localhost:8080/api/payment/status/${resolvedBookingId}`);
+                if (!res.ok) throw new Error('Lỗi kết nối backend');
                 const data = await res.json();
 
                 if (data.paid) {
@@ -68,14 +77,7 @@ const PaymentPage = () => {
     // Dọn interval khi unmount
     useEffect(() => () => clearInterval(intervalRef.current), []);
 
-    if (!location.state) {
-        return (
-            <div className="payment-page error-state">
-                <h2>Không tìm thấy thông tin đặt vé</h2>
-                <Link to="/" className="back-btn">Quay về trang chủ</Link>
-            </div>
-        );
-    }
+    if (!location.state) return null; // Ẩn giao diện trong lúc bị đuổi về
 
     return (
         <div className="payment-page">

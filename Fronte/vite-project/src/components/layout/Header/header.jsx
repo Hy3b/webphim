@@ -22,18 +22,13 @@ export default function Header() {
             <header className="main-header">
                 <div className="container main-header-content">
                     <div className="logo">
-<<<<<<< HEAD
                         <Link to="/" onClick={() => setActiveTab('')}> {/* Về trang chủ thì reset active */}
-=======
-                        <Link to="/">
->>>>>>> 403e9c32baebf487cb1a25a04af81606540e268a
                             <h1 className="logo-text">MY<span className="logo-highlight">CINEMA</span></h1>
                         </Link>
                     </div>
 
                     <nav className="main-nav">
                         <ul>
-<<<<<<< HEAD
                             {/* 3. Sửa lại logic active cho từng mục */}
                             <li>
                                 <Link to="/lichchieu" 
@@ -70,13 +65,6 @@ export default function Header() {
                                     THÀNH VIÊN
                                 </Link>
                             </li>
-=======
-                            <li><Link to="/">LỊCH CHIẾU</Link></li>
-                            <li><Link to="/">PHIM</Link></li>
-                            <li><Link to="/">GIÁ VÉ</Link></li>
-                            <li><Link to="/">NHƯỢNG QUYỀN</Link></li>
-                            <li><Link to="/">THÀNH VIÊN</Link></li>
->>>>>>> 403e9c32baebf487cb1a25a04af81606540e268a
                         </ul>
                     </nav>
                 </div>
