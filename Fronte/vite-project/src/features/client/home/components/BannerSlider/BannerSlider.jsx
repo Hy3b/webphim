@@ -2,18 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './BannerSlider.css';
 
 const BannerSlider = ({ movies }) => {
-    // Chỉ lấy những phim ĐANG CHIẾU để làm Slide
-    const trendingMovies = movies.filter(m => m.status === 'showing').slice(0, 5); // Lấy tối đa 5 phim
-    
+    const trendingMovies = movies.filter(m => m.status === 'showing').slice(0, 5);
     const [currentIndex, setCurrentIndex] = useState(0);
-
-    // Tự động chuyển slide sau 5s
-    useEffect(() => {
-        const interval = setInterval(() => {
-            nextSlide();
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [currentIndex]);
 
     const nextSlide = () => {
         setCurrentIndex((prevIndex) => 
@@ -26,6 +16,13 @@ const BannerSlider = ({ movies }) => {
             prevIndex === 0 ? trendingMovies.length - 1 : prevIndex - 1
         );
     };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            nextSlide();
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [currentIndex]);
 
     if (trendingMovies.length === 0) return null;
 

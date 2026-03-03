@@ -1,4 +1,4 @@
-package team.api.security;
+package team.api.repository;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

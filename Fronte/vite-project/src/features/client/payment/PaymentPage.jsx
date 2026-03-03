@@ -9,7 +9,7 @@ const POLL_INTERVAL_MS = 3000; // kiểm tra mỗi 3 giây
 const PaymentPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { movie, selectedSeats, totalPrice, bookingId, orderCode: stateOrderCode, bookingInfo } = location.state || {};
+    const { movie, selectedSeats, totalPrice, bookingId, orderCode: stateOrderCode } = location.state || {};
 
     // Bảo vệ route như hướng dẫn: Nếu không có state -> Đuổi về trang chủ
     useEffect(() => {

@@ -18,26 +18,47 @@ const MovieDetail = () => {
     // State lưu dữ liệu phim thật
     const [movie, setMovie] = useState(null);
     const [relatedMovies, setRelatedMovies] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // 1. Fetch dữ liệu chi tiết của phim dựa vào ID từ đường dẫn
         fetch(`http://localhost:8080/api/movies/${id}`)
-            .then(res => res.json())
-            .then(data => setMovie(data))
-            .catch(err => console.error("Lỗi tải phim: ", err));
-
-        // 2. Fetch danh sách tất cả các phim để làm Sidebar (Gợi ý phim khác)
-        fetch(`http://localhost:8080/api/movies`)
-            .then(res => res.json())
-            .then(data => {
-                // Chỉ lấy phim "Đang chiếu" & Khác với phim đang xem hiện tại
-                const filtered = data.filter(m => m.status === 'showing' && m.id.toString() !== id.toString());
-                setRelatedMovies(filtered.slice(0, 3)); // Lấy tối đa 3 phim
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                return res.json();
             })
-            .catch(err => console.error("Lỗi tải danh sách phim: ", err));
+            .then(data => {
+                setMovie(data);
+                setError(null);
+            })
+            .catch(err => {
+                console.error("Lỗi tải phim: ", err);
+                setMovie(null);
+                setError("Không thể tải chi tiết phim. Vui lòng thử lại sau.");
+            });
+
+        fetch(`http://localhost:8080/api/movies`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                const list = Array.isArray(data) ? data : [];
+                const filtered = list.filter(m => m.status === 'showing' && m.id.toString() !== id.toString());
+                setRelatedMovies(filtered.slice(0, 3));
+            })
+            .catch(err => {
+                console.error("Lỗi tải danh sách phim: ", err);
+                setRelatedMovies([]);
+            });
     }, [id]); // Đặt dependency là id để mỗi khi bấm qua phim khác, nó sẽ fetch lại data!
 
-    // Nếu dữ liệu chưa về kịp, hiển thị dòng Loading
+    if (error) {
+        return <div style={{textAlign: 'center', padding: '100px', color: '#fff'}}>{error}</div>;
+    }
     if (!movie) {
         return <div style={{textAlign: 'center', padding: '100px', color: '#fff'}}>Đang tải dữ liệu phim...</div>;
     }

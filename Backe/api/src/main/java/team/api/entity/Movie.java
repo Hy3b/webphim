@@ -3,6 +3,8 @@ package team.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "movies")
 @Getter
@@ -35,8 +37,8 @@ public class Movie {
     @Builder.Default
     private String genre = "Chưa cập nhật";
 
-    @Builder.Default
-    private String releaseDate = "Chưa cập nhật";
+    @Column(name = "release_date")
+    private LocalDate releaseDate;
 
     private String director;
 

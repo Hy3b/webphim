@@ -1,4 +1,4 @@
-package team.api.security;
+package team.api.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

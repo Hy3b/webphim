@@ -17,8 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import team.api.security.CustomUserDetailsService;
-import team.api.security.JwtAuthenticationFilter;
+import team.api.repository.CustomUserDetailsService;
+import team.api.repository.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -37,6 +37,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/movies/**").permitAll()
+                        .requestMatchers("/api/showtimes/**").permitAll()
+                        .requestMatchers("/api/rooms/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions
@@ -53,7 +56,8 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
-        configuration.addAllowedOriginPattern("*"); // Cho phép tất cả các domain test
+        configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin("http://127.0.0.1:5173");
         configuration.addAllowedMethod("*"); // Cho phép tất cả các method (GET, POST, v.v.)
         configuration.addAllowedHeader("*"); // Cho phép tất cả các header
         configuration.setAllowCredentials(true);

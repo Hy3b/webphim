@@ -4,29 +4,42 @@ import './HomePage.css';
 import BannerSlider from './components/BannerSlider/BannerSlider.jsx'
 
 const HomePage = () => {
-    // 1. Dữ liệu từ cơ sở dữ liệu (Database Data)
     const [moviesData, setMoviesData] = useState([]);
+    const [error, setError] = useState(null);
     
-    // Gọi API Node/Java để lấy danh sách phim thực tế
     useEffect(() => {
         fetch('http://localhost:8080/api/movies')
-            .then(res => res.json())
-            .then(data => {
-                setMoviesData(data); // Cập nhật state khi tải xong
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                return res.json();
             })
-            .catch(err => console.error("Lỗi khi tải phim từ hệ thống: ", err));
+            .then(data => {
+                setMoviesData(Array.isArray(data) ? data : []);
+                setError(null);
+            })
+            .catch(err => {
+                console.error("Lỗi khi tải phim từ hệ thống: ", err);
+                setMoviesData([]);
+                setError("Không thể tải danh sách phim. Vui lòng thử lại sau.");
+            });
     }, []);
 
-    // 2. Tab State: Quản lý xem đang chọn Tab nào
     const [activeTab, setActiveTab] = useState('showing');
 
-    // 3. Lọc danh sách phim theo Tab đang chọn
-    const displayedMovies = moviesData.filter(movie => movie.status === activeTab);
+    const displayedMovies = Array.isArray(moviesData)
+        ? moviesData.filter(movie => movie.status === activeTab)
+        : [];
 
     return (
         <div className="homepage-container">
-            {/* Thanh Tab chuyển đổi */}
-            <BannerSlider movies={moviesData} />
+            <BannerSlider movies={Array.isArray(moviesData) ? moviesData : []} />
+            {error && (
+                <div style={{ color: '#fff', background: '#c0392b', padding: '10px 16px', margin: '12px 0', borderRadius: 6 }}>
+                    {error}
+                </div>
+            )}
             <div className="tab-navigation">
                 <button 
                     className={`tab-btn ${activeTab === 'showing' ? 'active' : ''}`}
@@ -42,7 +55,6 @@ const HomePage = () => {
                 </button>
             </div>
 
-            {/* Danh sách phim */}
             <div className="movie-grid">
                 {displayedMovies.map((movie) => (
                     <MovieCard key={movie.id} movie={movie} />

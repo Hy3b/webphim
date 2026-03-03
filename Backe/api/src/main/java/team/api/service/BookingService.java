@@ -93,7 +93,7 @@ public class BookingService {
 
             // Map cache to store TTL for release if payment isn't done in 10 minutes
             String ttlMapKey = "showtime:" + showtime.getShowtimeId() + ":ttl_seats";
-            RMapCache<String, Long> ttlSeats = redissonClient.getMapCache(ttlMapKey);
+            RMapCache<String, Integer> ttlSeats = redissonClient.getMapCache(ttlMapKey);
 
             for (Seat seat : seatsToBook) {
                 BigDecimal seatPrice = showtime.getBasePrice().add(seat.getSeatType().getSurcharge());

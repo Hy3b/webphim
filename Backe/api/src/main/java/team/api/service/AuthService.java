@@ -11,8 +11,8 @@ import team.api.dto.request.RegisterRequest;
 import team.api.dto.response.AuthResponse;
 import team.api.entity.User;
 import team.api.repository.UserRepository;
-import team.api.security.CustomUserDetails;
-import team.api.security.JwtUtil;
+import team.api.repository.CustomUserDetails;
+import team.api.repository.JwtUtil;
 
 @Service
 @RequiredArgsConstructor

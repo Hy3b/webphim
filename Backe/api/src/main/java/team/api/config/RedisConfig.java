@@ -16,7 +16,7 @@ public class RedisConfig {
     @Value("${spring.redis.port:6379}")
     private String redisPort;
 
-    @Value("${spring.redis.password}")
+    @Value("${spring.redis.password:}")
     private String redisPassword;
 
     @Bean(destroyMethod = "shutdown")
@@ -24,9 +24,12 @@ public class RedisConfig {
         Config config = new Config();
         String redisAddress = String.format("redis://%s:%s", redisHost, redisPort);
 
-        config.useSingleServer()
-                .setAddress(redisAddress)
-                .setPassword(redisPassword);
+        var single = config.useSingleServer()
+                .setAddress(redisAddress);
+
+        if (redisPassword != null && !redisPassword.isBlank()) {
+            single.setPassword(redisPassword);
+        }
 
         return Redisson.create(config);
     }

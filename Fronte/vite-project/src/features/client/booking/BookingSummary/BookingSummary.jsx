@@ -45,6 +45,10 @@ const BookingSummary = ({ movie, selectedSeats, totalPrice, onConfirm, isLoading
                         {selectedSeats.length > 0 ? selectedSeats.join(', ') : '-'}
                     </span>
                 </div>
+                <div className="info-row">
+                    <span className="info-label">Tổng tiền</span>
+                    <span className="info-value">{(totalPrice || 0).toLocaleString()}đ</span>
+                </div>
 
                 <button
                     className={`continue-btn ${isLoading ? 'loading' : ''}`}
