@@ -53,6 +53,10 @@ public class Movie {
     @Column(columnDefinition = "enum('showing', 'coming') default 'showing'")
     private Status status = Status.showing;
 
+    @Column(name = "trailer_duration_minutes")
+    @Builder.Default
+    private Integer trailerDurationMinutes = 10;
+
     public enum Status {
         showing, coming
     }

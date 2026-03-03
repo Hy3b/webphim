@@ -31,4 +31,23 @@ public class Showtime {
 
     @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal basePrice;
+
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
+    @Column(name = "buffer_time_minutes")
+    @Builder.Default
+    private Integer bufferTimeMinutes = 15;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(columnDefinition = "enum('active', 'cancelled', 'completed') default 'active'")
+    private Status status = Status.active;
+
+    @Column(name = "batch_id", length = 100)
+    private String batchId;
+
+    public enum Status {
+        active, cancelled, completed
+    }
 }

@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/movies")
-@CrossOrigin(origins = "*") // Cho phép Vite Frontend gọi API
 public class MovieController {
 
     @Autowired
