@@ -9,6 +9,11 @@ import BookingPage from '../features/client/booking/BookingPage/BookingPage';
 import PaymentPage from '../features/client/payment/PaymentPage';
 import MovieDetail from '../features/client/movie/MovieDetail';
 import TicketPage from '../features/client/ticket/TicketPage';
+
+// Admin imports
+import AdminLayout from '../layouts/AdminLayout';
+import DashboardPage from '../features/admin/pages/DashboardPage';
+
 const AppRoutes = () => {
     return (
         <Routes>
@@ -21,6 +26,11 @@ const AppRoutes = () => {
                 <Route path="payment" element={<PaymentPage />} />
                 <Route path="ticket" element={<TicketPage />} />
                 <Route path="movie/:id" element={<MovieDetail />} />
+            </Route>
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<DashboardPage />} />
             </Route>
         </Routes>
     );

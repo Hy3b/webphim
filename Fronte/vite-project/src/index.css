@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* 1. Reset margin, padding và thiết lập box-sizing */
 * {
   margin: 0;
