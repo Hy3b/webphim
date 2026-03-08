@@ -74,29 +74,43 @@ const BookingPage = () => {
         }
     }, [id]);
 
+    // Fetch showtime + movie details from backend
     useEffect(() => {
-        setMovie({
-            id: id,
-            title: "Yêu quái vùng Yên Lãng",
-            originalTitle: "Yeu Quai Vung Yen Lang",
-            poster: "https://image.tmdb.org/t/p/w600_and_h900_face/5Xtwoju2GOlgXRkEtPO2BA5WNTw.jpg",
-            showtime: "23:00",
-            showDate: "26/01/2026",
-            theater: "Beta TRMall Phú Quốc",
-            room: "Rạp 4",
-            tags: ["Tâm lý", "Gia đình"],
-            duration: "111 phút",
-            type: "2D Phụ đề",
-            ageRating: "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên"
-        });
+        const fetchShowtimeDetail = async () => {
+            try {
+                const res = await fetch(`/api/showtimes/${id}`);
+                if (!res.ok) throw new Error("Không thể tải thông tin suất chiếu");
+                const data = await res.json();
 
-        // 1. NGAY LÚC MỞ TRANG: GỌI API BẢN ĐỒ GHẾ
+                // Format date/time from backend LocalDateTime
+                const dt = new Date(data.startTime);
+                const showtime = dt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                const showDate = dt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+                setMovie({
+                    id: data.movieId,
+                    title: data.movieTitle,
+                    poster: data.poster,
+                    showtime,
+                    showDate,
+                    room: data.roomName,
+                    duration: `${data.duration} phút`,
+                    tags: data.genre ? data.genre.split(',').map(g => g.trim()) : [],
+                    ageRating: data.ageRating,
+                });
+            } catch (err) {
+                console.error("Lỗi tải thông tin suất chiếu:", err);
+            }
+        };
+
+        fetchShowtimeDetail();
         fetchSeats();
     }, [id, fetchSeats]);
 
+
     const handleSeatSelect = (seat) => {
         if (seat.status === 'booked') return;
-        
+
         setSelectedSeats(prev => {
             if (prev.includes(seat.id)) {
                 return prev.filter(s => s !== seat.id);
@@ -123,7 +137,7 @@ const BookingPage = () => {
         setBookingError(null);
 
         const payload = {
-            userId: 1, // Fix cứng user 1 trước
+            userId: 2, // Fix cứng user 1 trước
             showtimeId: parseInt(id),
             seatIds: selectedSeats,
             totalAmount: calculateTotal()
@@ -143,7 +157,7 @@ const BookingPage = () => {
             }
 
             const data = await res.json();
-            
+
             // THÀNH CÔNG: Chuyển thẳng sang trang Payment
             navigate('/payment', {
                 state: {
@@ -185,7 +199,7 @@ const BookingPage = () => {
                 <div className="seat-selection-area">
                     {/* Hiển thị lỗi nếu có (Blocker màu đỏ) */}
                     {bookingError && <div className="error-banner" style={{ background: '#ffebee', color: '#c62828', padding: '15px', borderRadius: '4px', marginBottom: '15px' }}>{bookingError}</div>}
-                    
+
                     <SeatMap
                         seats={seats}
                         selectedSeats={selectedSeats}

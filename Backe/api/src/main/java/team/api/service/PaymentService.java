@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.api.dto.SePayWebhookRequest;
 import team.api.dto.response.BookingStatusResponse;
-import team.api.entity.Booking;
-import team.api.repository.BookingRepository;
+import team.api.entity.Order;
+import team.api.repository.OrderRepository;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -18,91 +18,89 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final BookingRepository bookingRepository;
+    private final OrderRepository orderRepository;
 
-    private static final Pattern BOOKING_ID_PATTERN = Pattern.compile("(?i)DH(\\d+)");
+    private static final Pattern ORDER_CODE_PATTERN = Pattern.compile("(?i)(DH\\d+)");
 
     @Transactional
     public void processWebhook(SePayWebhookRequest request) {
         log.info("=== Nhận webhook SePay: gateway={}, amount={}, content='{}'",
                 request.getGateway(), request.getTransferAmount(), request.getContent());
 
-        Integer bookingId = extractBookingId(request.getContent());
+        String orderCode = extractOrderCode(request.getContent());
 
-        if (bookingId == null) {
-            log.warn("Không tìm thấy booking_id (mã DH) trong nội dung: '{}'", request.getContent());
+        if (orderCode == null) {
+            log.warn("Không tìm thấy order_code (mã DH) trong nội dung: '{}'", request.getContent());
             return;
         }
 
-        log.info("Trích xuất được booking_id: '{}'", bookingId);
+        log.info("Trích xuất được order_code: '{}'", orderCode);
 
-        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+        Optional<Order> orderOpt = orderRepository.findByOrderCode(orderCode);
 
-        if (bookingOpt.isEmpty()) {
-            log.warn("Không tìm thấy booking với id='{}' trong DB", bookingId);
+        if (orderOpt.isEmpty()) {
+            log.warn("Không tìm thấy order với orderCode='{}' trong DB", orderCode);
             return;
         }
 
-        Booking booking = bookingOpt.get();
+        Order order = orderOpt.get();
 
-        if (!Booking.Status.pending.equals(booking.getStatus())) {
-            log.info("Booking '{}' đã ở trạng thái '{}', bỏ qua.", bookingId, booking.getStatus());
+        if (!Order.Status.pending.equals(order.getStatus())) {
+            log.info("Order '{}' đã ở trạng thái '{}', bỏ qua.", orderCode, order.getStatus());
             return;
         }
 
         // So sánh số tiền nhận với tổng tiền đơn hàng
-        int compareResult = request.getTransferAmount().compareTo(booking.getTotalAmount());
+        int compareResult = request.getTransferAmount().compareTo(order.getFinalAmount());
 
         if (compareResult >= 0) { // If amount is sufficient or overpaid
-            booking.setStatus(Booking.Status.paid);
-            bookingRepository.save(booking);
+            order.setStatus(Order.Status.paid);
+            orderRepository.save(order);
 
             if (compareResult == 0) {
-                log.info("✅ Booking '{}' đã thanh toán THÀNH CÔNG. Số tiền nhận: {}, Cần: {}",
-                        bookingId, request.getTransferAmount(), booking.getTotalAmount());
+                log.info("✅ Order '{}' đã thanh toán THÀNH CÔNG. Số tiền nhận: {}, Cần: {}",
+                        orderCode, request.getTransferAmount(), order.getFinalAmount());
             } else { // compareResult > 0
-                log.info("✅ Booking '{}' thanh toán THÀNH CÔNG (DƯ TIỀN). Số tiền nhận: {}, Cần: {}",
-                        bookingId, request.getTransferAmount(), booking.getTotalAmount());
+                log.info("✅ Order '{}' thanh toán THÀNH CÔNG (DƯ TIỀN). Số tiền nhận: {}, Cần: {}",
+                        orderCode, request.getTransferAmount(), order.getFinalAmount());
             }
         } else { // compareResult < 0
-            log.warn("⚠️ Booking '{}' thiếu tiền. Nhận: {}, Cần: {}",
-                    bookingId, request.getTransferAmount(), booking.getTotalAmount());
+            log.warn("⚠️ Order '{}' thiếu tiền. Nhận: {}, Cần: {}",
+                    orderCode, request.getTransferAmount(), order.getFinalAmount());
         }
     }
 
-    private Integer extractBookingId(String transferContent) {
+    private String extractOrderCode(String transferContent) {
         if (transferContent == null || transferContent.isBlank()) {
             return null;
         }
 
-        Matcher matcher = BOOKING_ID_PATTERN.matcher(transferContent);
+        Matcher matcher = ORDER_CODE_PATTERN.matcher(transferContent);
         if (matcher.find()) {
-            try {
-                return Integer.parseInt(matcher.group(1));
-            } catch (NumberFormatException e) {
-                log.error("Lỗi parse booking id: {}", matcher.group(1));
-            }
+            return matcher.group(1).toUpperCase();
         }
         return null;
     }
 
-    public BookingStatusResponse getBookingStatus(Integer bookingId) {
-        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+    public BookingStatusResponse getBookingStatus(String orderCode) {
+        Optional<Order> orderOpt = orderRepository.findByOrderCode(orderCode);
 
-        if (bookingOpt.isEmpty()) {
+        if (orderOpt.isEmpty()) {
             return BookingStatusResponse.builder()
-                    .bookingId(bookingId)
+                    // If frontend expects bookingId as int, but we provide orderCode (DH...).
+                    // Assuming frontend adjusts.
+                    // .bookingId(null)
                     .status("not_found")
                     .paid(false)
                     .build();
         }
 
-        Booking booking = bookingOpt.get();
-        boolean isPaid = Booking.Status.paid.equals(booking.getStatus());
+        Order order = orderOpt.get();
+        boolean isPaid = Order.Status.paid.equals(order.getStatus());
 
         return BookingStatusResponse.builder()
-                .bookingId(bookingId)
-                .status(booking.getStatus().name())
+                .bookingId(order.getOrderId())
+                .status(order.getStatus().name())
                 .paid(isPaid)
                 .build();
     }

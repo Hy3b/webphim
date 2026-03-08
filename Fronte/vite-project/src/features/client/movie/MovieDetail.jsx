@@ -21,13 +21,13 @@ const MovieDetail = () => {
 
     useEffect(() => {
         // 1. Fetch dữ liệu chi tiết của phim dựa vào ID từ đường dẫn
-        fetch(`http://localhost:8080/api/movies/${id}`)
+        fetch(`/api/movies/${id}`)
             .then(res => res.json())
             .then(data => setMovie(data))
             .catch(err => console.error("Lỗi tải phim: ", err));
 
         // 2. Fetch danh sách tất cả các phim để làm Sidebar (Gợi ý phim khác)
-        fetch(`http://localhost:8080/api/movies`)
+        fetch(`/api/movies`)
             .then(res => res.json())
             .then(data => {
                 // Chỉ lấy phim "Đang chiếu" & Khác với phim đang xem hiện tại

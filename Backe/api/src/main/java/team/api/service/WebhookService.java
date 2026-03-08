@@ -2,7 +2,6 @@ package team.api.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RMap;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
@@ -10,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import team.api.dto.request.WebhookRequest;
 import team.api.entity.Booking;
 import team.api.entity.BookingSeat;
+import team.api.entity.Order;
 import team.api.entity.Seat;
 import team.api.repository.BookingRepository;
 import team.api.repository.BookingSeatRepository;
+import team.api.repository.OrderRepository;
 
 import java.util.List;
 
@@ -23,84 +24,86 @@ public class WebhookService {
 
     private final BookingRepository bookingRepository;
     private final BookingSeatRepository bookingSeatRepository;
+    private final OrderRepository orderRepository;
     private final RedissonClient redissonClient;
 
     @Transactional(rollbackFor = Exception.class)
     public String processPaymentWebhook(WebhookRequest request) {
-        // 1. (Mock) Verify Signature to ensure the webhook is actually from VNPay/Momo
+        // 1. Verify Signature (Mock)
         if (!"valid_secret_hash_signature".equals(request.getSignature())) {
             throw new RuntimeException("Invalid Webhook Signature!");
         }
 
-        // 2. Fetch the Booking
-        Booking booking = bookingRepository.findById(request.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Booking not found."));
+        // 2. Fetch Order
+        Order order = orderRepository.findById(request.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Order not found."));
 
-        if (!Booking.Status.pending.equals(booking.getStatus())) {
-            return "Webhook ignored. Booking is already processed with status: " + booking.getStatus();
+        if (!Order.Status.pending.equals(order.getStatus())) {
+            return "Webhook ignored. Order is already processed with status: " + order.getStatus();
         }
 
-        String redisHashKey = "showtime:" + booking.getShowtime().getShowtimeId() + ":seats";
-        String ttlMapKey = "showtime:" + booking.getShowtime().getShowtimeId() + ":ttl_seats";
+        List<Booking> bookings = bookingRepository.findAll()
+                .stream()
+                .filter(b -> b.getOrder().getOrderId().equals(order.getOrderId()))
+                .toList();
 
-        RMap<String, String> seatStatuses = redissonClient.getMap(redisHashKey);
-        RMapCache<String, Integer> ttlSeats = redissonClient.getMapCache(ttlMapKey);
+        if (bookings.isEmpty()) {
+            throw new RuntimeException("No bookings associated with this order.");
+        }
+
+        Integer showtimeId = bookings.get(0).getShowtime().getShowtimeId();
+        String redisHashKey = "showtime:" + showtimeId + ":seats";
+
+        // Dùng cùng RMapCache như BookingService (không dùng RMap thường)
+        RMapCache<String, String> seatStatuses = redissonClient.getMapCache(redisHashKey);
 
         // 3. Handle Payment Failed/Cancelled
         if (!"SUCCESS".equals(request.getStatus())) {
-            // Update DB Status
-            booking.setStatus(Booking.Status.cancelled);
-            bookingRepository.save(booking);
+            order.setStatus(Order.Status.cancelled);
+            orderRepository.save(order);
 
-            // Release the seats in Redis back to AVAILABLE
-            List<BookingSeat> bookingSeats = bookingSeatRepository.findAll()
-                    .stream()
-                    .filter(bs -> bs.getBooking().getBookingId().equals(booking.getBookingId()))
-                    .toList();
+            for (Booking booking : bookings) {
+                List<BookingSeat> bookingSeats = bookingSeatRepository.findAll()
+                        .stream()
+                        .filter(bs -> bs.getBooking().getBookingId().equals(booking.getBookingId()))
+                        .toList();
 
-            for (BookingSeat bs : bookingSeats) {
-                Seat seat = bs.getSeat();
-                String seatKey = seat.getRowName() + seat.getSeatNumber();
-                // Remove from TTL cache and Redis Hash -> falls back to "AVAILABLE" logic
-                ttlSeats.remove(seatKey);
-                seatStatuses.remove(seatKey);
+                for (BookingSeat bs : bookingSeats) {
+                    Seat seat = bs.getSeat();
+                    String seatKey = seat.getRowName() + seat.getSeatNumber();
+                    // Xóa entry khỏi RMapCache → ghế trở về AVAILABLE ngay lập tức
+                    seatStatuses.remove(seatKey);
+                    log.info("🔓 Giải phóng ghế {} (payment failed/cancelled, orderId={})",
+                            seatKey, order.getOrderId());
+                }
             }
             return "Payment FAILED. Seats have been unlocked.";
         }
 
         // 4. Handle Payment SUCCESS
         try {
-            // Atomic Update on MySQL
-            booking.setStatus(Booking.Status.paid);
-            bookingRepository.save(booking);
+            order.setStatus(Order.Status.paid);
+            orderRepository.save(order);
 
-            // Fetch the seats related to this booking
-            List<BookingSeat> bookingSeats = bookingSeatRepository.findAll()
-                    .stream()
-                    .filter(bs -> bs.getBooking().getBookingId().equals(booking.getBookingId()))
-                    .toList();
+            for (Booking booking : bookings) {
+                List<BookingSeat> bookingSeats = bookingSeatRepository.findAll()
+                        .stream()
+                        .filter(bs -> bs.getBooking().getBookingId().equals(booking.getBookingId()))
+                        .toList();
 
-            // Permanent Update in Redis (No rollback possible automatically without
-            // specific redisson logic, doing inside try-catch)
-            for (BookingSeat bs : bookingSeats) {
-                Seat seat = bs.getSeat();
-                String seatKey = seat.getRowName() + seat.getSeatNumber();
-
-                // Set permanently to SOLD
-                seatStatuses.put(seatKey, "SOLD");
-
-                // Remove from the temporary 10-minute Auto-Evict queue
-                ttlSeats.remove(seatKey);
+                for (BookingSeat bs : bookingSeats) {
+                    Seat seat = bs.getSeat();
+                    String seatKey = seat.getRowName() + seat.getSeatNumber();
+                    // Overwrite LOCKED → SOLD vĩnh viễn (put không có TTL = không expire)
+                    seatStatuses.put(seatKey, "SOLD");
+                    log.info("🪑 Ghế {} đã SOLD vĩnh viễn (orderId={})", seatKey, order.getOrderId());
+                }
             }
 
             return "Payment SUCCESS. Tickets generated. Seats marked as SOLD.";
 
         } catch (Exception e) {
-            // If MySQL fails (e.g connection lost or constraint violated), @Transactional
-            // rolls back DB.
-            // We should ideally revert the Redis states if necessary, but Spring handles
-            // the exception throw which propagates Rollback.
-            log.error("Error processing successful payment webhook for bookingId: {}", booking.getBookingId(), e);
+            log.error("Error processing successful payment webhook for orderId: {}", order.getOrderId(), e);
             throw new RuntimeException("Atomic update failed. System reverted to safe point.", e);
         }
     }

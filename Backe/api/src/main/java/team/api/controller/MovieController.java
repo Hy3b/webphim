@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/movies")
-@CrossOrigin(origins = "*") // Cho phép Vite Frontend gọi API
 public class MovieController {
 
     @Autowired
@@ -29,4 +28,5 @@ public class MovieController {
     public Movie createMovie(@RequestBody Movie movie) {
         return movieRepository.save(movie);
     }
+
 }

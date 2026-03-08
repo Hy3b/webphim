@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an Axios instance with default configuration
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api', // Adjust according to your Spring Boot port
+    baseURL: '/api', // Vite proxy sẽ forward sang localhost:8080
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

@@ -5,6 +5,7 @@ import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import team.api.dto.response.SeatStatusResponse;
+import team.api.dto.response.ShowtimeDetailResponse;
 import team.api.entity.Seat;
 import team.api.entity.Showtime;
 import team.api.repository.SeatRepository;
@@ -46,5 +47,23 @@ public class ShowtimeService {
                     .seatTypeName(seat.getSeatType().getName())
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    public ShowtimeDetailResponse getShowtimeDetail(Integer showtimeId) {
+        Showtime showtime = showtimeRepository.findById(showtimeId)
+                .orElseThrow(() -> new RuntimeException("Showtime not found"));
+
+        return ShowtimeDetailResponse.builder()
+                .showtimeId(showtime.getShowtimeId())
+                .movieId(showtime.getMovie().getId())
+                .movieTitle(showtime.getMovie().getName())
+                .poster(showtime.getMovie().getPoster())
+                .roomName(showtime.getRoom().getName())
+                .startTime(showtime.getStartTime())
+                .basePrice(showtime.getBasePrice())
+                .duration(showtime.getMovie().getDuration())
+                .genre(showtime.getMovie().getGenre())
+                .ageRating(showtime.getMovie().getAgeRating())
+                .build();
     }
 }
