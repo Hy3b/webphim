@@ -37,33 +37,33 @@ public class PaymentService {
 
     @Transactional
     public void processWebhook(SePayWebhookRequest request) {
-        log.info("=== Nhận webhook SePay: gateway={}, amount={}, content='{}'",
+        log.info("=== Nhan webhook SePay: gateway={}, amount={}, content='{}'",
                 request.getGateway(), request.getTransferAmount(), request.getContent());
 
         String orderCode = extractOrderCode(request.getContent());
 
         if (orderCode == null) {
-            log.warn("Không tìm thấy order_code (mã DH) trong nội dung: '{}'", request.getContent());
+            log.warn("Khong tim thay order_code (ma DH) trong noi dung: '{}'", request.getContent());
             return;
         }
 
-        log.info("Trích xuất được order_code: '{}'", orderCode);
+        log.info("Trich xuat duoc order_code: '{}'", orderCode);
 
         Optional<Order> orderOpt = orderRepository.findByOrderCode(orderCode);
 
         if (orderOpt.isEmpty()) {
-            log.warn("Không tìm thấy order với orderCode='{}' trong DB", orderCode);
+            log.warn("Khong tim thay order voi orderCode='{}' trong DB", orderCode);
             return;
         }
 
         Order order = orderOpt.get();
 
         if (!Order.Status.pending.equals(order.getStatus())) {
-            log.info("Order '{}' đã ở trạng thái '{}', bỏ qua.", orderCode, order.getStatus());
+            log.info("Order '{}' da o trang thai '{}', bo qua.", orderCode, order.getStatus());
             return;
         }
 
-        // So sánh số tiền nhận với tổng tiền đơn hàng
+        // So sanh so tien nhan voi tong tien don hang
         int compareResult = request.getTransferAmount().compareTo(order.getFinalAmount());
 
         if (compareResult >= 0) { // If amount is sufficient or overpaid
@@ -71,10 +71,10 @@ public class PaymentService {
             orderRepository.save(order);
 
             if (compareResult == 0) {
-                log.info("✅ Order '{}' đã thanh toán THÀNH CÔNG. Số tiền nhận: {}, Cần: {}",
+                log.info(" Order '{}' da thanh toan THANH CONG. So tien nhan: {}, Can: {}",
                         orderCode, request.getTransferAmount(), order.getFinalAmount());
             } else { // compareResult > 0
-                log.info("✅ Order '{}' thanh toán THÀNH CÔNG (DƯ TIỀN). Số tiền nhận: {}, Cần: {}",
+                log.info(" Order '{}' thanh toan THANH CONG (DU TIEN). So tien nhan: {}, Can: {}",
                         orderCode, request.getTransferAmount(), order.getFinalAmount());
             }
 
@@ -82,11 +82,11 @@ public class PaymentService {
             try {
                 processSeatsOnPaymentSuccess(order);
             } catch (Exception e) {
-                log.error("Lỗi khi xử lý chốt ghế cho đơn hàng: {}", orderCode, e);
+                log.error("Loi khi xu li chot ghe cho don hang: {}", orderCode, e);
             }
 
         } else { // compareResult < 0
-            log.warn("⚠️ Order '{}' thiếu tiền. Nhận: {}, Cần: {}",
+            log.warn(" Order '{}' thieu tien. Nhan: {}, Can: {}",
                     orderCode, request.getTransferAmount(), order.getFinalAmount());
         }
     }
@@ -95,7 +95,7 @@ public class PaymentService {
         List<Booking> bookings = bookingRepository.findByOrder_OrderId(order.getOrderId());
 
         if (bookings.isEmpty()) {
-            log.warn("Không tìm thấy booking nào cho orderId: {}", order.getOrderId());
+            log.warn("Khong tim thay booking nao cho orderId: {}", order.getOrderId());
             return;
         }
 
@@ -111,7 +111,7 @@ public class PaymentService {
                 String seatKey = seat.getRowName() + seat.getSeatNumber();
                 // Overwrite LOCKED → SOLD vĩnh viễn (put không có TTL = không expire)
                 seatStatuses.put(seatKey, "SOLD");
-                log.info("🪑 Ghế {} đã SOLD vĩnh viễn (orderId={})", seatKey, order.getOrderId());
+                log.info(" Ghế {} da SOLD vinh vien (orderId={})", seatKey, order.getOrderId());
             }
         }
     }

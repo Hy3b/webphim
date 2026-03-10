@@ -42,7 +42,7 @@ const BookingPage = () => {
                     row: seat.rowName,
                     number: seat.seatNumber.toString().padStart(2, '0'),
                     status: seat.status === 'AVAILABLE' ? 'available' : seat.status === 'LOCKED' ? 'holding' : 'booked',
-                    price: seat.seatTypeName === 'VIP' ? 70000 : (seat.seatTypeName === 'Couple' ? 120000 : 50000),
+                    price: Number(seat.price),
                     type: seat.seatTypeName.toLowerCase()
                 }));
                 if (mappedSeats.length > 0) {

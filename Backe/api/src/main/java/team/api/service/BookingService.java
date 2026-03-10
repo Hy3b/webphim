@@ -38,7 +38,7 @@ public class BookingService {
 
     @Transactional
     public CreateBookingResponse bookSeats(BookingRequest request) {
-        log.info("🔍 Bắt đầu booking: userId={}, showtimeId={}, seatIds={}",
+        log.info(" Bắt đầu booking: userId={}, showtimeId={}, seatIds={}",
                 request.getUserId(), request.getShowtimeId(), request.getSeatIds());
 
         // ═════════════════════════════════════════════════════════════
@@ -47,13 +47,13 @@ public class BookingService {
 
         Showtime showtime = showtimeRepository.findById(request.getShowtimeId())
                 .orElseThrow(() -> {
-                    log.error("❌ Showtime không tồn tại: showtimeId={}", request.getShowtimeId());
+                    log.error(" Showtime không tồn tại: showtimeId={}", request.getShowtimeId());
                     return new RuntimeException("Showtime not found");
                 });
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> {
-                    log.error("❌ User không tồn tại: userId={}", request.getUserId());
+                    log.error("User khong ton tai: userId={}", request.getUserId());
                     return new RuntimeException("User not found");
                 });
 
@@ -62,7 +62,7 @@ public class BookingService {
                 request.getSeatIds());
 
         if (seatsToBook.size() != request.getSeatIds().size()) {
-            log.error("❌ Một số ghế không tồn tại: requested={}, found={}",
+            log.error("Mot so ghe khong ton tai: requested={}, found={}",
                     request.getSeatIds().size(), seatsToBook.size());
             throw new RuntimeException("Some seats are invalid");
         }
@@ -80,7 +80,7 @@ public class BookingService {
                 seatIdsToBook);
 
         if (isAlreadyBookedDb) {
-            log.warn("⚠️ Một số ghế đã được booked trong DB: showtimeId={}, seatIds={}",
+            log.warn("Mot so ghe da duoc booked trong DB: showtimeId={}, seatIds={}",
                     showtime.getShowtimeId(), seatIdsToBook);
             throw new RuntimeException("Some of the requested seats are already booked");
         }
@@ -94,7 +94,7 @@ public class BookingService {
         RMap<String, String> seatStatuses = redissonClient.getMap(redisHashKey);
 
         try {
-            log.debug("🔒 Cố gắng acquire {} lock(s)...", seatsToBook.size());
+            log.debug("Co gang acquire {} lock(s)...", seatsToBook.size());
 
             for (Seat seat : seatsToBook) {
                 String lockKey = "seat_lock:" + showtime.getShowtimeId() + "_" + seat.getSeatId();
@@ -104,7 +104,7 @@ public class BookingService {
                 boolean isLocked = lock.tryLock(LOCK_WAIT_SECONDS, LOCK_HOLD_SECONDS, TimeUnit.SECONDS);
 
                 if (!isLocked) {
-                    log.warn("⚠️ Không thể lock ghế: {} (đang được booked bởi user khác)",
+                    log.warn("Khong the lock ghe: {} (dang duoc booked boi user khac)",
                             seat.getRowName() + seat.getSeatNumber());
                     throw new RuntimeException(
                             "Seat " + seat.getRowName() + seat.getSeatNumber()
@@ -112,33 +112,33 @@ public class BookingService {
                 }
 
                 acquiredLocks.add(lock);
-                log.debug("✓ Locked ghế: {}", seat.getRowName() + seat.getSeatNumber());
+                log.debug("Locked ghe: {}", seat.getRowName() + seat.getSeatNumber());
             }
 
             // ═════════════════════════════════════════════════════════════
             // PHASE 4: Double-check Redis status trước khi xử lý
             // ═════════════════════════════════════════════════════════════
 
-            log.debug("🔍 Double-check Redis status của tất cả ghế...");
+            log.debug("Double-check Redis status của tat ca ghe...");
 
             for (Seat seat : seatsToBook) {
                 String seatKey = seat.getRowName() + seat.getSeatNumber();
                 String currentStatus = seatStatuses.get(seatKey);
 
                 if ("LOCKED".equals(currentStatus) || "SOLD".equals(currentStatus)) {
-                    log.warn("⚠️ Ghế {} đã có status: {} (trong Redis)", seatKey, currentStatus);
+                    log.warn("Ghế {} đã có status: {} (trong Redis)", seatKey, currentStatus);
                     throw new RuntimeException(
                             "Seat " + seatKey + " is already " + currentStatus);
                 }
             }
 
-            log.debug("✓ Tất cả ghế available trong Redis");
+            log.debug("Tất cả ghế available trong Redis");
 
             // ═════════════════════════════════════════════════════════════
             // PHASE 5: Create Order and Booking in Database
             // ═════════════════════════════════════════════════════════════
 
-            log.debug("💾 Tạo Order và Booking trong DB...");
+            log.debug("Tạo Order và Booking trong DB...");
 
             BigDecimal totalAmount = BigDecimal.ZERO;
             for (Seat seat : seatsToBook) {
@@ -158,13 +158,13 @@ public class BookingService {
                     .build();
             order = orderRepository.save(order);
 
-            log.debug("  → Saved Order (temp): orderId={}, amount={}", order.getOrderId(), totalAmount);
+            log.debug("Saved Order (temp): orderId={}, amount={}", order.getOrderId(), totalAmount);
 
             // ✅ Cập nhật orderCode với ID thực - chỉ save 1 lần duy nhất
             order.setOrderCode("DH" + order.getOrderId());
             // @Transactional sẽ tự động flush khi method kết thúc, không cần save lại
 
-            log.debug("  → Updated orderCode: {}", order.getOrderCode());
+            log.debug("  Updated orderCode: {}", order.getOrderCode());
 
             // ✅ Tạo Booking
             Booking booking = Booking.builder()
@@ -173,13 +173,13 @@ public class BookingService {
                     .build();
             booking = bookingRepository.save(booking);
 
-            log.debug("  → Saved Booking: bookingId={}", booking.getBookingId());
+            log.debug("  Saved Booking: bookingId={}", booking.getBookingId());
 
             // ═════════════════════════════════════════════════════════════
             // PHASE 6: Create BookingSeat records
             // ═════════════════════════════════════════════════════════════
 
-            log.debug("📝 Tạo {} BookingSeat records...", seatsToBook.size());
+            log.debug("Tạo {} BookingSeat records...", seatsToBook.size());
 
             List<BookingSeat> bookingSeats = new ArrayList<>();
             for (Seat seat : seatsToBook) {
@@ -199,7 +199,7 @@ public class BookingService {
             }
 
             bookingSeatRepository.saveAll(bookingSeats);
-            log.debug("✓ Saved {} BookingSeat records", bookingSeats.size());
+            log.debug("Saved {} BookingSeat records", bookingSeats.size());
 
             // ✅ Flush DB changes TRƯỚC KHI update Redis
             // Đảm bảo consistency: nếu DB commit fail, Redis không được update
@@ -207,13 +207,13 @@ public class BookingService {
             orderRepository.flush();
             bookingRepository.flush();
 
-            log.debug("✓ DB transaction flushed");
+            log.debug("DB transaction flushed");
 
             // ═════════════════════════════════════════════════════════════
             // PHASE 7: Update Redis - đánh dấu LOCKED
             // ═════════════════════════════════════════════════════════════
 
-            log.debug("📍 Đánh dấu ghế LOCKED trong Redis với Scheduler xử lý timeout...");
+            log.debug("Danh dau ghe LOCKED trong Redis voi Scheduler xu ly timeout...");
 
             for (Seat seat : seatsToBook) {
                 String seatKey = seat.getRowName() + seat.getSeatNumber();
@@ -224,13 +224,13 @@ public class BookingService {
                 log.debug("  → {} marked LOCKED (Scheduler sẽ expire order sau {}min)", seatKey, BOOKING_TTL_MINUTES);
             }
 
-            log.debug("✓ Tất cả ghế đã được đánh dấu LOCKED trong Redis");
+            log.debug("Tat ca ghe da duoc danh dau LOCKED trong Redis");
 
             // ═════════════════════════════════════════════════════════════
             // SUCCESS: Trả về response
             // ═════════════════════════════════════════════════════════════
 
-            log.info("✅ Booking thành công: bookingId={}, orderCode={}, amount={}, expiredAt={}",
+            log.info("Booking thanh cong: bookingId={}, orderCode={}, amount={}, expiredAt={}",
                     booking.getBookingId(), order.getOrderCode(), order.getTotalAmount(), order.getExpiredAt());
 
             return CreateBookingResponse.builder()
@@ -242,12 +242,12 @@ public class BookingService {
         } catch (InterruptedException e) {
             // ✅ Restore interrupt flag
             Thread.currentThread().interrupt();
-            log.error("❌ Booking bị interrupt: {}", e.getMessage());
+            log.error("Booking bi interrupt: {}", e.getMessage());
             throw new RuntimeException("Booking interrupted", e);
 
         } catch (RuntimeException e) {
             // ✅ Log chi tiết lỗi
-            log.error("❌ Booking failed: {}", e.getMessage());
+            log.error("Booking failed: {}", e.getMessage());
             // DB transaction sẽ rollback tự động
             // Redis update chưa chạy → State consistent
             throw e;
@@ -258,7 +258,7 @@ public class BookingService {
             // ═════════════════════════════════════════════════════════════
 
             if (!acquiredLocks.isEmpty()) {
-                log.debug("🔓 Giải phóng {} lock(s)...", acquiredLocks.size());
+                log.debug("Giai phong {} lock(s)...", acquiredLocks.size());
 
                 for (RLock lock : acquiredLocks) {
                     try {
@@ -268,11 +268,11 @@ public class BookingService {
                         }
                     } catch (Exception e) {
                         // ✅ Không throw exception ở đây, để lock tự expire
-                        log.warn("⚠️ Lỗi khi unlock: {}", e.getMessage());
+                        log.warn("Loi khi unlock: {}", e.getMessage());
                     }
                 }
 
-                log.debug("✓ Tất cả lock đã được giải phóng");
+                log.debug("Tat ca lock da duoc giai phong");
             }
         }
     }
@@ -290,7 +290,7 @@ public class BookingService {
             // null = AVAILABLE, "LOCKED" = temp booking, "SOLD" = paid
             return status == null;
         } catch (Exception e) {
-            log.warn("⚠️ Lỗi khi check seat availability: {}", e.getMessage());
+            log.warn("Loi khi check seat availability: {}", e.getMessage());
             return false; // Fail-safe: coi như ghế không available
         }
     }
@@ -322,7 +322,7 @@ public class BookingService {
 
             return available;
         } catch (Exception e) {
-            log.error("❌ Lỗi khi lấy available seats: {}", e.getMessage());
+            log.error("Loi khi lay available seats: {}", e.getMessage());
             return new ArrayList<>();
         }
     }

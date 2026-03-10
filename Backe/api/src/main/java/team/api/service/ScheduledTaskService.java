@@ -26,7 +26,8 @@ public class ScheduledTaskService {
     private final RedissonClient redissonClient;
 
     /**
-     * Quét mỗi 60 giây, tìm các order pending đã hết hạn và cập nhật status sang expired.
+     * Quét mỗi 60 giây, tìm các order pending đã hết hạn và cập nhật status sang
+     * expired.
      * Giải phóng ghế (LOCKED → xóa khỏi Redis RMap) thủ công.
      */
     @Scheduled(fixedDelay = 60_000)
@@ -34,8 +35,7 @@ public class ScheduledTaskService {
     public void expireStaleOrders() {
         List<Order> expiredOrders = orderRepository.findByStatusAndExpiredAtBefore(
                 Order.Status.pending,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         if (expiredOrders.isEmpty()) {
             return;
@@ -49,7 +49,7 @@ public class ScheduledTaskService {
             for (BookingSeat bs : bookingSeats) {
                 String redisHashKey = "showtime:" + bs.getShowtime().getShowtimeId() + ":seats";
                 RMap<String, String> seatStatuses = redissonClient.getMap(redisHashKey);
-                
+
                 String seatKey = bs.getSeat().getRowName() + bs.getSeat().getSeatNumber();
                 seatStatuses.remove(seatKey);
             }
@@ -58,7 +58,7 @@ public class ScheduledTaskService {
         }
 
         orderRepository.saveAll(expiredOrders);
-        log.info("⏰ Scheduler: đã expire {} order(s) quá hạn thanh toán và giải phóng ghế.", expiredOrders.size());
+        log.info("Scheduler: đã expire {} order(s) quá hạn thanh toán và giải phóng ghế.", expiredOrders.size());
     }
 
     @PostConstruct
@@ -74,7 +74,7 @@ public class ScheduledTaskService {
             }
         }
         if (totalDeleted > 0) {
-            log.info("🗑️ Dọn dẹp thành công {} BookingSeat(s) từ các order đã expired cũ ở DB.", totalDeleted);
+            log.info(" Dọn dẹp thành công {} BookingSeat(s) từ các order đã expired cũ ở DB.", totalDeleted);
         }
     }
 }

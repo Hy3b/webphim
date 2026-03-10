@@ -45,6 +45,7 @@ public class ShowtimeService {
                     .seatNumber(seat.getSeatNumber())
                     .status(status)
                     .seatTypeName(seat.getSeatType().getName())
+                    .price(showtime.getBasePrice().add(seat.getSeatType().getSurcharge()))
                     .build();
         }).collect(Collectors.toList());
     }
