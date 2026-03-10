@@ -50,12 +50,10 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+                        request.getEmail(),
+                        request.getPassword()));
 
-        User user = userRepository.findByUsernameOrEmail(request.getUsername(), request.getUsername())
+        User user = userRepository.findByUsernameOrEmail(request.getEmail(), request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Error: User not found."));
 
         CustomUserDetails userDetails = new CustomUserDetails(user);

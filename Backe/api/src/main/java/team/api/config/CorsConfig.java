@@ -17,8 +17,8 @@ public class CorsConfig implements WebMvcConfigurer {
 
     private static final List<String> ALLOWED_ORIGINS = List.of(
             "http://localhost:5173",
-            "http://127.0.0.1:5173",
-            "https://web.dxhiep.id.vn"
+            "http://127.0.0.1:5173"
+
     );
 
     @Override
@@ -38,7 +38,7 @@ public class CorsConfig implements WebMvcConfigurer {
             @Override
             public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
                     throws IOException, ServletException {
-                HttpServletRequest  request  = (HttpServletRequest)  req;
+                HttpServletRequest request = (HttpServletRequest) req;
                 HttpServletResponse response = (HttpServletResponse) res;
 
                 String origin = request.getHeader("Origin");
