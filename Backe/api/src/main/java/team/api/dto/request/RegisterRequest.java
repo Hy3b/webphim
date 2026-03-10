@@ -25,4 +25,10 @@ public class RegisterRequest {
     @NotBlank(message = "Password cannot be blank")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+
+    @NotBlank(message = "Full name cannot be blank")
+    private String fullName;
+
+    // Optional phone number validation could be added if needed
+    private String phoneNumber;
 }

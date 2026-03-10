@@ -66,4 +66,31 @@ public class ShowtimeService {
                 .ageRating(showtime.getMovie().getAgeRating())
                 .build();
     }
+
+    public List<ShowtimeDetailResponse> getShowtimesByMovie(Long movieId) {
+        return showtimeRepository.findByMovie_Id(movieId).stream()
+                .map(this::mapToShowtimeDetailResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ShowtimeDetailResponse> getAllShowtimes() {
+        return showtimeRepository.findAll().stream()
+                .map(this::mapToShowtimeDetailResponse)
+                .collect(Collectors.toList());
+    }
+
+    private ShowtimeDetailResponse mapToShowtimeDetailResponse(Showtime showtime) {
+        return ShowtimeDetailResponse.builder()
+                .showtimeId(showtime.getShowtimeId())
+                .movieId(showtime.getMovie().getId())
+                .movieTitle(showtime.getMovie().getName())
+                .poster(showtime.getMovie().getPoster())
+                .roomName(showtime.getRoom().getName())
+                .startTime(showtime.getStartTime())
+                .basePrice(showtime.getBasePrice())
+                .duration(showtime.getMovie().getDuration())
+                .genre(showtime.getMovie().getGenre())
+                .ageRating(showtime.getMovie().getAgeRating())
+                .build();
+    }
 }

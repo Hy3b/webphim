@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class hello {
     @GetMapping
     public String xinchao() {
-        return "Chao mung ban den voi api cua web phim 🐧🐧🐧";
+        return "Chao mung ban den voi api cua web phim";
     }
 }

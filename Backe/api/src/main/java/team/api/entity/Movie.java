@@ -26,6 +26,10 @@ public class Movie {
     @Column(name = "duration_minutes", nullable = false)
     private Integer duration;
 
+    @Column(name = "trailer_duration_minutes")
+    @Builder.Default
+    private Integer trailerDuration = 10;
+
     @Column(name = "poster_url", length = 255)
     private String poster;
 

@@ -16,26 +16,30 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
-    public Long getId() {
-        return user.getId();
+    public Integer getId() {
+        return user.getUserId();
     }
 
     public String getRole() {
-        return user.getRole();
+        return user.getRole().name();
     }
 
     public String getEmail() {
         return user.getEmail();
     }
 
+    public String getFullName() {
+        return user.getFullName();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(user.getRole()));
+        return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return user.getPasswordHash();
     }
 
     @Override

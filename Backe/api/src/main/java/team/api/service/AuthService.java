@@ -36,8 +36,10 @@ public class AuthService {
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role("ROLE_USER")
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .role(User.Role.customer)
                 .build();
 
         userRepository.save(user);
@@ -53,7 +55,7 @@ public class AuthService {
                 )
         );
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsernameOrEmail(request.getUsername(), request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Error: User not found."));
 
         CustomUserDetails userDetails = new CustomUserDetails(user);

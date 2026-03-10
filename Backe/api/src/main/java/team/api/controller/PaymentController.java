@@ -3,7 +3,8 @@ package team.api.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.api.dto.SePayWebhookRequest;
+
+import team.api.dto.request.SePayWebhookRequest;
 import team.api.service.PaymentService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,17 +50,20 @@ public class PaymentController {
     }
 
     @PostMapping("/sepay-webhook")
-    public ResponseEntity<Map<String, Boolean>> handleSePayWebhook(
+    public ResponseEntity<Map<String, Object>> handleSePayWebhook(
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestBody SePayWebhookRequest request) {
 
         // 1. Kiểm tra tính hợp lệ của Secret Key
-        // TODO: Bật lại khi deploy production
         if (sepaySecretKey != null && !sepaySecretKey.isEmpty()) {
             if (authorization == null || !authorization.contains(sepaySecretKey)) {
-                log.warn("Cảnh báo: Webhook nhận được Secret Key không hợp lệ!");
+                log.warn("❌ Cảnh báo: Webhook nhận được Secret Key không hợp lệ! (Header Authorization: {})", authorization);
                 return ResponseEntity.status(403).build();
+            } else {
+                log.info("✅ Xác thực Secret Key SePay thành công!");
             }
+        } else {
+            log.info("⚠️ Bỏ qua xác thực Secret Key SePay (Chưa cấu hình biến môi trường sepay.secret-key)");
         }
 
         log.info("📩 Nhận webhook từ SePay - referenceCode: {}", request.getReferenceCode());
@@ -67,14 +71,15 @@ public class PaymentController {
         // 2. Xử lý webhook update database
         try {
             paymentService.processWebhook(request);
+            // SePay bắt buộc nhận {"success": true} để xác nhận đã nhận thông báo
+            return ResponseEntity.ok(Map.of("success", true));
+            
         } catch (Exception e) {
-            // Vẫn trả về 200 để SePay không retry liên tục.
-            // Log lỗi để debug, nhưng không để lộ stack trace ra ngoài.
-            log.error("Lỗi xử lý webhook SePay: {}", e.getMessage(), e);
+            log.error("❌ Lỗi xử lý webhook SePay: {}", e.getMessage(), e);
+            // Trả về HTTP 400 Bad Request. 
+            // Khi SePay nhận 400, hệ thống của họ sẽ đánh dấu lỗi và TỰ ĐỘNG RETRY (gửi lại thông báo sau).
+            return ResponseEntity.badRequest().body(Map.of("success", false, "error", e.getMessage()));
         }
-
-        // SePay bắt buộc nhận {"success": true} để xác nhận đã nhận thông báo
-        return ResponseEntity.ok(Map.of("success", true));
     }
 
     /**

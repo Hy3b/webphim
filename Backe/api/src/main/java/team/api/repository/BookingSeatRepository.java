@@ -10,4 +10,8 @@ import java.util.List;
 public interface BookingSeatRepository extends JpaRepository<BookingSeat, Integer> {
     
     boolean existsByShowtime_ShowtimeIdAndSeat_SeatIdIn(Integer showtimeId, List<Integer> seatIds);
+
+    List<BookingSeat> findByBooking_Order(team.api.entity.Order order);
+    
+    List<BookingSeat> findByBooking_BookingId(Integer bookingId);
 }

@@ -29,4 +29,14 @@ public class ShowtimeController {
     public ResponseEntity<ShowtimeDetailResponse> getShowtimeDetail(@PathVariable("id") Integer showtimeId) {
         return ResponseEntity.ok(showtimeService.getShowtimeDetail(showtimeId));
     }
+
+    @GetMapping("/movie/{movieId}")
+    public ResponseEntity<List<ShowtimeDetailResponse>> getShowtimesByMovie(@PathVariable("movieId") Long movieId) {
+        return ResponseEntity.ok(showtimeService.getShowtimesByMovie(movieId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ShowtimeDetailResponse>> getAllShowtimes() {
+        return ResponseEntity.ok(showtimeService.getAllShowtimes());
+    }
 }

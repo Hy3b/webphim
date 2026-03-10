@@ -11,6 +11,9 @@ import java.util.List;
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Integer> {
 
+    @Query("SELECT s FROM Seat s WHERE s.room.roomId = :roomId")
+    List<Seat> findByRoomId(@Param("roomId") Integer roomId);
+
     @Query("SELECT s FROM Seat s JOIN FETCH s.seatType WHERE s.room.roomId = :roomId")
     List<Seat> findByRoomIdWithSeatType(@Param("roomId") Integer roomId);
 

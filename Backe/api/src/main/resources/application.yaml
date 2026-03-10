@@ -15,11 +15,10 @@ spring:
       # Đây là chế độ an toàn nhất cho môi trường dev/prod khi DB đã được quản lý thủ công.
       # Các tùy chọn khác: create | create-drop | update | none
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
     # Tắt defer vì không còn cần chạy data.sql sau khi Hibernate khởi xong
     defer-datasource-initialization: false
 
@@ -40,3 +39,8 @@ sepay:
   secret-key: ${SEPAY_SECRET_KEY}
   bank-account: ${SEPAY_BANK_ACCOUNT}
   bank-name: ${SEPAY_BANK_NAME}
+
+# Cấu hình JWT
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}

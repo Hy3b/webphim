@@ -3,41 +3,68 @@ import { useParams } from 'react-router-dom';
 import MovieCard from '../../../components/movie_card/movie_card.jsx';
 import DateSelector from '../Schedule/components/DateSelector/DateSelector';
 import ShowtimeGrid from '../../../components/common/ShowtimeGrid/ShowtimeGrid';
-import { scheduleData } from '../Schedule/data/fakeData';
 import './MovieDetail.css'; 
 
 const MovieDetail = () => {
-    const { id } = useParams(); // Lấy ID từ URL (ví dụ: /movie/1 -> id = 1)
+    const { id } = useParams();
 
-    // State cho thanh Chọn Ngày (Vẫn xài data ảo ngầm định)
-    const [activeTab, setActiveTab] = useState(scheduleData[0]?.day.id || 'tab-id-1');
-    const days = scheduleData.map(item => item.day);
-    const activeDayData = scheduleData.find(item => item.day.id === activeTab);
-    const showtimes = activeDayData?.movies[0]?.showtimes || [];
-
-    // State lưu dữ liệu phim thật
     const [movie, setMovie] = useState(null);
     const [relatedMovies, setRelatedMovies] = useState([]);
+    const [rawShowtimes, setRawShowtimes] = useState([]);
+    const [activeTab, setActiveTab] = useState(null);
 
     useEffect(() => {
-        // 1. Fetch dữ liệu chi tiết của phim dựa vào ID từ đường dẫn
         fetch(`/api/movies/${id}`)
             .then(res => res.json())
             .then(data => setMovie(data))
             .catch(err => console.error("Lỗi tải phim: ", err));
 
-        // 2. Fetch danh sách tất cả các phim để làm Sidebar (Gợi ý phim khác)
         fetch(`/api/movies`)
             .then(res => res.json())
             .then(data => {
-                // Chỉ lấy phim "Đang chiếu" & Khác với phim đang xem hiện tại
                 const filtered = data.filter(m => m.status === 'showing' && m.id.toString() !== id.toString());
-                setRelatedMovies(filtered.slice(0, 3)); // Lấy tối đa 3 phim
+                setRelatedMovies(filtered.slice(0, 3));
             })
             .catch(err => console.error("Lỗi tải danh sách phim: ", err));
-    }, [id]); // Đặt dependency là id để mỗi khi bấm qua phim khác, nó sẽ fetch lại data!
 
-    // Nếu dữ liệu chưa về kịp, hiển thị dòng Loading
+        // Fetch real showtimes for this movie
+        fetch(`http://localhost:8080/api/showtimes/movie/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                setRawShowtimes(data);
+            })
+            .catch(err => console.error("Lỗi tải lịch chiếu: ", err));
+    }, [id]);
+
+    // Grouping logic for DateSelector
+    const uniqueDates = [...new Set(rawShowtimes.map(st => st.startTime.split('T')[0]))].sort();
+    
+    const days = uniqueDates.map((dateStr, index) => {
+        const d = new Date(dateStr);
+        return {
+            id: `tab-id-${index}`,
+            dateValue: dateStr,
+            dayNumber: d.getDate().toString().padStart(2, '0'),
+            monthYear: `/${(d.getMonth() + 1).toString().padStart(2, '0')} - ${d.toLocaleDateString('vi-VN', { weekday: 'short' })}`
+        };
+    });
+
+    // Auto-select first date tab when data arrives
+    useEffect(() => {
+        if (days.length > 0 && !activeTab) {
+            setActiveTab(days[0].id);
+        }
+    }, [days, activeTab]);
+
+    const selectedDate = days.find(d => d.id === activeTab)?.dateValue;
+    const showtimes = rawShowtimes
+        .filter(st => st.startTime.startsWith(selectedDate))
+        .map(st => ({
+            id: st.showtimeId,
+            time: st.startTime.split('T')[1].substring(0, 5),
+            seats: '25' // Default to 25 seats total
+        }));
+
     if (!movie) {
         return <div style={{textAlign: 'center', padding: '100px', color: '#fff'}}>Đang tải dữ liệu phim...</div>;
     }

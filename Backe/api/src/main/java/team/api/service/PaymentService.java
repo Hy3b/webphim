@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.api.dto.SePayWebhookRequest;
+
+import team.api.dto.request.SePayWebhookRequest;
 import team.api.dto.response.BookingStatusResponse;
 import team.api.entity.Order;
 import team.api.repository.OrderRepository;
@@ -12,6 +13,15 @@ import team.api.repository.OrderRepository;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
+
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import team.api.entity.Booking;
+import team.api.entity.BookingSeat;
+import team.api.entity.Seat;
+import team.api.repository.BookingRepository;
+import team.api.repository.BookingSeatRepository;
 
 @Slf4j
 @Service
@@ -19,6 +29,9 @@ import java.util.regex.Pattern;
 public class PaymentService {
 
     private final OrderRepository orderRepository;
+    private final BookingRepository bookingRepository;
+    private final BookingSeatRepository bookingSeatRepository;
+    private final RedissonClient redissonClient;
 
     private static final Pattern ORDER_CODE_PATTERN = Pattern.compile("(?i)(DH\\d+)");
 
@@ -64,9 +77,42 @@ public class PaymentService {
                 log.info("✅ Order '{}' thanh toán THÀNH CÔNG (DƯ TIỀN). Số tiền nhận: {}, Cần: {}",
                         orderCode, request.getTransferAmount(), order.getFinalAmount());
             }
+
+            // Xử lý chốt ghế vĩnh viễn trên Redis (SOLD)
+            try {
+                processSeatsOnPaymentSuccess(order);
+            } catch (Exception e) {
+                log.error("Lỗi khi xử lý chốt ghế cho đơn hàng: {}", orderCode, e);
+            }
+
         } else { // compareResult < 0
             log.warn("⚠️ Order '{}' thiếu tiền. Nhận: {}, Cần: {}",
                     orderCode, request.getTransferAmount(), order.getFinalAmount());
+        }
+    }
+
+    private void processSeatsOnPaymentSuccess(Order order) {
+        List<Booking> bookings = bookingRepository.findByOrder_OrderId(order.getOrderId());
+
+        if (bookings.isEmpty()) {
+            log.warn("Không tìm thấy booking nào cho orderId: {}", order.getOrderId());
+            return;
+        }
+
+        Integer showtimeId = bookings.get(0).getShowtime().getShowtimeId();
+        String redisHashKey = "showtime:" + showtimeId + ":seats";
+        RMap<String, String> seatStatuses = redissonClient.getMap(redisHashKey);
+
+        for (Booking booking : bookings) {
+            List<BookingSeat> bookingSeats = bookingSeatRepository.findByBooking_BookingId(booking.getBookingId());
+
+            for (BookingSeat bs : bookingSeats) {
+                Seat seat = bs.getSeat();
+                String seatKey = seat.getRowName() + seat.getSeatNumber();
+                // Overwrite LOCKED → SOLD vĩnh viễn (put không có TTL = không expire)
+                seatStatuses.put(seatKey, "SOLD");
+                log.info("🪑 Ghế {} đã SOLD vĩnh viễn (orderId={})", seatKey, order.getOrderId());
+            }
         }
     }
 

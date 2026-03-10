@@ -2,11 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import SeatMap from '../SeatMap/SeatMap';
 import BookingSummary from '../BookingSummary/BookingSummary';
+import { useAuth } from '../../../../context/AuthContext';
 import './BookingPage.css';
 
 const BookingPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [seats, setSeats] = useState([]);
     const [movie, setMovie] = useState(null);
@@ -36,14 +38,13 @@ const BookingPage = () => {
             if (response.ok) {
                 const data = await response.json();
                 const mappedSeats = data.map(seat => ({
-                    id: `${seat.rowName}${seat.seatNumber}`, // Backend nhận List<String> dạng "A1", "B2"
+                    id: seat.rowName + seat.seatNumber, // Trả về dạng String A1, A2 để backend map đúng List<String> seatIds
                     row: seat.rowName,
                     number: seat.seatNumber.toString().padStart(2, '0'),
-                    status: seat.status === 'AVAILABLE' ? 'available' : 'booked',
-                    price: seat.seatTypeName === 'VIP' ? 70000 : 50000, // VIP 70k, Thường 50k
-                    type: seat.seatTypeName.toLowerCase() === 'vip' ? 'vip' : 'standard'
+                    status: seat.status === 'AVAILABLE' ? 'available' : seat.status === 'LOCKED' ? 'holding' : 'booked',
+                    price: seat.seatTypeName === 'VIP' ? 70000 : (seat.seatTypeName === 'Couple' ? 120000 : 50000),
+                    type: seat.seatTypeName.toLowerCase()
                 }));
-                // Tốt nhất nếu data đầy đủ thì gán, không thì lấy map
                 if (mappedSeats.length > 0) {
                     setSeats(mappedSeats);
                     return;
@@ -52,25 +53,6 @@ const BookingPage = () => {
             throw new Error("Không có data cấu trúc chuẩn");
         } catch (error) {
             console.error("Lỗi tải ghế/Server chưa chuẩn bị API, dùng mock data:", error);
-            const mockSeats = [];
-            const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-
-            rows.forEach((row, rowIndex) => {
-                for (let i = 1; i <= 14; i++) {
-                    const isBooked = Math.random() < 0.1;
-                    const price = rowIndex > 5 ? 70000 : 50000;
-
-                    mockSeats.push({
-                        id: `${row}${i}`,
-                        row: row,
-                        number: i.toString().padStart(2, '0'),
-                        status: isBooked ? 'booked' : 'available',
-                        price: price,
-                        type: 'standard'
-                    });
-                }
-            });
-            setSeats(mockSeats);
         }
     }, [id]);
 
@@ -129,6 +111,12 @@ const BookingPage = () => {
 
     // 3. HÀM XÁC NHẬN ĐẶT GHẾ (GỌI POST REQUEST REDIS LOCK)
     const handleConfirmBooking = async () => {
+        if (!user) {
+            alert("Bạn cần phải đăng nhập để tiếp tục đặt vé!");
+            navigate('/login');
+            return;
+        }
+
         if (selectedSeats.length === 0) {
             setBookingError("Vui lòng chọn ít nhất 1 ghế!");
             return;
@@ -137,7 +125,7 @@ const BookingPage = () => {
         setBookingError(null);
 
         const payload = {
-            userId: 2, // Fix cứng user 1 trước
+            userId: user.id || 2, // Lấy ID của user đang đăng nhập (hoặc dự phòng)
             showtimeId: parseInt(id),
             seatIds: selectedSeats,
             totalAmount: calculateTotal()
@@ -147,8 +135,15 @@ const BookingPage = () => {
             const res = await fetch('http://localhost:8080/api/bookings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
+
+            if (res.status === 401) {
+                alert("Bạn cần phải đăng nhập để tiếp tục đặt vé!");
+                navigate('/login');
+                return;
+            }
 
             // Nếu Backend trả về 400 (Redis block vì khách khác vừa hẫng tay trên)
             if (!res.ok) {
@@ -165,8 +160,8 @@ const BookingPage = () => {
                     selectedSeats,
                     totalPrice: calculateTotal(),
                     bookingInfo: data,
-                    bookingId: data?.bookingId || Math.floor(Math.random() * 100000),
-                    orderCode: data?.orderCode || `DH${Date.now()}`
+                    bookingId: data?.bookingId, // Nhận data chuẩn từ server
+                    orderCode: data?.orderCode  // Nhận data chuẩn từ server
                 }
             });
         } catch (err) {
@@ -214,6 +209,9 @@ const BookingPage = () => {
                             </div>
                             <div className="info-block">
                                 <span className="label">Ghế VIP</span>
+                            </div>
+                            <div className="info-block">
+                                <span className="label">Ghế đôi</span>
                             </div>
                         </div>
                         <div className="price-timer-container">

@@ -13,4 +13,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     Optional<Order> findByOrderCode(String orderCode);
 
     List<Order> findByStatusAndExpiredAtBefore(Order.Status status, LocalDateTime dateTime);
+
+    List<Order> findByStatus(Order.Status status);
 }

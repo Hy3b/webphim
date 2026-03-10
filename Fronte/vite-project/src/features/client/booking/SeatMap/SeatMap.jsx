@@ -18,7 +18,7 @@ const SeatMap = ({ seats, selectedSeats, onSeatSelect }) => {
                         <div className="row-seats">
                             {seats.filter(seat => seat.row === row).map(seat => {
                                 const isSelected = selectedSeats.includes(seat.id);
-                                const isBooked = seat.status === 'booked';
+                                const isBooked = seat.status === 'booked' || seat.status === 'holding';
 
                                 return (
                                     <button
@@ -51,11 +51,11 @@ const SeatMap = ({ seats, selectedSeats, onSeatSelect }) => {
                     <div className="seat-item booked"></div>
                     <span>Ghế đã bán</span>
                 </div>
-                {/* 
                 <div className="legend-item">
-                    <div className="seat-item processing"></div>
+                    <div className="seat-item holding"></div>
                     <span>Ghế đang giữ</span>
                 </div>
+                {/* 
                  <div className="legend-item">
                     <div className="seat-item booked-advance"></div>
                     <span>Ghế đặt trước</span>
