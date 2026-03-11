@@ -13,6 +13,12 @@ import TicketPage from '../features/client/ticket/TicketPage';
 // Admin imports
 import AdminLayout from '../layouts/AdminLayout';
 import DashboardPage from '../features/admin/pages/DashboardPage';
+import MoviesPage from '../features/admin/pages/movies/MoviesPage';
+import MovieFormPage from '../features/admin/pages/movies/MovieFormPage';
+import ShowtimesPage from '../features/admin/pages/showtimes/ShowtimesPage';
+import ShowtimeFormPage from '../features/admin/pages/showtimes/ShowtimeFormPage';
+import RoomsPage from '../features/admin/pages/rooms/RoomsPage';
+import SeatMapTemplatesPage from '../features/admin/pages/seat-map/SeatMapTemplatesPage';
 
 const AppRoutes = () => {
     return (
@@ -31,6 +37,13 @@ const AppRoutes = () => {
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<DashboardPage />} />
+                <Route path="movies" element={<MoviesPage />} />
+                <Route path="movies/create" element={<MovieFormPage />} />
+                <Route path="movies/edit/:id" element={<MovieFormPage />} />
+                <Route path="showtimes" element={<ShowtimesPage />} />
+                <Route path="showtimes/create" element={<ShowtimeFormPage />} />
+                <Route path="rooms" element={<RoomsPage />} />
+                <Route path="seat-map" element={<SeatMapTemplatesPage />} />
             </Route>
         </Routes>
     );
