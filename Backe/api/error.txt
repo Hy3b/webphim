@@ -1,0 +1,83 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------------< team:api >------------------------------
+[INFO] Building api 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.0:clean (default-clean) @ api ---
+[INFO] Deleting D:\Documents\code\webphim\Backe\api\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ api ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ api ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 50 source files with javac [debug parameters release 21] to target\classes
+[INFO] Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetailsService.java:[19,35] cannot find symbol
+  symbol:   method findByUsername(java.lang.String)
+  location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[28,27] cannot find symbol
+  symbol:   method existsByUsername(java.lang.String)
+  location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[32,27] cannot find symbol
+  symbol:   method existsByEmail(java.lang.String)
+  location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[39,17] cannot find symbol
+  symbol:   method password(java.lang.String)
+  location: class team.api.entity.User.UserBuilder
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[56,35] cannot find symbol
+  symbol:   method findByUsername(java.lang.String)
+  location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[20,20] cannot find symbol
+  symbol:   method getId()
+  location: variable user of type team.api.entity.User
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[24,28] incompatible types: team.api.entity.User.Role cannot be converted to java.lang.String
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[33,81] incompatible types: team.api.entity.User.Role cannot be converted to java.lang.String
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[38,20] cannot find symbol
+  symbol:   method getPassword()
+  location: variable user of type team.api.entity.User
+[INFO] 9 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.836 s
+[INFO] Finished at: 2026-03-08T22:22:36+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project api: Compilation failure: Compilation failure: 
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetailsService.java:[19,35] cannot find symbol
+[ERROR]   symbol:   method findByUsername(java.lang.String)
+[ERROR]   location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[28,27] cannot find symbol
+[ERROR]   symbol:   method existsByUsername(java.lang.String)
+[ERROR]   location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[32,27] cannot find symbol
+[ERROR]   symbol:   method existsByEmail(java.lang.String)
+[ERROR]   location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[39,17] cannot find symbol
+[ERROR]   symbol:   method password(java.lang.String)
+[ERROR]   location: class team.api.entity.User.UserBuilder
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/service/AuthService.java:[56,35] cannot find symbol
+[ERROR]   symbol:   method findByUsername(java.lang.String)
+[ERROR]   location: variable userRepository of type team.api.repository.UserRepository
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[20,20] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable user of type team.api.entity.User
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[24,28] incompatible types: team.api.entity.User.Role cannot be converted to java.lang.String
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[33,81] incompatible types: team.api.entity.User.Role cannot be converted to java.lang.String
+[ERROR] /D:/Documents/code/webphim/Backe/api/src/main/java/team/api/security/CustomUserDetails.java:[38,20] cannot find symbol
+[ERROR]   symbol:   method getPassword()
+[ERROR]   location: variable user of type team.api.entity.User
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

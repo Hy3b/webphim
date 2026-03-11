@@ -1,9 +1,12 @@
 import React, { useState } from 'react'; // 1. Import useState
 import { Link } from 'react-router-dom';
 import './header.css';
+import { useAuth } from '../../../context/AuthContext';
+
 export default function Header() {
     // 2. Khởi tạo biến Active Tab
     const [activeTab, setActiveTab] = useState('');
+    const { user, logout } = useAuth();
 
     return (
         <div className="header-wrapper">
@@ -11,10 +14,19 @@ export default function Header() {
             <div className="top-bar">
                 <div className="container top-bar-content">
                     <div className="auth-links">
-                        <Link to="/login">Đăng nhập</Link>
-                        <span className="divider">|</span>
-                        <Link to="/register">Đăng ký</Link>
-
+                        {user ? (
+                            <div className="user-profile-menu">
+                                <span>Xin chào, {user.fullName || user.username}</span>
+                                <span className="divider">|</span>
+                                <button onClick={logout} className="logout-btn" style={{ background: 'none', border: 'none', color: '#ffd700', cursor: 'pointer', font: 'inherit', padding: 0 }}>Đăng xuất</button>
+                            </div>
+                        ) : (
+                            <>
+                                <Link to="/login">Đăng nhập</Link>
+                                <span className="divider">|</span>
+                                <Link to="/register">Đăng ký</Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

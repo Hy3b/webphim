@@ -131,3 +131,12 @@
     opacity: 1;
     /* Keep vivid red */
 }
+
+/* Holding: Orange/Yellow */
+.seat-item.holding {
+    background-color: #ffb300;
+    /* Amber/Orange */
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.9;
+}

@@ -23,8 +23,8 @@ public class Room {
     private Integer totalSeats;
 
     @Enumerated(EnumType.STRING)
-    @Builder.Default
     @Column(columnDefinition = "enum('active', 'maintenance') default 'active'")
+    @Builder.Default
     private Status status = Status.active;
 
     public enum Status {

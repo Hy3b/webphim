@@ -23,6 +23,7 @@ public class BookingController {
             CreateBookingResponse response = bookingService.bookSeats(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

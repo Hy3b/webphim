@@ -1,10 +1,10 @@
 package team.api.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team.api.dto.SePayWebhookRequest;
+
+import team.api.dto.request.SePayWebhookRequest;
 import team.api.service.PaymentService;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +22,16 @@ import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 @RestController
 @RequestMapping("/api/payment")
-@RequiredArgsConstructor
 public class PaymentController {
 
     private final PaymentService paymentService;
-    @Value("${sepay.secret-key:}")
-    private String sepaySecretKey;
+    private final String sepaySecretKey;
+
+    public PaymentController(PaymentService paymentService,
+            @Value("${sepay.secret-key:}") String sepaySecretKey) {
+        this.paymentService = paymentService;
+        this.sepaySecretKey = sepaySecretKey;
+    }
 
     /**
      * Nhận webhook từ SePay và xử lý đối soát thanh toán.
@@ -46,42 +50,46 @@ public class PaymentController {
     }
 
     @PostMapping("/sepay-webhook")
-    public ResponseEntity<Map<String, Boolean>> handleSePayWebhook(
+    public ResponseEntity<Map<String, Object>> handleSePayWebhook(
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestBody SePayWebhookRequest request) {
 
         // 1. Kiểm tra tính hợp lệ của Secret Key
-        // TODO: Bật lại khi deploy production
-        // if (sepaySecretKey != null && !sepaySecretKey.isEmpty()) {
-        // if (authorization == null || !authorization.contains(sepaySecretKey)) {
-        // log.warn("Cảnh báo: Webhook nhận được Secret Key không hợp lệ!");
-        // return ResponseEntity.status(403).build();
-        // }
-        // }
+        if (sepaySecretKey != null && !sepaySecretKey.isEmpty()) {
+            if (authorization == null || !authorization.contains(sepaySecretKey)) {
+                log.warn("❌ Cảnh báo: Webhook nhận được Secret Key không hợp lệ! (Header Authorization: {})", authorization);
+                return ResponseEntity.status(403).build();
+            } else {
+                log.info("✅ Xác thực Secret Key SePay thành công!");
+            }
+        } else {
+            log.info("⚠️ Bỏ qua xác thực Secret Key SePay (Chưa cấu hình biến môi trường sepay.secret-key)");
+        }
 
         log.info("📩 Nhận webhook từ SePay - referenceCode: {}", request.getReferenceCode());
 
         // 2. Xử lý webhook update database
         try {
             paymentService.processWebhook(request);
+            // SePay bắt buộc nhận {"success": true} để xác nhận đã nhận thông báo
+            return ResponseEntity.ok(Map.of("success", true));
+            
         } catch (Exception e) {
-            // Vẫn trả về 200 để SePay không retry liên tục.
-            // Log lỗi để debug, nhưng không để lộ stack trace ra ngoài.
-            log.error("Lỗi xử lý webhook SePay: {}", e.getMessage(), e);
+            log.error("❌ Lỗi xử lý webhook SePay: {}", e.getMessage(), e);
+            // Trả về HTTP 400 Bad Request. 
+            // Khi SePay nhận 400, hệ thống của họ sẽ đánh dấu lỗi và TỰ ĐỘNG RETRY (gửi lại thông báo sau).
+            return ResponseEntity.badRequest().body(Map.of("success", false, "error", e.getMessage()));
         }
-
-        // SePay bắt buộc nhận {"success": true} để xác nhận đã nhận thông báo
-        return ResponseEntity.ok(Map.of("success", true));
     }
 
     /**
      * API để frontend polling (kiểm tra liên tục) xem booking đã được thanh toán
      * chưa.
      */
-    @GetMapping("/status/{bookingId}")
+    @GetMapping("/status/{orderCode}")
     public ResponseEntity<team.api.dto.response.BookingStatusResponse> checkPaymentStatus(
-            @PathVariable Integer bookingId) {
-        team.api.dto.response.BookingStatusResponse status = paymentService.getBookingStatus(bookingId);
+            @PathVariable String orderCode) {
+        team.api.dto.response.BookingStatusResponse status = paymentService.getBookingStatus(orderCode);
         return ResponseEntity.ok(status);
     }
 }

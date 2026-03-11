@@ -28,4 +28,5 @@ public class MovieController {
     public Movie createMovie(@RequestBody Movie movie) {
         return movieRepository.save(movie);
     }
+
 }

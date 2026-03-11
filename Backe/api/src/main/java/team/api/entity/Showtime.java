@@ -29,9 +29,6 @@ public class Showtime {
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal basePrice;
-
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
@@ -39,9 +36,12 @@ public class Showtime {
     @Builder.Default
     private Integer bufferTimeMinutes = 15;
 
+    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal basePrice;
+
     @Enumerated(EnumType.STRING)
-    @Builder.Default
     @Column(columnDefinition = "enum('active', 'cancelled', 'completed') default 'active'")
+    @Builder.Default
     private Status status = Status.active;
 
     @Column(name = "batch_id", length = 100)

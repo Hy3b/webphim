@@ -2,14 +2,14 @@ package team.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import team.api.dto.request.ShowtimeGenerateRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import team.api.dto.response.SeatStatusResponse;
-import team.api.entity.Showtime;
-import team.api.service.ShowtimeGeneratorService;
+import team.api.dto.response.ShowtimeDetailResponse;
 import team.api.service.ShowtimeService;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -18,7 +18,6 @@ import java.util.List;
 public class ShowtimeController {
 
     private final ShowtimeService showtimeService;
-    private final ShowtimeGeneratorService showtimeGeneratorService;
 
     @GetMapping("/{id}/seats")
     public ResponseEntity<List<SeatStatusResponse>> getSeatStatuses(@PathVariable("id") Integer showtimeId) {
@@ -26,14 +25,18 @@ public class ShowtimeController {
         return ResponseEntity.ok(seatStatuses);
     }
 
-    @PostMapping("/generate")
-    public ResponseEntity<?> generateShowtimes(@RequestBody ShowtimeGenerateRequest request) {
-        try {
-            List<Showtime> results = showtimeGeneratorService.generateShowtimes(request);
-            return ResponseEntity.ok(Collections.singletonMap("message",
-                    results.size() + " suất chiếu đã được tạo thành công!"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<ShowtimeDetailResponse> getShowtimeDetail(@PathVariable("id") Integer showtimeId) {
+        return ResponseEntity.ok(showtimeService.getShowtimeDetail(showtimeId));
+    }
+
+    @GetMapping("/movie/{movieId}")
+    public ResponseEntity<List<ShowtimeDetailResponse>> getShowtimesByMovie(@PathVariable("movieId") Long movieId) {
+        return ResponseEntity.ok(showtimeService.getShowtimesByMovie(movieId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ShowtimeDetailResponse>> getAllShowtimes() {
+        return ResponseEntity.ok(showtimeService.getAllShowtimes());
     }
 }

@@ -9,7 +9,7 @@ const HomePage = () => {
     
     // Gọi API Node/Java để lấy danh sách phim thực tế
     useEffect(() => {
-        fetch('http://localhost:8080/api/movies')
+        fetch('/api/movies')
             .then(res => res.json())
             .then(data => {
                 setMoviesData(data); // Cập nhật state khi tải xong

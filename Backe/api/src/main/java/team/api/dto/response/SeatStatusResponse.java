@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,4 +17,5 @@ public class SeatStatusResponse {
     private Integer seatNumber;
     private String status; // AVAILABLE, LOCKED, SOLD
     private String seatTypeName;
+    private BigDecimal price;
 }

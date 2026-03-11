@@ -1,19 +1,49 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './LoginPage.css';
+import { useAuth } from '../../../context/AuthContext';
 
 const LoginPage = () => {
+    const navigate = useNavigate();
+    const { login } = useAuth();
     const [form, setForm] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // goi API dang nhap
-        console.log(form);
+        setErrorMessage('');
+
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    // Backend có thể đang kỳ vọng username cho trường đăng nhập
+                    username: form.email.trim(),
+                    password: form.password
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert('Đăng nhập thành công!');
+                await login();
+                navigate('/'); // Chuyển hướng về trang chủ
+            } else {
+                setErrorMessage('Email/Tên đăng nhập hoặc mật khẩu không chính xác!');
+            }
+        } catch (error) {
+            console.error("Lỗi đăng nhập:", error);
+            setErrorMessage('Đăng nhập thất bại: Không thể kết nối đến máy chủ!');
+        }
     };
 
     return (
@@ -24,6 +54,12 @@ const LoginPage = () => {
                     <div className="auth-divider-line"></div>
                     <p>Chào mừng bạn trở lại với MyCinema!</p>
                 </div>
+
+                {errorMessage && (
+                    <div className="auth-error-message" style={{ color: '#e74c3c', marginBottom: '15px', padding: '10px', backgroundColor: 'rgba(231, 76, 60, 0.1)', borderRadius: '4px', border: '1px solid #e74c3c' }}>
+                        {errorMessage}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">

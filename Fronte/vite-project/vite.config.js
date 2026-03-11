@@ -5,6 +5,14 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: ['webphim.hanhfine.id.vn']
+    allowedHosts: true,
+    proxy: {
+      // Mọi request /api/... → forward tới backend (không qua browser → không bị PNA block)
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   }
 })

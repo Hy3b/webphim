@@ -1,31 +1,46 @@
 spring:
   application:
     name: api
+
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:Cinema_DB}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${DB_USER:root}
-    password: ${DB_PASS:123456}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASS}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
-      ddl-auto: create
-    show-sql: true
-    defer-datasource-initialization: true # Chạy file data.sql sau khi Hibernate tạo bảng xong
+      # validate: Hibernate sẽ so sánh các @Entity với bảng thực tế trong DB.
+      # Nếu không khớp (thiếu cột, sai kiểu dữ liệu) → app sẽ KHÔNG khởi động.
+      # Đây là chế độ an toàn nhất cho môi trường dev/prod khi DB đã được quản lý thủ công.
+      # Các tùy chọn khác: create | create-drop | update | none
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
+    # Tắt defer vì không còn cần chạy data.sql sau khi Hibernate khởi xong
+    defer-datasource-initialization: false
+
   sql:
     init:
-      mode: always # Luôn chạy file data.sql khi khởi động
+      # Tắt hoàn toàn việc tự động chạy file data.sql / schema.sql khi khởi động.
+      # Dữ liệu sẽ được lấy trực tiếp từ database (đã có sẵn dữ liệu thật).
+      mode: never
+
   redis:
-    host: ${REDIS_HOST:127.0.0.1}
-    port: ${REDIS_PORT:6380}
-    password: ${REDIS_PASSWORD:webphim-secret-redis}
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
 
 # Cấu hình tích hợp SePay
 sepay:
-  merchant-id: SP-TEST-DVG6A78A
-  secret-key: spsk_test_4pAQ8JhbRHjD7jYqn9L6G5ApmcPiwdjz
-  bank-account: 0398800105
-  bank-name: MB
+  merchant-id: ${SEPAY_MERCHANT_ID}
+  secret-key: ${SEPAY_SECRET_KEY}
+  bank-account: ${SEPAY_BANK_ACCOUNT}
+  bank-name: ${SEPAY_BANK_NAME}
+
+# Cấu hình JWT
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}

@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS Cinema_DB;
 USE Cinema_DB;
 
+-- 1. Bảng users (Không phụ thuộc)
 CREATE TABLE users (
     user_id integer not null auto_increment,
     created_at datetime(6),
@@ -15,6 +16,7 @@ CREATE TABLE users (
     constraint UK_email unique (email)
 ) engine=InnoDB;
 
+-- 2. Bảng rooms (Không phụ thuộc)
 CREATE TABLE rooms (
     room_id integer not null auto_increment,
     total_seats integer,
@@ -23,6 +25,7 @@ CREATE TABLE rooms (
     primary key (room_id)
 ) engine=InnoDB;
 
+-- 3. Bảng seat_types (Không phụ thuộc)
 CREATE TABLE seat_types (
     seat_type_id integer not null auto_increment,
     surcharge decimal(10,2),
@@ -30,9 +33,10 @@ CREATE TABLE seat_types (
     primary key (seat_type_id)
 ) engine=InnoDB;
 
+-- 4. Bảng seats (Phụ thuộc: rooms, seat_types)
 CREATE TABLE seats (
-    room_id integer not null,
     seat_id integer not null auto_increment,
+    room_id integer not null,
     seat_number integer not null,
     seat_type_id integer not null,
     row_name char(2) not null,
@@ -42,11 +46,12 @@ CREATE TABLE seats (
     constraint fk_seat_type foreign key (seat_type_id) references seat_types (seat_type_id)
 ) engine=InnoDB;
 
+-- 5. Bảng movies (Không phụ thuộc)
 CREATE TABLE movies (
+    movie_id bigint not null auto_increment,
     duration_minutes integer not null,
     trailer_duration_minutes integer default 10,
     rating float(53),
-    movie_id bigint not null auto_increment,
     title varchar(200) not null,
     age_rating varchar(255),
     banner varchar(255),
@@ -60,10 +65,11 @@ CREATE TABLE movies (
     primary key (movie_id)
 ) engine=InnoDB;
 
+-- 6. Bảng showtimes (Phụ thuộc: movies, rooms)
 CREATE TABLE showtimes (
+    showtime_id integer not null auto_increment,
     base_price decimal(10,2) not null,
     room_id integer not null,
-    showtime_id integer not null auto_increment,
     movie_id bigint not null,
     start_time datetime(6) not null,
     end_time datetime(6),
@@ -75,18 +81,38 @@ CREATE TABLE showtimes (
     constraint fk_show_room foreign key (room_id) references rooms (room_id)
 ) engine=InnoDB;
 
-CREATE TABLE bookings (
-    booking_id integer not null auto_increment,
-    showtime_id integer not null,
-    total_amount decimal(10,2) not null,
+-- 7. Bảng orders (Phụ thuộc: users) 
+-- Bảng này CẦN được tạo trước bảng bookings
+CREATE TABLE orders (
+    order_id integer not null auto_increment,
+    order_code varchar(50) not null, 
     user_id integer not null,
-    booking_date datetime(6),
-    status enum('pending','paid','cancelled') default 'pending',
-    primary key (booking_id),
-    constraint fk_booking_showtime foreign key (showtime_id) references showtimes (showtime_id),
-    constraint fk_booking_user foreign key (user_id) references users (user_id)
+    total_amount decimal(10,2) not null, 
+    discount_amount decimal(10,2) default 0.00,
+    final_amount decimal(10,2) not null, 
+    status enum('pending', 'paid', 'cancelled', 'expired', 'refunded') default 'pending',
+    payment_method varchar(50), 
+    expired_at datetime(6) not null, 
+    created_at datetime(6) default current_timestamp(6),
+    updated_at datetime(6) on update current_timestamp(6),
+    primary key (order_id),
+    constraint uk_order_code unique (order_code),
+    constraint fk_order_user foreign key (user_id) references users (user_id)
 ) engine=InnoDB;
 
+-- 8. Bảng bookings (Phụ thuộc: orders, showtimes)
+-- Đã loại bỏ các cột thừa (total_amount, status, user_id, booking_date)
+-- và tích hợp trực tiếp order_id
+CREATE TABLE bookings (
+    booking_id integer not null auto_increment,
+    order_id integer not null,
+    showtime_id integer not null,
+    primary key (booking_id),
+    constraint fk_booking_order foreign key (order_id) references orders (order_id),
+    constraint fk_booking_showtime foreign key (showtime_id) references showtimes (showtime_id)
+) engine=InnoDB;
+
+-- 9. Bảng booking_seats (Phụ thuộc: bookings, seats, showtimes)
 CREATE TABLE booking_seats (
     id integer not null auto_increment,
     booking_id integer not null,
