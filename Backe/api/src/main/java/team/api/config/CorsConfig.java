@@ -17,9 +17,7 @@ public class CorsConfig implements WebMvcConfigurer {
 
     private static final List<String> ALLOWED_ORIGINS = List.of(
             "http://localhost:5173",
-            "http://127.0.0.1:5173"
-
-    );
+            "http://127.0.0.1:5173");
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
