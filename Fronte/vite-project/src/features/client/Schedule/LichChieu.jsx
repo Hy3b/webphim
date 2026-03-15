@@ -27,7 +27,7 @@ const LichChieu = () => {
 
     // Grouping logic for DateSelector
     const uniqueDates = [...new Set(rawShowtimes.map(st => st.startTime.split('T')[0]))].sort();
-    
+
     const days = uniqueDates.map((dateStr, index) => {
         const d = new Date(dateStr);
         return {
@@ -77,7 +77,7 @@ const LichChieu = () => {
 
                                         if (movieShowtimes.length === 0) return null; // Không chiếu ngày này thì hide phim
 
-                                        return <MovieItem key={movie.id} movie={{...movie, showtimes: movieShowtimes, type: '2D PHỤ ĐỀ'}} />;
+                                        return <MovieItem key={movie.id} movie={{ ...movie, showtimes: movieShowtimes, type: '2D PHỤ ĐỀ' }} />;
                                     })
                                 ) : (
                                     <div className="empty-state">Đang tải phim...</div>

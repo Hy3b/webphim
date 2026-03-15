@@ -1,0 +1,78 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------------< team:api >------------------------------
+[INFO] Building api 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ api ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ api ---
+[INFO] skip non existing resourceDirectory D:\Documents\code\webphim\Backe\api\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.2:test (default-test) @ api ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running team.api.service.admin.AdminBookingServiceTest
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 1.728 s <<< FAILURE! -- in team.api.service.admin.AdminBookingServiceTest
+[ERROR] team.api.service.admin.AdminBookingServiceTest.bookTicketsAtCounter_CashPayment_Success -- Time elapsed: 1.693 s <<< ERROR!
+java.lang.Error: 
+Unresolved compilation problem: 
+	The method seatNumber(Integer) in the type Seat.SeatBuilder is not applicable for the arguments (String)
+
+	at team.api.service.admin.AdminBookingServiceTest.setUp(AdminBookingServiceTest.java:84)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] team.api.service.admin.AdminBookingServiceTest.bookTicketsAtCounter_QRPayment_Success -- Time elapsed: 0.005 s <<< ERROR!
+java.lang.Error: 
+Unresolved compilation problem: 
+	The method seatNumber(Integer) in the type Seat.SeatBuilder is not applicable for the arguments (String)
+
+	at team.api.service.admin.AdminBookingServiceTest.setUp(AdminBookingServiceTest.java:84)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   AdminBookingServiceTest.setUp:84  Unresolved compilation problem: 
+	The method seatNumber(Integer) in the type Seat.SeatBuilder is not applicable for the arguments (String)
+
+[ERROR]   AdminBookingServiceTest.setUp:84  Unresolved compilation problem: 
+	The method seatNumber(Integer) in the type Seat.SeatBuilder is not applicable for the arguments (String)
+
+[INFO] 
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.046 s
+[INFO] Finished at: 2026-03-15T20:32:52+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.2:test (default-test) on project api: 
+[ERROR] 
+[ERROR] See D:\Documents\code\webphim\Backe\api\target\surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

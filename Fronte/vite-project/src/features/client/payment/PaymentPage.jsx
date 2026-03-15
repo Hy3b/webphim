@@ -169,8 +169,8 @@ const PaymentPage = () => {
                                 <p style={{ color: '#dc3545', margin: 0 }}>
                                     <strong>Phiên giao dịch đã kết thúc do quá thời gian thanh toán.</strong>
                                 </p>
-                                <button 
-                                    onClick={() => navigate('/')} 
+                                <button
+                                    onClick={() => navigate('/')}
                                     style={{ padding: '10px 24px', backgroundColor: '#fff', border: '2px solid #dc3545', color: '#dc3545', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', transition: 'all 0.2s ease-in-out' }}
                                     onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#dc3545'; e.currentTarget.style.color = '#fff'; }}
                                     onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.color = '#dc3545'; }}

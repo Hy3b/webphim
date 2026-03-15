@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await fetch('http://localhost:8080/api/auth/logout', {
+            await fetch('auth/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

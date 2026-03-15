@@ -119,6 +119,7 @@ CREATE TABLE booking_seats (
     price decimal(10,2) not null,
     seat_id integer not null,
     showtime_id integer not null,
+    is_checked_in BOOLEAN DEFAULT FALSE, -- Cột đã được thêm trực tiếp vào đây
     primary key (id),
     constraint uq_showtime_seat unique (showtime_id, seat_id),
     constraint fk_bs_booking foreign key (booking_id) references bookings (booking_id),

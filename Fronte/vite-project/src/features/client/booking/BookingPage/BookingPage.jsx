@@ -125,7 +125,7 @@ const BookingPage = () => {
         setBookingError(null);
 
         const payload = {
-            userId: user.id || 2, // Lấy ID của user đang đăng nhập (hoặc dự phòng)
+            userId: user.id, // Lấy ID của user đang đăng nhập
             showtimeId: parseInt(id),
             seatIds: selectedSeats,
             totalAmount: calculateTotal()
