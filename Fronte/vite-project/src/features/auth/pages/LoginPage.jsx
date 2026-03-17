@@ -27,7 +27,7 @@ const LoginPage = () => {
                 credentials: 'include',
                 body: JSON.stringify({
                     // Backend có thể đang kỳ vọng username cho trường đăng nhập
-                    username: form.email.trim(),
+                    email: form.email.trim(),
                     password: form.password
                 })
             });

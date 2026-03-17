@@ -45,14 +45,14 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         try {
             AuthResponse authResponse = authService.login(request);
-            
+
             Cookie cookie = new Cookie("jwt", authResponse.getAccessToken());
             cookie.setHttpOnly(true);
             cookie.setSecure(false); // Secure=true on HTTPS
             cookie.setPath("/");
             cookie.setMaxAge((int) (authResponse.getExpiresIn() / 1000));
             response.addCookie(cookie);
-            
+
             return ResponseEntity.ok(authResponse);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -85,7 +85,7 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
-        
+
         Map<String, String> result = new HashMap<>();
         result.put("message", "Đăng xuất thành công");
         return ResponseEntity.ok(result);
