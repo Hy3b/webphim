@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 // Create an Axios instance with default configuration
 const api = axios.create({
     baseURL: '/api', // Vite proxy sẽ forward sang localhost:8080
@@ -12,10 +11,10 @@ const api = axios.create({
 // Add a request interceptor (e.g., for adding token)
 api.interceptors.request.use(
     (config) => {
-        // const token = localStorage.getItem('token');
-        // if (token) {
-        //   config.headers.Authorization = `Bearer ${token}`;
-        // }
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => {

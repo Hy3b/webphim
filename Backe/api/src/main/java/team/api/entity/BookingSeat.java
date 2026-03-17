@@ -32,4 +32,8 @@ public class BookingSeat {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Column(name = "is_checked_in", nullable = false)
+    @Builder.Default
+    private Boolean isCheckedIn = false;
 }

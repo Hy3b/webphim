@@ -14,10 +14,10 @@ import java.util.List;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
-
     private static final List<String> ALLOWED_ORIGINS = List.of(
             "http://localhost:5173",
             "http://127.0.0.1:5173",
+            "http://localhost:3000",
             "https://hanh.hanhfine.id.vn");
 
     @Override

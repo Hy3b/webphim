@@ -36,9 +36,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/webhook/**", "/", "/api/payment/sepay-webhook", "/api/payment/status/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/webhook/**", "/", "/api/payment/sepay-webhook",
+                                "/api/payment/status/**")
+                        .permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/movies/**", "/api/showtimes/**")
                         .permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {

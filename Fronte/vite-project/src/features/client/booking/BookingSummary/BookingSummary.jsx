@@ -37,7 +37,7 @@ const BookingSummary = ({ movie, selectedSeats, totalPrice, onConfirm, isLoading
                 </div>
                 <div className="info-row">
                     <span className="info-label">Phòng chiếu</span>
-                    <span className="info-value">{movie.room || 'Rạp 1'}</span>
+                    <span className="info-value">{movie.room}</span>
                 </div>
                 <div className="info-row">
                     <span className="info-label">Ghế ngồi</span>

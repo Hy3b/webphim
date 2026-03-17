@@ -57,14 +57,14 @@ public class PaymentController {
         // 1. Kiểm tra tính hợp lệ của Secret Key
         if (sepaySecretKey != null && !sepaySecretKey.isEmpty()) {
             if (authorization == null || !authorization.contains(sepaySecretKey)) {
-                log.warn("Cảnh báo: Webhook nhận được Secret Key không hợp lệ! (Header Authorization: {})",
+                log.warn("❌ Cảnh báo: Webhook nhận được Secret Key không hợp lệ! (Header Authorization: {})",
                         authorization);
                 return ResponseEntity.status(403).build();
             } else {
-                log.info("Xác thực Secret Key SePay thành công!");
+                log.info("✅ Xác thực Secret Key SePay thành công!");
             }
         } else {
-            log.info("Bỏ qua xác thực Secret Key SePay (Chưa cấu hình biến môi trường sepay.secret-key)");
+            log.info("⚠️ Bỏ qua xác thực Secret Key SePay (Chưa cấu hình biến môi trường sepay.secret-key)");
         }
 
         log.info("Nhận webhook từ SePay - referenceCode: {}", request.getReferenceCode());
@@ -76,7 +76,7 @@ public class PaymentController {
             return ResponseEntity.ok(Map.of("success", true));
 
         } catch (Exception e) {
-            log.error("Lỗi xử lý webhook SePay: {}", e.getMessage(), e);
+            log.error("❌ Lỗi xử lý webhook SePay: {}", e.getMessage(), e);
             // Trả về HTTP 400 Bad Request.
             // Khi SePay nhận 400, hệ thống của họ sẽ đánh dấu lỗi và TỰ ĐỘNG RETRY (gửi lại
             // thông báo sau).

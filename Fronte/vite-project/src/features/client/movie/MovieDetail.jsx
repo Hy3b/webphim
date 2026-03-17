@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import MovieCard from '../../../components/movie_card/movie_card.jsx';
 import DateSelector from '../Schedule/components/DateSelector/DateSelector';
 import ShowtimeGrid from '../../../components/common/ShowtimeGrid/ShowtimeGrid';
-import './MovieDetail.css'; 
+import './MovieDetail.css';
 
 const MovieDetail = () => {
     const { id } = useParams();
@@ -14,12 +14,12 @@ const MovieDetail = () => {
     const [activeTab, setActiveTab] = useState(null);
 
     useEffect(() => {
-        fetch(`/api/movies/${id}`)
+        fetch(`http://localhost:8080/api/movies/${id}`)
             .then(res => res.json())
             .then(data => setMovie(data))
             .catch(err => console.error("Lỗi tải phim: ", err));
 
-        fetch(`/api/movies`)
+        fetch(`http://localhost:8080/api/movies`)
             .then(res => res.json())
             .then(data => {
                 const filtered = data.filter(m => m.status === 'showing' && m.id.toString() !== id.toString());
@@ -38,7 +38,7 @@ const MovieDetail = () => {
 
     // Grouping logic for DateSelector
     const uniqueDates = [...new Set(rawShowtimes.map(st => st.startTime.split('T')[0]))].sort();
-    
+
     const days = uniqueDates.map((dateStr, index) => {
         const d = new Date(dateStr);
         return {
@@ -66,7 +66,7 @@ const MovieDetail = () => {
         }));
 
     if (!movie) {
-        return <div style={{textAlign: 'center', padding: '100px', color: '#fff'}}>Đang tải dữ liệu phim...</div>;
+        return <div style={{ textAlign: 'center', padding: '100px', color: '#fff' }}>Đang tải dữ liệu phim...</div>;
     }
 
     return (
@@ -86,7 +86,7 @@ const MovieDetail = () => {
                     </div>
                     <div className="info-box">
                         <h1 className="movie-title">
-                            {movie.name} 
+                            {movie.name}
                             <span className="rating-tag">{movie.ageRating}</span>
                         </h1>
                         <div className="meta-info">
@@ -110,12 +110,12 @@ const MovieDetail = () => {
                 {movie.status === 'showing' ? (
                     <div className="showtimes-container">
                         <h3 className="section-title">LỊCH CHIẾU</h3>
-                        <DateSelector 
-                            days={days} 
-                            activeTab={activeTab} 
-                            onTabChange={setActiveTab} 
+                        <DateSelector
+                            days={days}
+                            activeTab={activeTab}
+                            onTabChange={setActiveTab}
                         />
-                        
+
                         <ShowtimeGrid showtimes={showtimes} />
                     </div>
                 ) : (
@@ -134,8 +134,8 @@ const MovieDetail = () => {
                 <div className="sidebar-list">
                     {relatedMovies.map(item => (
                         // Tái sử dụng MovieCard nhưng css có thể cần chỉnh lại xíu nếu muốn nhỏ hơn
-                        <div key={item.id} style={{transform: 'scale(0.9)', transformOrigin: 'top left', marginBottom: '-50px'}}>
-                             <MovieCard movie={item} />
+                        <div key={item.id} style={{ transform: 'scale(0.9)', transformOrigin: 'top left', marginBottom: '-50px' }}>
+                            <MovieCard movie={item} />
                         </div>
                     ))}
                 </div>

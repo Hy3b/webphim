@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import MovieCard from '../../../components/movie_card/movie_card.jsx'; 
+import MovieCard from '../../../components/movie_card/movie_card.jsx';
 import './HomePage.css';
 import BannerSlider from './components/BannerSlider/BannerSlider.jsx'
 
 const HomePage = () => {
     // 1. Dữ liệu từ cơ sở dữ liệu (Database Data)
     const [moviesData, setMoviesData] = useState([]);
-    
+
     // Gọi API Node/Java để lấy danh sách phim thực tế
     useEffect(() => {
         fetch('/api/movies')
@@ -28,13 +28,13 @@ const HomePage = () => {
             {/* Thanh Tab chuyển đổi */}
             <BannerSlider movies={moviesData} />
             <div className="tab-navigation">
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'showing' ? 'active' : ''}`}
                     onClick={() => setActiveTab('showing')}
                 >
                     PHIM ĐANG CHIẾU
                 </button>
-                <button 
+                <button
                     className={`tab-btn ${activeTab === 'coming' ? 'active' : ''}`}
                     onClick={() => setActiveTab('coming')}
                 >
