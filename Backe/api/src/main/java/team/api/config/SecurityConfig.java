@@ -20,6 +20,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import team.api.security.CustomUserDetailsService;
 import team.api.security.JwtAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -56,7 +58,9 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
-        configuration.addAllowedOriginPattern("*"); // Cho phép tất cả các domain test
+        // Cấu hình chặt chẽ danh sách origin (Frontend domains) để chặn bị lộ cookie
+        // theo chuẩn OWASP
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
         configuration.addAllowedMethod("*"); // Cho phép tất cả các method (GET, POST, v.v.)
         configuration.addAllowedHeader("*"); // Cho phép tất cả các header
         configuration.setAllowCredentials(true);

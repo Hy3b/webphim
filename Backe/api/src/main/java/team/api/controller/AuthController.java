@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import team.api.dto.request.LoginRequest;
 import team.api.dto.request.RegisterRequest;
@@ -45,14 +46,16 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         try {
             AuthResponse authResponse = authService.login(request);
-            
-            Cookie cookie = new Cookie("jwt", authResponse.getAccessToken());
-            cookie.setHttpOnly(true);
-            cookie.setSecure(false); // Secure=true on HTTPS
-            cookie.setPath("/");
-            cookie.setMaxAge((int) (authResponse.getExpiresIn() / 1000));
-            response.addCookie(cookie);
-            
+
+            ResponseCookie springCookie = ResponseCookie.from("jwt", authResponse.getAccessToken())
+                    .httpOnly(true)
+                    .secure(false) // Secure=true trên môi trường có HTTPS (Production)
+                    .path("/")
+                    .maxAge(authResponse.getExpiresIn() / 1000)
+                    .sameSite("Strict")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, springCookie.toString());
+
             return ResponseEntity.ok(authResponse);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -79,13 +82,15 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("jwt", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-        
+        ResponseCookie springCookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, springCookie.toString());
+
         Map<String, String> result = new HashMap<>();
         result.put("message", "Đăng xuất thành công");
         return ResponseEntity.ok(result);
