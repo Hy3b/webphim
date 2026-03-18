@@ -36,7 +36,25 @@ const LoginPage = () => {
                 const data = await response.json();
                 alert('Đăng nhập thành công!');
                 await login();
-                navigate('/'); // Chuyển hướng về trang chủ
+
+                try {
+                    // Giải mã JWT accessToken để lấy quyền
+                    const { jwtDecode } = await import('jwt-decode');
+                    const decoded = jwtDecode(data.accessToken);
+                    const role = typeof decoded.role === 'string' ? decoded.role.toUpperCase() : '';
+
+                    if (role === 'ADMIN' || role === 'STAFF') {
+                        // Theo yêu cầu, mở trang Admin ở một tab mới
+                        window.open('/admin', '_blank');
+                        // Tab hiện tại (Web khách) chuyển về trang chủ
+                        navigate('/');
+                    } else {
+                        navigate('/'); // Chuyển hướng về trang chủ
+                    }
+                } catch (decodeError) {
+                    console.error("Lỗi khi giải mã token:", decodeError);
+                    navigate('/');
+                }
             } else {
                 setErrorMessage('Email/Tên đăng nhập hoặc mật khẩu không chính xác!');
             }
