@@ -1,9 +1,0 @@
-webhookId,gateway,transactionDate,accountNumber,transferAmount,content,referenceCode,expectedHttpStatus,expectedSuccess,testCaseName
-1001,MBBank,2026-03-11 10:00:00,0123456789,80000,Chuyen tien mua ve phim hay lam,MB1001,200,1,TC_PAY_01 - Khong co ma don hang
-1002,MBBank,2026-03-11 10:01:00,0123456789,80000,Thanh toan ve phim DH999 cam on,MB1002,200,1,TC_PAY_02 - Don hang khong ton tai DB
-1003,MBBank,2026-03-11 10:02:00,0123456789,100000,Chuyen khoan don hang DH201,MB1003,200,1,TC_PAY_03 - Don hang da paid roi
-1004,MBBank,2026-03-11 10:03:00,0123456789,150000,Chuyen khoan don hang DH202,MB1004,200,1,TC_PAY_04 - Don hang da expired
-1005,MBBank,2026-03-11 10:04:00,0123456789,50000,Mua ve xem phim DH200 cam on ban,MB1005,200,1,TC_PAY_05 - So tien khong du
-1006,MBBank,2026-03-11 10:05:00,0123456789,80000,Thanh toan DH200 day du so tien,MB1006,200,1,TC_PAY_06 - So tien vua du thanh cong
-1007,MBBank,2026-03-11 10:06:00,0123456789,100000,Chuyen tien mua ve DH123 them chut,MB1007,200,1,TC_PAY_07 - So tien thua van thanh cong
-1008,TCBank,2026-03-11 10:10:00,9876543210,80000,Nguyen Van A chuyen mua ve xem phim DH200 tai rap Galaxy toi nay nhe,MB1008,200,1,TC_PAY_08 - Ma DH nam giua chuoi dai

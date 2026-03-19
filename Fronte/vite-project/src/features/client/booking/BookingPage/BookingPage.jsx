@@ -60,7 +60,7 @@ const BookingPage = () => {
     useEffect(() => {
         const fetchShowtimeDetail = async () => {
             try {
-                const res = await fetch(`/api/showtimes/${id}`);
+                const res = await fetch(`http://localhost:8080/api/showtimes/${id}`);
                 if (!res.ok) throw new Error("Không thể tải thông tin suất chiếu");
                 const data = await res.json();
 
