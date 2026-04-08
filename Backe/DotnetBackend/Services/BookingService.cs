@@ -18,6 +18,9 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
     /// </summary>
     public async Task<CreateBookingResponse> BookSeatsAsync(BookingRequest request)
     {
+        if (request.SeatIds == null || request.SeatIds.Count == 0)
+            throw new ArgumentException("Vui lòng chọn ít nhất 1 ghế");
+
         var showtime = await db.Showtimes
             .Include(s => s.Room)
             .FirstOrDefaultAsync(s => s.ShowtimeId == request.ShowtimeId)

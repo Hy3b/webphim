@@ -84,6 +84,7 @@ const RegisterPage = () => {
                             value={form.username}
                             onChange={handleChange}
                             placeholder="Viết liền không dấu..."
+                            maxLength={50}
                             required
                         />
                     </div>
@@ -97,6 +98,7 @@ const RegisterPage = () => {
                             value={form.fullName}
                             onChange={handleChange}
                             placeholder="Nhập họ và tên đầy đủ..."
+                            maxLength={100}
                             required
                         />
                     </div>
@@ -110,6 +112,7 @@ const RegisterPage = () => {
                             value={form.email}
                             onChange={handleChange}
                             placeholder="Nhập địa chỉ email..."
+                            maxLength={100}
                             required
                         />
                     </div>
@@ -123,6 +126,7 @@ const RegisterPage = () => {
                             value={form.phone}
                             onChange={handleChange}
                             placeholder="Nhập số điện thoại..."
+                            maxLength={15}
                         />
                     </div>
 
@@ -136,6 +140,7 @@ const RegisterPage = () => {
                                 value={form.password}
                                 onChange={handleChange}
                                 placeholder="Tối thiểu 8 ký tự..."
+                                maxLength={100}
                                 required
                             />
                             <button
@@ -157,6 +162,7 @@ const RegisterPage = () => {
                             value={form.confirmPassword}
                             onChange={handleChange}
                             placeholder="Nhập lại mật khẩu..."
+                            maxLength={100}
                             required
                             style={{
                                 borderColor: passwordMatch ? '#2ecc71'

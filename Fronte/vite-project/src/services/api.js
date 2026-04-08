@@ -1,8 +1,11 @@
 import axios from 'axios';
-// Create an Axios instance with default configuration
+
+// Dev: VITE_API_BASE_URL=/api  → Vite proxy → localhost:8080
+// Prod: VITE_API_BASE_URL=https://backe-live.hanhfine.id.vn/api
 const api = axios.create({
-    baseURL: '/api', // Vite proxy sẽ forward sang localhost:8080
+    baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
     timeout: 10000,
+    withCredentials: true, // Gửi cookie JWT
     headers: {
         'Content-Type': 'application/json',
     },

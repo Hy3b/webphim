@@ -7,8 +7,8 @@ using StackExchange.Redis;
 using WebPhimApi.Configuration;
 using WebPhimApi.Data;
 
-// Load .env file
-DotEnv.Load();
+// Load .env file (probe up the directory tree for IDE compatibility)
+DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
 var builder = WebApplication.CreateBuilder(args);
 

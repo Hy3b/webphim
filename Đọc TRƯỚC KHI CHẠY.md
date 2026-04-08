@@ -46,9 +46,8 @@ cp Backe/DotnetBackend/.env.example Backe/DotnetBackend/.env
 
 # → Điền DB_PASSWORD, JWT_SECRET vào
 
-# 2. Khởi động Redis
-
-docker compose -f Backe/api/docker-compose.yml up -d
+# 2. Khởi động Redis và MySQL
+docker compose -f Backe/DotnetBackend/docker-compose.yml up -d
 
 # 3. Tạo bảng DB
 
@@ -102,7 +101,7 @@ Dự án dùng **Redis** để quản lý trạng thái ghế theo thời gian t
 Chạy lệnh sau tại thư mục gốc của project:
 
 ```bash
-docker compose -f Backe/api/docker-compose.yml up -d
+docker compose -f Backe/DotnetBackend/docker-compose.yml up -d
 ```
 
 Kiểm tra Redis đang chạy:
@@ -185,8 +184,8 @@ Frontend khởi động tại: **http://localhost:5173** hoặc **http://localho
 ## 📋 Tóm Tắt Lệnh Chạy Hàng Ngày
 
 ```bash
-# Terminal 1: Redis (nếu chưa chạy)
-docker compose -f Backe/api/docker-compose.yml up -d
+# Terminal 1: Redis và MySQL (nếu chưa chạy)
+docker compose -f Backe/DotnetBackend/docker-compose.yml up -d
 
 # Terminal 2: Backend
 cd Backe/DotnetBackend && dotnet run

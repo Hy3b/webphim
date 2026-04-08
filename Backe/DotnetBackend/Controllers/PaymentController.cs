@@ -33,7 +33,7 @@ public class PaymentController(
             if (authorization is null || !authorization.Contains(SepaySecret))
             {
                 logger.LogWarning("❌ Webhook nhận được Secret Key không hợp lệ! Authorization: {Auth}", authorization);
-                return StatusCode(403);
+                return Unauthorized(new { success = false, message = "Lỗi xác thực Token" });
             }
             logger.LogInformation("✅ Xác thực Secret Key SePay thành công!");
         }
@@ -48,6 +48,11 @@ public class PaymentController(
         {
             await paymentService.ProcessWebhookAsync(request);
             return Ok(new { success = true });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogWarning("Đơn hàng không tồn tại: {Msg}", ex.Message);
+            return NotFound(new { success = false, error = ex.Message });
         }
         catch (Exception ex)
         {

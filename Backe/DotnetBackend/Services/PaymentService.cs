@@ -18,7 +18,7 @@ public partial class PaymentService(
     [GeneratedRegex(@"(?i)(DH\d+)", RegexOptions.Compiled)]
     private static partial Regex OrderCodePattern();
 
-    public async Task ProcessWebhookAsync(SePayWebhookRequest request)
+    public virtual async Task ProcessWebhookAsync(SePayWebhookRequest request)
     {
         logger.LogInformation("=== Nhận webhook SePay: gateway={Gateway}, amount={Amount}, content='{Content}'",
             request.Gateway, request.TransferAmount, request.Content);
@@ -34,7 +34,7 @@ public partial class PaymentService(
         if (order is null)
         {
             logger.LogWarning("Không tìm thấy order với orderCode='{OrderCode}'", orderCode);
-            return;
+            throw new KeyNotFoundException($"Không tìm thấy đơn hàng chứa mã {orderCode}");
         }
 
         if (order.Status != OrderStatus.pending)

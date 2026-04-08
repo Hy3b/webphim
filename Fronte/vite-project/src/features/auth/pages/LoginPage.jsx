@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './LoginPage.css';
 import { useAuth } from '../../../context/AuthContext';
+import LoadingOverlay from '../../../components/common/LoadingOverlay/LoadingOverlay';
+import './LoginPage.css';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -9,6 +10,8 @@ const LoginPage = () => {
     const [form, setForm] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,6 +20,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
+        setIsLoading(true);
 
         try {
             const response = await fetch('http://localhost:8080/api/auth/login', {
@@ -34,38 +38,43 @@ const LoginPage = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                alert('Đăng nhập thành công!');
+                setIsSuccess(true);
                 await login();
 
-                try {
-                    // Giải mã JWT accessToken để lấy quyền
-                    const { jwtDecode } = await import('jwt-decode');
-                    const decoded = jwtDecode(data.accessToken);
-                    const role = typeof decoded.role === 'string' ? decoded.role.toUpperCase() : '';
+                setTimeout(async () => {
+                    try {
+                        // Giải mã JWT accessToken để lấy quyền
+                        const { jwtDecode } = await import('jwt-decode');
+                        const decoded = jwtDecode(data.accessToken);
+                        const role = typeof decoded.role === 'string' ? decoded.role.toUpperCase() : '';
 
-                    if (role === 'ADMIN' || role === 'STAFF') {
-                        // Theo yêu cầu, mở trang Admin ở một tab mới
-                        window.open('/admin', '_blank');
-                        // Tab hiện tại (Web khách) chuyển về trang chủ
+                        if (role === 'ADMIN' || role === 'STAFF') {
+                            // Theo yêu cầu, mở trang Admin ở một tab mới
+                            window.open('/admin', '_blank');
+                            // Tab hiện tại (Web khách) chuyển về trang chủ
+                            navigate('/');
+                        } else {
+                            navigate('/'); // Chuyển hướng về trang chủ
+                        }
+                    } catch (decodeError) {
+                        console.error("Lỗi khi giải mã token:", decodeError);
                         navigate('/');
-                    } else {
-                        navigate('/'); // Chuyển hướng về trang chủ
                     }
-                } catch (decodeError) {
-                    console.error("Lỗi khi giải mã token:", decodeError);
-                    navigate('/');
-                }
+                }, 1500); // Wait 1.5s to show overlay
             } else {
                 setErrorMessage('Email/Tên đăng nhập hoặc mật khẩu không chính xác!');
+                setIsLoading(false);
             }
         } catch (error) {
             console.error("Lỗi đăng nhập:", error);
             setErrorMessage('Đăng nhập thất bại: Không thể kết nối đến máy chủ!');
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="login-page">
+            {isSuccess && <LoadingOverlay text="Loading..." />}
             <div className="login-container">
                 <div className="auth-header">
                     <h2>Đăng Nhập</h2>
@@ -83,12 +92,14 @@ const LoginPage = () => {
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input
+                            
                             id="email"
                             type="email"
                             name="email"
                             value={form.email}
                             onChange={handleChange}
                             placeholder="Nhập địa chỉ email..."
+                            maxLength={100}
                             required
                         />
                     </div>
@@ -103,6 +114,7 @@ const LoginPage = () => {
                                 value={form.password}
                                 onChange={handleChange}
                                 placeholder="Nhập mật khẩu..."
+                                maxLength={100}
                                 required
                             />
                             <button
@@ -119,8 +131,8 @@ const LoginPage = () => {
                         <a href="#" className="forgot-link">Quên mật khẩu?</a>
                     </div>
 
-                    <button type="submit" className="btn-submit">
-                        ĐĂNG NHẬP
+                    <button type="submit" className="btn-submit" disabled={isLoading}>
+                        {isLoading && !isSuccess ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP'}
                     </button>
 
                     <div className="or-divider">hoặc đăng nhập với</div>

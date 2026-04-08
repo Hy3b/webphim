@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
+import api from '../../../services/api';
 import './PaymentPage.css';
 
 const POLL_INTERVAL_MS = 5000; // kiểm tra mỗi 5 giây
@@ -52,9 +53,9 @@ const PaymentPage = () => {
 
         intervalRef.current = setInterval(async () => {
             try {
-                const res = await fetch(`http://localhost:8080/api/payment/status/${orderCode}`);
-                if (!res.ok) throw new Error('Lỗi kết nối backend');
-                const data = await res.json();
+                const res = await api.get(`/payment/status/${orderCode}`);
+                if (res.status !== 200) throw new Error('Lỗi kết nối backend');
+                const data = res.data;
 
                 if (data.paid) {
                     clearInterval(intervalRef.current);

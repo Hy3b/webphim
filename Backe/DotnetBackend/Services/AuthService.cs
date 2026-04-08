@@ -8,7 +8,7 @@ namespace WebPhimApi.Services;
 
 public class AuthService(AppDbContext db, JwtService jwtService)
 {
-    public async Task<(AuthResponse? token, string? error)> LoginAsync(LoginRequest request)
+    public virtual async Task<(AuthResponse? token, string? error)> LoginAsync(LoginRequest request)
     {
         var user = await db.Users
             .FirstOrDefaultAsync(u => u.Email == request.Email || u.Username == request.Email);
@@ -20,7 +20,7 @@ public class AuthService(AppDbContext db, JwtService jwtService)
         return (new AuthResponse(token), null);
     }
 
-    public async Task<(AuthResponse? token, string? error)> RegisterAsync(RegisterRequest request)
+    public virtual async Task<(AuthResponse? token, string? error)> RegisterAsync(RegisterRequest request)
     {
         if (await db.Users.AnyAsync(u => u.Username == request.Username))
             return (null, "Username đã tồn tại");
@@ -46,7 +46,7 @@ public class AuthService(AppDbContext db, JwtService jwtService)
         return (new AuthResponse(token), null);
     }
 
-    public async Task<UserInfoResponse?> GetMeAsync(int userId)
+    public virtual async Task<UserInfoResponse?> GetMeAsync(int userId)
     {
         var user = await db.Users.FindAsync(userId);
         if (user is null) return null;
