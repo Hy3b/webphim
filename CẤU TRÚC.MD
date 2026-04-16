@@ -78,71 +78,46 @@ DotnetBackend/
 ```
 src/
 ├── main.jsx                      ← Điểm khởi động React, bọc AuthProvider + Router
-├── App.jsx                       ← Khai báo toàn bộ Routes của ứng dụng
 ├── index.css                     ← CSS global (biến màu, font, reset)
 │
-├── context/
-│   └── AuthContext.jsx           ← Global state đăng nhập: user, login(), logout()
-│                                    → Gọi GET /api/auth/me để xác thực qua Cookie
+├── app/
+│   └── App.jsx                   ← Component gốc khai báo toàn bộ Routes của ứng dụng
 │
-├── layouts/
-│   ├── ClientLayout.jsx          ← Layout trang khách: Header + <Outlet> + Footer
-│   └── AdminLayout.jsx           ← Layout trang admin: Sidebar + <Outlet>
+├── routes/                       ← Cấu hình điều hướng theo role
+│   ├── AdminRoute.jsx            ← Route bảo vệ dành riêng cho Admin
+│   └── PrivateRoute.jsx          ← Route cần đăng nhập
 │
-├── components/                   ← UI components dùng chung
-│   ├── common/
-│   │   ├── Button/               ← Nút bấm tái sử dụng
-│   │   └── ShowtimeGrid/         ← Lưới hiển thị giờ chiếu
-│   ├── layout/
-│   │   ├── Header/               ← Header: logo, nav, nút đăng nhập/logout
-│   │   └── Footer/               ← Footer trang web
-│   └── movie_card/               ← Card hiển thị thông tin phim (poster, tên, rating)
+├── context/                      ← Global Contexts (trạng thái chung)
+│   └── AuthContext.jsx           ← Trạng thái Auth (đăng nhập, token, vai trò)
 │
-├── features/
+├── modules/                      ← Tính năng phân tách theo miền (Domain-Driven Design)
 │   │
-│   ├── auth/                     ← Xác thực người dùng
-│   │   └── pages/
-│   │       ├── LoginPage.jsx     ← Form đăng nhập → POST /api/auth/login
-│   │       └── RegisterPage.jsx  ← Form đăng ký → POST /api/auth/register
+│   ├── admin/                    ← Miền quản trị viên
+│   │   ├── components/           ← Các thành phần UI riêng cho trang admin
+│   │   ├── layouts/              ← Layout bao bọc dashboard admin (Sidebar + Header Admin)
+│   │   └── pages/                ← Các trang: AdminDashboard, MovieManager,...
 │   │
-│   ├── client/                   ← Tất cả trang của khách hàng
-│   │   │
-│   │   ├── home/                 ← Trang chủ
-│   │   │   ├── HomePage.jsx      ← Hiển thị banner + phim đang chiếu / sắp chiếu
-│   │   │   └── components/
-│   │   │       └── BannerSlider/ ← Slide ảnh banner tự động
-│   │   │
-│   │   ├── Schedule/             ← Trang lịch chiếu
-│   │   │   ├── LichChieu.jsx     ← Lấy phim (GET /api/movies) + suất (GET /api/showtimes)
-│   │   │   │                       → Nhóm theo ngày, bấm vào giờ → chuyển sang Booking
-│   │   │   └── components/
-│   │   │       ├── DateSelector/ ← Tab chọn ngày
-│   │   │       ├── MovieItem/    ← Một dòng phim trong lịch chiếu
-│   │   │       └── NoteSection/  ← Ghi chú màu ghế
-│   │   │
-│   │   ├── movie/
-│   │   │   └── MovieDetail.jsx   ← Chi tiết phim (lấy theo id) + nút "Đặt vé"
-│   │   │
-│   │   ├── booking/              ← Luồng đặt vé
-│   │   │   ├── BookingPage/      ← Chọn ghế
-│   │   │   │   └── BookingPage.jsx
-│   │   │   │       ← GET /api/showtimes/{id}/seats (Redis real-time)
-│   │   │   │       ← POST /api/bookings (Redis lock + DB)
-│   │   │   ├── SeatMap/          ← Sơ đồ ghế 2D (render từng ghế theo trạng thái)
-│   │   │   └── BookingSummary/   ← Sidebar tóm tắt: phim, ghế, giá → nút xác nhận
-│   │   │
-│   │   ├── payment/
-│   │   │   └── PaymentPage.jsx   ← Hiển thị QR SePay + polling GET /api/payment/status
-│   │   │
-│   │   └── ticket/
-│   │       └── TicketPage.jsx    ← Hiển thị e-ticket sau khi thanh toán thành công
+│   ├── client/                   ← Miền khách hàng (người dùng end-user)
+│   │   ├── components/           ← Header, Footer và các mục view riêng của client
+│   │   ├── layouts/              ← ClientLayout bọc nội dung (Navbar + Body + Footer)
+│   │   └── pages/                ← Trang: HomePage, MovieDetail, BookingPage, Schedule,...
 │   │
-│   └── admin/                    ← Trang quản trị (chỉ Admin/Staff)
-│       └── dashboard/
-│           └── AdminDashboard.jsx ← Dashboard quản lý (phim, phòng, vé, thống kê)
+│   └── auth/                     ← Miền xác thực người dùng
+│       ├── layouts/              ← Layout trống cho form login/register
+│       └── pages/                ← LoginPage, RegisterPage
 │
-└── pages/
-    └── ProfilePage.jsx           ← Trang thông tin cá nhân của user
+├── shared/                       ← Chia sẻ chung giữa nhiều miền (admin, client, auth)
+│   ├── components/               ← Các thành phần tĩnh/tái sử dụng nhiều nơi
+│   │   ├── Button/               ← Nút bấm chung
+│   │   ├── LoadingOverlay/       ← Giao diện loading xoay chuyên nghiệp
+│   │   ├── movie_card/           ← Card hiển thị thông tin phim ngắn gọn
+│   │   └── ShowtimeGrid/         ← Lưới giờ chiếu (chọn thời gian)
+│   ├── context/                  ← React Context chung
+│   ├── services/                 ← Kế nối API hoặc utils nghiệp vụ dùng chung
+│   └── utils/                    ← Các hàm định dạng tĩnh (format date, price...)
+│
+├── styles/                       ← Khai báo style/font/màu chung
+└── services/                     ← Logic/API calls gọi DB tổng quát
 ```
 
 ---
