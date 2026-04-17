@@ -31,11 +31,11 @@ const MovieCard = ({movie}) => {
             {/* Phần thông tin phim */}
             <div className="movie-info">
                 <h3 className="movie-card-name">
-                    <Link to={`/movie/${movie.id}`}>{movie.name}</Link>
+                    <Link to={`/movie/${movie.id}`}>{movie.name || movie.title}</Link>
                 </h3>
                 <div className="movie-card-details">
                     <span className="movie-card-genre">{movie.genre}</span>
-                    <span className="movie-card-duration">{movie.duration} phút</span>
+                    <span className="movie-card-duration">⏱ {movie.duration} phút</span>
                 </div>
             </div>
         </div>

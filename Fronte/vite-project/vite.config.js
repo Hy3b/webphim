@@ -9,9 +9,11 @@ export default defineConfig({
     proxy: {
       // Mọi request /api/... → forward tới backend (không qua browser → không bị PNA block)
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://127.0.0.1:8080',  // dùng IP trực tiếp, tránh IPv6/IPv4 mismatch
         changeOrigin: true,
         secure: false,
+        proxyTimeout: 10000,
+        timeout: 10000,
       }
     }
   }

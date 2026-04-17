@@ -3,6 +3,7 @@ import './LichChieu.css';
 import DateSelector from './components/DateSelector/DateSelector';
 import NoteSection from './components/NoteSection/NoteSection';
 import MovieItem from './components/MovieItem/MovieItem';
+import api from '../../../../services/api';
 
 const LichChieu = () => {
     const [activeTab, setActiveTab] = useState(null);
@@ -10,18 +11,14 @@ const LichChieu = () => {
     const [rawShowtimes, setRawShowtimes] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/movies')
-            .then(res => res.json())
-            .then(data => {
-                setRealMovies(data.filter(m => m.status === 'showing'));
+        api.get('/movies')
+            .then(res => {
+                setRealMovies(res.data.filter(m => m.status === 'showing'));
             })
             .catch(err => console.error("Lỗi khi tải phim: ", err));
 
-        fetch('http://localhost:8080/api/showtimes')
-            .then(res => res.json())
-            .then(data => {
-                setRawShowtimes(data);
-            })
+        api.get('/showtimes')
+            .then(res => setRawShowtimes(res.data))
             .catch(err => console.error("Lỗi tải lịch chiếu: ", err));
     }, []);
 

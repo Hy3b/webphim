@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import SeatMap from '../SeatMap/SeatMap';
 import BookingSummary from '../BookingSummary/BookingSummary';
 import { useAuth } from '../../../../../context/AuthContext';
+import api from '../../../../../services/api';
 import './BookingPage.css';
 
 const BookingPage = () => {
@@ -34,21 +35,19 @@ const BookingPage = () => {
     // Hàm gọi API lấy ghế hoặc fallback mock data
     const fetchSeats = useCallback(async () => {
         try {
-            const response = await fetch(`http://localhost:8080/api/showtimes/${id}/seats`);
-            if (response.ok) {
-                const data = await response.json();
-                const mappedSeats = data.map(seat => ({
-                    id: seat.rowName + seat.seatNumber, // Trả về dạng String A1, A2 để backend map đúng List<String> seatIds
-                    row: seat.rowName,
-                    number: seat.seatNumber.toString().padStart(2, '0'),
-                    status: seat.status === 'AVAILABLE' ? 'available' : seat.status === 'LOCKED' ? 'holding' : 'booked',
-                    price: Number(seat.price),
-                    type: seat.seatTypeName.toLowerCase()
-                }));
-                if (mappedSeats.length > 0) {
-                    setSeats(mappedSeats);
-                    return;
-                }
+            const response = await api.get(`/showtimes/${id}/seats`);
+            const data = response.data;
+            const mappedSeats = data.map(seat => ({
+                id: seat.rowName + seat.seatNumber,
+                row: seat.rowName,
+                number: seat.seatNumber.toString().padStart(2, '0'),
+                status: seat.status === 'AVAILABLE' ? 'available' : seat.status === 'LOCKED' ? 'holding' : 'booked',
+                price: Number(seat.price),
+                type: seat.seatTypeName.toLowerCase()
+            }));
+            if (mappedSeats.length > 0) {
+                setSeats(mappedSeats);
+                return;
             }
             throw new Error("Không có data cấu trúc chuẩn");
         } catch (error) {
@@ -60,9 +59,8 @@ const BookingPage = () => {
     useEffect(() => {
         const fetchShowtimeDetail = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/api/showtimes/${id}`);
-                if (!res.ok) throw new Error("Không thể tải thông tin suất chiếu");
-                const data = await res.json();
+                const res = await api.get(`/showtimes/${id}`);
+                const data = res.data;
 
                 // Format date/time from backend LocalDateTime
                 const dt = new Date(data.startTime);
@@ -132,36 +130,17 @@ const BookingPage = () => {
         };
 
         try {
-            const res = await fetch('http://localhost:8080/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(payload)
-            });
+            const res = await api.post('/bookings', payload);
+            const data = res.data;
 
-            if (res.status === 401) {
-                alert("Bạn cần phải đăng nhập để tiếp tục đặt vé!");
-                navigate('/login');
-                return;
-            }
-
-            // Nếu Backend trả về 400 (Redis block vì khách khác vừa hẫng tay trên)
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(errorText || "Ghế đã bị người khác khóa. Vui lòng chọn ghế khác!");
-            }
-
-            const data = await res.json();
-
-            // THÀNH CÔNG: Chuyển thẳng sang trang Payment
             navigate('/payment', {
                 state: {
                     movie,
                     selectedSeats,
                     totalPrice: calculateTotal(),
                     bookingInfo: data,
-                    bookingId: data?.bookingId, // Nhận data chuẩn từ server
-                    orderCode: data?.orderCode  // Nhận data chuẩn từ server
+                    bookingId: data?.bookingId,
+                    orderCode: data?.orderCode
                 }
             });
         } catch (err) {

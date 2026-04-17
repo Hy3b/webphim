@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -10,16 +11,10 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuthStatus = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/me', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include' // Important for sending HttpOnly Cookie
-            });
+            const response = await api.get('/auth/me');
 
-            if (response.ok) {
-                const userData = await response.json();
+            if (response.status === 200) {
+                const userData = response.data;
                 setUser(userData);
             } else {
                 setUser(null);
@@ -44,13 +39,8 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await fetch('http://localhost:8080/api/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            });
+            await api.post('/auth/logout');
+            localStorage.removeItem('token'); // Xóa token khi đăng xuất
             setUser(null);
         } catch (error) {
             console.error("Lỗi khi đăng xuất:", error);

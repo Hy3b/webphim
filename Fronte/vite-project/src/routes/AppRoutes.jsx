@@ -14,6 +14,8 @@ import TicketPage from '../modules/client/pages/ticket/TicketPage';
 import AdminLayout from '../modules/admin/layouts/AdminLayout';
 import AdminRoute from './AdminRoute';
 import AdminDashboard from '../modules/admin/pages/AdminDashboard/AdminDashboard';
+import MovieManager from '../modules/admin/pages/MovieManager/MovieManager';
+import ShowtimeManager from '../modules/admin/pages/ShowtimeManager/ShowtimeManager';
 
 const AppRoutes = () => {
     return (
@@ -38,8 +40,8 @@ const AppRoutes = () => {
                 {/* Placeholders for future pages */}
                 <Route path="rooms" element={<div>Quản lý phòng rạp</div>} />
                 <Route path="seats" element={<div>Quản lý sơ đồ ghế</div>} />
-                <Route path="movies" element={<div>Quản lý phim</div>} />
-                <Route path="showtimes" element={<div>Quản lý suất chiếu</div>} />
+                <Route path="movies" element={<MovieManager />} />
+                <Route path="showtimes" element={<ShowtimeManager />} />
                 <Route path="tickets" element={<div>Bán vé trực tiếp</div>} />
             </Route>
         </Routes>

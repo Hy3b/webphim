@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebPhimApi.Data;
 
@@ -11,9 +12,11 @@ using WebPhimApi.Data;
 namespace WebPhimApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260416181331_AddMovieSoftDelete")]
+    partial class AddMovieSoftDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,7 +145,7 @@ namespace WebPhimApi.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("enum('draft','showing','coming')");
+                        .HasColumnType("enum('showing','coming')");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -353,7 +356,7 @@ namespace WebPhimApi.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("enum('draft','active','cancelled','completed')");
+                        .HasColumnType("enum('active','cancelled','completed')");
 
                     b.HasKey("ShowtimeId");
 

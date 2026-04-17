@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../../../services/api';
 import './LoginPage.css';
 
 const RegisterPage = () => {
@@ -29,26 +30,19 @@ const RegisterPage = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:8080/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: form.username.trim(),
-                    fullName: form.fullName.trim(),
-                    email: form.email.trim(),
-                    phoneNumber: form.phone.trim(), // Backend requires phoneNumber (matches RegisterRequest)
-                    password: form.password
-                })
+            const response = await api.post('/auth/register', {
+                username: form.username.trim(),
+                fullName: form.fullName.trim(),
+                email: form.email.trim(),
+                phoneNumber: form.phone.trim(),
+                password: form.password
             });
 
-            if (response.ok) {
+            if (response.status === 200) {
                 alert('Đăng ký thành công!');
                 navigate('/login');
             } else {
-                const data = await response.text(); // Lấy message trả về (dưới dạng text nếu fail)
-                setErrorMessage(data || 'Đăng ký thất bại, email hoặc tên đăng nhập đã được sử dụng!');
+                setErrorMessage('Dữ liệu không hợp lệ, vui lòng kiểm tra lại!');
             }
         } catch (error) {
             console.error("Lỗi đăng ký:", error);

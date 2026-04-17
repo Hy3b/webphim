@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import MovieCard from '../../../../shared/components/movie_card/movie_card.jsx';
 import DateSelector from '../Schedule/components/DateSelector/DateSelector';
 import ShowtimeGrid from '../../../../shared/components/ShowtimeGrid/ShowtimeGrid';
+import api from '../../../../services/api';
 import './MovieDetail.css';
 
 const MovieDetail = () => {
@@ -14,25 +15,19 @@ const MovieDetail = () => {
     const [activeTab, setActiveTab] = useState(null);
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/movies/${id}`)
-            .then(res => res.json())
-            .then(data => setMovie(data))
+        api.get(`/movies/${id}`)
+            .then(res => setMovie(res.data))
             .catch(err => console.error("Lỗi tải phim: ", err));
 
-        fetch(`http://localhost:8080/api/movies`)
-            .then(res => res.json())
-            .then(data => {
-                const filtered = data.filter(m => m.status === 'showing' && m.id.toString() !== id.toString());
+        api.get('/movies')
+            .then(res => {
+                const filtered = res.data.filter(m => m.status === 'showing' && m.id.toString() !== id.toString());
                 setRelatedMovies(filtered.slice(0, 3));
             })
             .catch(err => console.error("Lỗi tải danh sách phim: ", err));
 
-        // Fetch real showtimes for this movie
-        fetch(`http://localhost:8080/api/showtimes/movie/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                setRawShowtimes(data);
-            })
+        api.get(`/showtimes/movie/${id}`)
+            .then(res => setRawShowtimes(res.data))
             .catch(err => console.error("Lỗi tải lịch chiếu: ", err));
     }, [id]);
 

@@ -30,8 +30,8 @@ public class Showtime
     [Column("base_price", TypeName = "decimal(10,2)")]
     public decimal BasePrice { get; set; }
 
-    [Column(TypeName = "enum('active','cancelled','completed')")]
-    public ShowtimeStatus Status { get; set; } = ShowtimeStatus.active;
+    [Column(TypeName = "enum('draft','active','cancelled','completed')")]
+    public ShowtimeStatus Status { get; set; } = ShowtimeStatus.draft;
 
     [MaxLength(100)]
     [Column("batch_id")]
@@ -48,4 +48,4 @@ public class Showtime
     public ICollection<BookingSeat> BookingSeats { get; set; } = [];
 }
 
-public enum ShowtimeStatus { active, cancelled, completed }
+public enum ShowtimeStatus { draft, active, cancelled, completed }

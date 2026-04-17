@@ -22,8 +22,8 @@ public class AuthController(AuthService authService) : ControllerBase
         Response.Cookies.Append("jwt", token!.AccessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,  // true trên production HTTPS
-            SameSite = SameSiteMode.Strict,
+            Secure = true,  // Bắt buộc = true để sử dụng SameSite = None qua chuẩn HTTPS của tunnel
+            SameSite = SameSiteMode.None, // Quan trọng: Cho phép gửi cookie chéo domain (Localhost -> Cloudflare)
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
 
@@ -41,8 +41,8 @@ public class AuthController(AuthService authService) : ControllerBase
         Response.Cookies.Append("jwt", token!.AccessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
-            SameSite = SameSiteMode.Strict,
+            Secure = true,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
 
@@ -67,8 +67,8 @@ public class AuthController(AuthService authService) : ControllerBase
         Response.Cookies.Append("jwt", "", new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
-            SameSite = SameSiteMode.Strict,
+            Secure = true,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(-1)
         });
         return Ok(new { message = "Đăng xuất thành công" });

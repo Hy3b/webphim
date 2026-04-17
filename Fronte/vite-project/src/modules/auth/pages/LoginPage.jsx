@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import LoadingOverlay from '../../../shared/components/LoadingOverlay/LoadingOverlay';
+import api from '../../../services/api';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -23,21 +24,15 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    // Backend có thể đang kỳ vọng username cho trường đăng nhập
-                    email: form.email.trim(),
-                    password: form.password
-                })
+            const response = await api.post('/auth/login', {
+                email: form.email.trim(),
+                password: form.password
             });
 
-            if (response.ok) {
-                const data = await response.json();
+            if (response.status === 200) {
+                const data = response.data;
+                // Lưu token vào localStorage để interceptor trong api.js tự động nhận diện!
+                localStorage.setItem('token', data.accessToken);
                 setIsSuccess(true);
                 await login();
 
