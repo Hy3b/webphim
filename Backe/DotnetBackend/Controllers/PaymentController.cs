@@ -26,6 +26,9 @@ public class PaymentController(
         [FromHeader(Name = "Authorization")] string? authorization,
         [FromBody] SePayWebhookRequest request)
     {
+        // Log ngay lập tức khi nhận được request (để debug tunnel/CORS)
+        logger.LogInformation(">>> [SePay Webhook Entry] Nhận request POST. Auth Header: {Auth}", authorization ?? "NONE");
+
         // 1. Xác thực secret key
         if (!string.IsNullOrEmpty(SepaySecret))
         {

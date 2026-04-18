@@ -35,7 +35,7 @@ public class BookingCleanupService(IServiceProvider services, ILogger<BookingCle
         var cache = redis.GetDatabase();
 
         var expiredOrders = await db.Orders
-            .Where(o => o.Status == OrderStatus.pending && o.ExpiredAt < DateTime.UtcNow)
+            .Where(o => o.Status == OrderStatus.pending && o.ExpiredAt < DateTime.Now)
             .ToListAsync(cancellationToken);
 
         if (expiredOrders.Count == 0) return;
@@ -43,7 +43,7 @@ public class BookingCleanupService(IServiceProvider services, ILogger<BookingCle
         foreach (var order in expiredOrders)
         {
             order.Status = OrderStatus.cancelled;
-            order.UpdatedAt = DateTime.UtcNow;
+            order.UpdatedAt = DateTime.Now;
 
             var bookings = await db.Bookings
                 .Where(b => b.OrderId == order.OrderId)
