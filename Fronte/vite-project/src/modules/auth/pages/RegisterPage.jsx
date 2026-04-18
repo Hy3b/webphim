@@ -46,7 +46,12 @@ const RegisterPage = () => {
             }
         } catch (error) {
             console.error("Lỗi đăng ký:", error);
-            setErrorMessage('Đăng ký thất bại: Không thể kết nối đến máy chủ!');
+            if (error.response) {
+                const msg = error.response.data?.message || 'Đăng ký thất bại. Email hoặc tên đăng nhập đã tồn tại!';
+                setErrorMessage(msg);
+            } else {
+                setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
+            }
         }
     };
 

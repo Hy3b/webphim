@@ -12,6 +12,13 @@ DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Explicitly register SEPAY_WEBHOOK_SECRET into configuration if found in env
+var sepaySecret = Environment.GetEnvironmentVariable("SEPAY_WEBHOOK_SECRET");
+if (!string.IsNullOrEmpty(sepaySecret))
+{
+    builder.Configuration["SepayWebhookSecret"] = sepaySecret;
+}
+
 // ──────────────────────────────────────────────
 // 1. CORS  (tương đương CorsConfig.java)
 // ──────────────────────────────────────────────
@@ -38,7 +45,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
+        mySqlOptions => mySqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
 // ──────────────────────────────────────────────
 // 3. JWT AUTH (tương đương Spring Security + JwtUtil)
@@ -113,6 +121,9 @@ builder.Services.AddScoped<WebPhimApi.Services.PaymentService>();
 builder.Services.AddScoped<WebPhimApi.Services.AdminBookingService>();
 builder.Services.AddScoped<WebPhimApi.Services.AdminTicketService>();
 
+// Khởi chạy Daemon dọn rạp 
+builder.Services.AddHostedService<WebPhimApi.Services.BookingCleanupService>();
+
 builder.Services.AddControllers();
 
 // ──────────────────────────────────────────────
@@ -121,6 +132,18 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 app.UseCors("WebPhimPolicy");
+
+// Simple Request Logging Middleware for Debugging Webhooks
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.Value?.Contains("payment") == true)
+    {
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation(">>> [Incoming Request] {Method} {Path}", context.Request.Method, context.Request.Path);
+    }
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

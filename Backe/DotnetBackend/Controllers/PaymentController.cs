@@ -15,8 +15,7 @@ public class PaymentController(
     IConfiguration config,
     ILogger<PaymentController> logger) : ControllerBase
 {
-    private string SepaySecret => Environment.GetEnvironmentVariable("SEPAY_WEBHOOK_SECRET")
-        ?? config["SepayWebhookSecret"] ?? "";
+    private string SepaySecret => config["SepayWebhookSecret"] ?? "";
 
     // SePay verify URL bằng GET trước khi lưu webhook
     [HttpGet("sepay-webhook")]

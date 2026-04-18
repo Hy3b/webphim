@@ -69,6 +69,7 @@ const LichChieu = () => {
                                             .map(st => ({
                                                 id: st.showtimeId,
                                                 time: st.startTime.split('T')[1].substring(0, 5),
+                                                fullTime: st.startTime, // Cung cấp thời gian thực để chặn bấm khi quá giờ
                                                 seats: '25'
                                             }));
 

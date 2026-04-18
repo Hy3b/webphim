@@ -62,7 +62,15 @@ const LoginPage = () => {
             }
         } catch (error) {
             console.error("Lỗi đăng nhập:", error);
-            setErrorMessage('Đăng nhập thất bại: Không thể kết nối đến máy chủ!');
+            // Axios ném lỗi cho mọi status 4xx/5xx — cần phân biệt
+            if (error.response) {
+                // Có response từ server (401 sai mật khẩu, 400 validation...)
+                const msg = error.response.data?.message || 'Email hoặc mật khẩu không đúng!';
+                setErrorMessage(msg);
+            } else {
+                // Không kết nối được server (network error)
+                setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
+            }
             setIsLoading(false);
         }
     };

@@ -26,6 +26,11 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
             .FirstOrDefaultAsync(s => s.ShowtimeId == request.ShowtimeId)
             ?? throw new KeyNotFoundException("Suất chiếu không tồn tại");
 
+        if (showtime.StartTime < DateTime.UtcNow)
+        {
+            throw new ArgumentException("Suất chiếu này đã bắt đầu hoặc đã kết thúc, không thể đặt vé.");
+        }
+
         var user = await db.Users.FindAsync(request.UserId)
             ?? throw new KeyNotFoundException("Người dùng không tồn tại");
 

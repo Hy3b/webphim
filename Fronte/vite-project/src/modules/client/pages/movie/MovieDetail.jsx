@@ -57,6 +57,7 @@ const MovieDetail = () => {
         .map(st => ({
             id: st.showtimeId,
             time: st.startTime.split('T')[1].substring(0, 5),
+            fullTime: st.startTime, // Cung cấp thời gian thực
             seats: '25' // Default to 25 seats total
         }));
 

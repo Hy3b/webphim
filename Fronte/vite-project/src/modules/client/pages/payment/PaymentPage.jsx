@@ -29,6 +29,7 @@ const PaymentPage = () => {
     const sepayAccount = import.meta.env.VITE_SEPAY_BANK_ACCOUNT;
     const sepayBank = import.meta.env.VITE_SEPAY_BANK_NAME;
 
+    // Sử dụng API QR chính thức của SePay để đảm bảo App ngân hàng (như Techcombank, Vietcombank) luôn tự động điền đúng Nội dung chuyển khoản (des)
     const qrUrl = `https://qr.sepay.vn/img?acc=${sepayAccount}&bank=${sepayBank}&amount=${totalPrice}&des=${orderCode}`;
 
     const [pollStatus, setPollStatus] = useState('idle');   // idle | polling | paid | error
@@ -46,43 +47,57 @@ const PaymentPage = () => {
         return () => clearInterval(dotRef.current);
     }, [pollStatus]);
 
-    // Polling: gọi API mỗi 5 giây
+    // Polling: gọi API mỗi 3 giây
     const startPolling = () => {
         if (intervalRef.current) return;
         setPollStatus('polling');
+        console.log('[Payment] Bắt đầu polling orderCode:', orderCode);
 
         intervalRef.current = setInterval(async () => {
             try {
                 const res = await api.get(`/payment/status/${orderCode}`);
-                if (res.status !== 200) throw new Error('Lỗi kết nối backend');
                 const data = res.data;
+                console.log('[Payment] Poll result:', data);
 
                 if (data.paid) {
                     clearInterval(intervalRef.current);
+                    intervalRef.current = null;
                     setPollStatus('paid');
 
-                    navigate('/ticket', {
-                        state: {
-                            movie,
-                            selectedSeats,
-                            totalPrice,
-                            orderCode,
-                            bookingId: resolvedBookingId,
-                            paidAt: new Date().toISOString()
-                        }
-                    });
+                    // Delay nhỏ để user thấy "Đã thanh toán!" trước khi chuyển trang
+                    setTimeout(() => {
+                        navigate('/ticket', {
+                            state: {
+                                movie,
+                                selectedSeats,
+                                totalPrice,
+                                orderCode,
+                                bookingId: resolvedBookingId,
+                                paidAt: new Date().toISOString()
+                            }
+                        });
+                    }, 1200);
                 } else if (data.status === 'expired' || data.status === 'cancelled') {
                     clearInterval(intervalRef.current);
+                    intervalRef.current = null;
                     setPollStatus('expired');
                 }
-            } catch {
-                // Giữ polling, không dừng vì lỗi mạng tạm thời
+            } catch (err) {
+                console.warn('[Payment] Poll lỗi:', err.message);
             }
-        }, POLL_INTERVAL_MS);
+        }, 3000);
     };
 
     // Dọn interval khi unmount
     useEffect(() => () => clearInterval(intervalRef.current), []);
+
+    // TỰ ĐỘNG BẬT RADAR QUÉT THANH TOÁN KHI MỞ TRANG
+    useEffect(() => {
+        if (location.state && pollStatus === 'idle') {
+            startPolling();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.state]);
 
     if (!location.state) return null; // Ẩn giao diện trong lúc bị đuổi về
 
@@ -91,7 +106,7 @@ const PaymentPage = () => {
             <div className="payment-container">
                 <div className="payment-header">
                     <h2>Thanh Toán Đơn Hàng</h2>
-                    <p>Quét mã QR rồi bấm <strong>"Tôi đã thanh toán"</strong> để hệ thống xác nhận tự động</p>
+                    <p>Mở ứng dụng ngân hàng và <strong>quét mã QR</strong>. Hệ thống sẽ <strong>tự động</strong> chuyển trang khi bạn thanh toán thành công.</p>
                 </div>
 
                 <div className="payment-content">

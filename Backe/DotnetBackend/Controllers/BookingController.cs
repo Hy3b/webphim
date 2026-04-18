@@ -28,7 +28,9 @@ public class BookingController(BookingService bookingService) : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = ex.Message });
+            var logger = HttpContext.RequestServices.GetRequiredService<ILogger<BookingController>>();
+            logger.LogError(ex, "Lỗi khi tạo booking");
+            return StatusCode(500, new { message = ex.Message, stack = ex.StackTrace });
         }
     }
 }

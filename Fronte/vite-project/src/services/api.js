@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-// Dev: VITE_API_BASE_URL=/api  → Vite proxy → localhost:8080
-// Prod: VITE_API_BASE_URL=https://backe-live.hanhfine.id.vn/api
+// Ưu tiên chạy URL từ .env, nếu không có thì mặc định dùng public API của Cloudflare
+const baseURL = import.meta.env?.VITE_API_BASE_URL || 'https://backe-live.hanhfine.id.vn/api';
+
 const api = axios.create({
-    baseURL: 'https://backe-live.hanhfine.id.vn/api',
+    baseURL: baseURL,
     timeout: 10000,
     withCredentials: true, // Gửi cookie JWT
     headers: {
