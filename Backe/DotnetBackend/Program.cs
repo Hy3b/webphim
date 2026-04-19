@@ -120,6 +120,8 @@ builder.Services.AddScoped<WebPhimApi.Services.BookingService>();
 builder.Services.AddScoped<WebPhimApi.Services.PaymentService>();
 builder.Services.AddScoped<WebPhimApi.Services.AdminBookingService>();
 builder.Services.AddScoped<WebPhimApi.Services.AdminTicketService>();
+builder.Services.AddScoped<WebPhimApi.Services.RoomService>();
+builder.Services.AddScoped<WebPhimApi.Services.SeatService>();
 
 // Khởi chạy Daemon dọn rạp 
 builder.Services.AddHostedService<WebPhimApi.Services.BookingCleanupService>();
@@ -147,5 +149,14 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try {
+        db.Database.ExecuteSqlRaw("ALTER TABLE movies MODIFY COLUMN Status ENUM('draft', 'showing', 'coming') NOT NULL DEFAULT 'draft';");
+        db.Database.ExecuteSqlRaw("ALTER TABLE showtimes MODIFY COLUMN status ENUM('draft','active','cancelled','completed') NOT NULL DEFAULT 'draft';");
+    } catch {}
+}
 
 app.Run();

@@ -226,3 +226,52 @@
     padding: 24px;
     overflow-y: auto;
 }
+
+/* =========================================
+   DARK MODE STYLES
+   ========================================= */
+.admin-container.dark-theme {
+    background-color: #0d1117;
+    color: #e6edf3;
+}
+
+.dark-theme .admin-sidebar {
+    background-color: #161b22;
+    border-right: 1px solid rgba(48, 54, 61, 0.8);
+}
+
+.dark-theme .submenu {
+    background-color: #0d1117;
+}
+
+.dark-theme .admin-header {
+    background-color: #161b22;
+    box-shadow: none;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.8);
+}
+
+.dark-theme .toggle-menu-btn,
+.dark-theme .icon-btn {
+    color: #8b949e;
+}
+
+.dark-theme .toggle-menu-btn:hover,
+.dark-theme .icon-btn:hover {
+    color: #e6edf3;
+}
+
+.dark-theme .user-profile {
+    border-left-color: rgba(48, 54, 61, 0.8);
+}
+
+.dark-theme .user-name {
+    color: #e6edf3;
+}
+
+.dark-theme .user-role {
+    color: #8b949e;
+}
+
+.dark-theme .user-avatar {
+    background-color: #21262d;
+}

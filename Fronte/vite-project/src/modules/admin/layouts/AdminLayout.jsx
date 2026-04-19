@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { 
-    LayoutDashboard, 
-    Building2, 
-    Film, 
-    Ticket, 
+import {
+    LayoutDashboard,
+    Building2,
+    Film,
+    Ticket,
     LogOut,
     Menu,
     ChevronDown,
     ChevronUp,
     Maximize,
     Moon,
+    Sun,
     MonitorPlay,
     UserCircle
 } from 'lucide-react';
@@ -22,6 +23,11 @@ const AdminLayout = () => {
     const navigate = useNavigate();
 
     const [isMenuOpen, setIsMenuOpen] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        const savedTheme = localStorage.getItem('adminDarkMode');
+        return savedTheme === 'true';
+    });
+    
     const [openSubmenu, setOpenSubmenu] = useState({
         cinema: false,
         movie: false,
@@ -42,24 +48,32 @@ const AdminLayout = () => {
         navigate('/login');
     };
 
+    const toggleTheme = () => {
+        setIsDarkMode(prev => {
+            const newValue = !prev;
+            localStorage.setItem('adminDarkMode', newValue);
+            return newValue;
+        });
+    };
+
     return (
-        <div className="admin-container">
+        <div className={`admin-container ${isDarkMode ? 'dark-theme' : ''}`}>
             {/* Sidebar */}
             <aside className={`admin-sidebar ${!isMenuOpen ? 'closed' : ''}`}>
                 <div className="sidebar-logo">
                     <h2>BEECINEMA</h2>
                 </div>
-                
+
                 <div className="sidebar-menu-title">MENU</div>
                 <nav className="sidebar-nav">
                     <ul>
                         <li>
-                            <NavLink to="/admin/dashboard" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+                            <NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
                                 <LayoutDashboard size={18} />
                                 <span>Tổng quan</span>
                             </NavLink>
                         </li>
-                        
+
                         {/* Fake thong ke */}
                         <li className={`nav-item-dropdown ${openSubmenu.cinema ? 'open' : ''}`}>
                             <div className="nav-link" onClick={() => toggleSubmenu('cinema')}>
@@ -69,13 +83,8 @@ const AdminLayout = () => {
                             </div>
                             <ul className="submenu">
                                 <li>
-                                    <NavLink to="/admin/rooms" className={({isActive}) => isActive ? 'sub-nav-link active' : 'sub-nav-link'}>
+                                    <NavLink to="/admin/rooms" className={({ isActive }) => isActive ? 'sub-nav-link active' : 'sub-nav-link'}>
                                         Quản lý phòng
-                                    </NavLink>
-                                </li>
-                                <li>
-                                    <NavLink to="/admin/seats" className={({isActive}) => isActive ? 'sub-nav-link active' : 'sub-nav-link'}>
-                                        Quản lý sơ đồ ghế
                                     </NavLink>
                                 </li>
                             </ul>
@@ -89,12 +98,12 @@ const AdminLayout = () => {
                             </div>
                             <ul className="submenu">
                                 <li>
-                                    <NavLink to="/admin/movies" className={({isActive}) => isActive ? 'sub-nav-link active' : 'sub-nav-link'}>
+                                    <NavLink to="/admin/movies" className={({ isActive }) => isActive ? 'sub-nav-link active' : 'sub-nav-link'}>
                                         Quản lý phim
                                     </NavLink>
                                 </li>
                                 <li>
-                                    <NavLink to="/admin/showtimes" className={({isActive}) => isActive ? 'sub-nav-link active' : 'sub-nav-link'}>
+                                    <NavLink to="/admin/showtimes" className={({ isActive }) => isActive ? 'sub-nav-link active' : 'sub-nav-link'}>
                                         Quản lý suất chiếu
                                     </NavLink>
                                 </li>
@@ -102,7 +111,7 @@ const AdminLayout = () => {
                         </li>
 
                         <li>
-                            <NavLink to="/admin/tickets" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+                            <NavLink to="/admin/tickets" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
                                 <Ticket size={18} />
                                 <span>Tạo vé</span>
                             </NavLink>
@@ -128,13 +137,13 @@ const AdminLayout = () => {
                             <button className="icon-btn">
                                 <Maximize size={18} />
                             </button>
-                            <button className="icon-btn">
-                                <Moon size={18} />
+                            <button className="icon-btn" onClick={toggleTheme} title={isDarkMode ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}>
+                                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
                             </button>
                         </div>
-                        
+
                         <div className="user-profile">
-                            <div className="user-avatar" onClick={handleLogout} style={{cursor: 'pointer'}} title="Click để đăng xuất">
+                            <div className="user-avatar" onClick={handleLogout} style={{ cursor: 'pointer' }} title="Click để đăng xuất">
                                 <UserCircle size={36} color="#465b8a" />
                             </div>
                             <div className="user-info">

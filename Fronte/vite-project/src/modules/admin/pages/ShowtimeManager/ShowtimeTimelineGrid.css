@@ -275,3 +275,29 @@
 .stg-publish-btn:hover {
     background: #2ea043;
 }
+
+/* =========================================
+   LIGHT MODE OVERRIDES
+   ========================================= */
+.admin-container:not(.dark-theme) .stg-wrapper {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.admin-container:not(.dark-theme) .stg-timeline-header {
+    background: #f8f9fc;
+    border-color: #e2e8f0;
+}
+.admin-container:not(.dark-theme) .stg-room-label-col {
+    border-color: #e2e8f0;
+}
+.admin-container:not(.dark-theme) .stg-hour-label { color: #64748b; }
+.admin-container:not(.dark-theme) .stg-room-row { border-color: #e2e8f0; }
+.admin-container:not(.dark-theme) .stg-room-label {
+    background: #f8f9fc;
+    border-color: #e2e8f0;
+}
+.admin-container:not(.dark-theme) .stg-room-name { color: #1e293b; }
+.admin-container:not(.dark-theme) .stg-grid-line { background: #e2e8f0; }
+.admin-container:not(.dark-theme) .stg-empty { color: #64748b; }
+

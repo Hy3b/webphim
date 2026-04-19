@@ -60,9 +60,14 @@ public class PaymentController(
         }
     }
 
+    // [FIX LOG] Bổ sung ResponseCache NoStore
+    // Lý do: Ngăn chặn triệt để tình trạng trình duyệt web (Chrome/Edge) và các Proxy
+    // tự động lưu trữ (cache) kết quả trả về của một URL cố định khi Frontend gọi liên tục (polling).
     [HttpGet("status/{orderCode}")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<IActionResult> CheckStatus(string orderCode)
     {
+        logger.LogWarning("-----> [Frontend Polling] dang check status cho orderCode: {OrderCode}", orderCode);
         var status = await paymentService.GetBookingStatusAsync(orderCode);
         return Ok(status);
     }

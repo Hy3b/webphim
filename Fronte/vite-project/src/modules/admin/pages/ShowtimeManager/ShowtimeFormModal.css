@@ -75,3 +75,37 @@
 }
 .sfm-btn-save:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(31,111,235,0.5); }
 .sfm-btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* =========================================
+   LIGHT MODE OVERRIDES
+   ========================================= */
+.admin-container:not(.dark-theme) .sfm-modal {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+}
+.admin-container:not(.dark-theme) .sfm-header {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+.admin-container:not(.dark-theme) .sfm-header h2 { color: #1e293b; }
+
+.admin-container:not(.dark-theme) .sfm-field label { color: #64748b; }
+.admin-container:not(.dark-theme) .sfm-field input,
+.admin-container:not(.dark-theme) .sfm-field select {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #334155;
+}
+.admin-container:not(.dark-theme) .sfm-field input::placeholder { color: #94a3b8; }
+
+.admin-container:not(.dark-theme) .sfm-footer { border-color: #e2e8f0; }
+
+.admin-container:not(.dark-theme) .sfm-btn-ghost {
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+.admin-container:not(.dark-theme) .sfm-btn-ghost:hover {
+    border-color: #94a3b8;
+    color: #1e293b;
+}

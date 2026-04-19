@@ -21,7 +21,8 @@ public class Movie
     [Column(TypeName = "text")]
     public string? Description { get; set; }
 
-    public int? Duration { get; set; } // Tổng thời lượng (phút)
+    [Column("duration_minutes")]
+    public int Duration { get; set; } = 0; // Tổng thời lượng (phút) — NOT NULL trong DB
 
     [Column("trailer_duration_minutes")]
     public int TrailerDuration { get; set; } = 10;

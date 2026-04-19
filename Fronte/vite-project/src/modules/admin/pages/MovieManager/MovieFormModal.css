@@ -158,3 +158,39 @@
     box-shadow: 0 6px 18px rgba(31,111,235,0.5);
 }
 .mfm-btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* =========================================
+   LIGHT MODE OVERRIDES
+   ========================================= */
+.admin-container:not(.dark-theme) .mfm-modal {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+}
+.admin-container:not(.dark-theme) .mfm-header {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+.admin-container:not(.dark-theme) .mfm-header h2 { color: #1e293b; }
+
+.admin-container:not(.dark-theme) .mfm-field label { color: #64748b; }
+.admin-container:not(.dark-theme) .mfm-field input,
+.admin-container:not(.dark-theme) .mfm-field select,
+.admin-container:not(.dark-theme) .mfm-field textarea {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #334155;
+}
+.admin-container:not(.dark-theme) .mfm-field input::placeholder,
+.admin-container:not(.dark-theme) .mfm-field textarea::placeholder { color: #94a3b8; }
+
+.admin-container:not(.dark-theme) .mfm-footer { border-color: #e2e8f0; }
+
+.admin-container:not(.dark-theme) .mfm-btn-ghost {
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+.admin-container:not(.dark-theme) .mfm-btn-ghost:hover {
+    border-color: #94a3b8;
+    color: #1e293b;
+}

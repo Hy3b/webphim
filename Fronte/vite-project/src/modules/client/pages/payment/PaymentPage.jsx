@@ -55,7 +55,8 @@ const PaymentPage = () => {
 
         intervalRef.current = setInterval(async () => {
             try {
-                const res = await api.get(`/payment/status/${orderCode}`);
+                // Thêm query timestamp để tránh trình duyệt cache kết quả HTTP GET báo pending liên tục
+                const res = await api.get(`/payment/status/${orderCode}?_t=${Date.now()}`);
                 const data = res.data;
                 console.log('[Payment] Poll result:', data);
 
@@ -88,16 +89,32 @@ const PaymentPage = () => {
         }, 3000);
     };
 
-    // Dọn interval khi unmount
-    useEffect(() => () => clearInterval(intervalRef.current), []);
-
-    // TỰ ĐỘNG BẬT RADAR QUÉT THANH TOÁN KHI MỞ TRANG
+    // [FIX LOG] Dọn interval khi component thực sự unmount
+    // Lý do: Sửa lỗi React 18 Strict Mode. Khi Strict Mode giả vờ unmount component để test, 
+    // lệnh xóa khoảng thời gian (clearInterval) được gọi để hủy vòng lặp cũ.
+    // Tuy nhiên, nếu ta không cập nhật intervalRef.current = null, 
+    // thì khi component bật lại (remount), biến intervalRef này vẫn còn giữ thẻ ID cũ 
+    // khiến hàm startPolling() nghĩ rằng vòng lặp chưa bị hủy và cứ thế Return (không quét mạng).
     useEffect(() => {
-        if (location.state && pollStatus === 'idle') {
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, []);
+
+    // TỰ ĐỘNG BẬT RADAR QUÉT THANH TOÁN KHI MỞ TRANG HOẶC KHI REMOUNT (Strict Mode)
+    useEffect(() => {
+        if (!location.state) return;
+
+        // Nếu status đang là idle hoặc polling, thì luôn đảm bảo interval đang chạy
+        if (pollStatus === 'idle' || pollStatus === 'polling') {
             startPolling();
         }
+        
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.state]);
+    }, [location.state, pollStatus]);
 
     if (!location.state) return null; // Ẩn giao diện trong lúc bị đuổi về
 
@@ -175,9 +192,12 @@ const PaymentPage = () => {
                         </button>
 
                         {pollStatus === 'polling' && (
-                            <p className="poll-hint">
-                                Hệ thống đang tự động kiểm tra mỗi 5 giây. Vui lòng chờ...
-                            </p>
+                            <div className="poll-hint">
+                                <p>Hệ thống đang tự động kiểm tra mỗi 5 giây. Vui lòng chờ...</p>
+                                <p style={{fontSize: '11px', color: '#666', marginTop: '10px'}}>
+                                    Debug Info: baseURL={api.defaults.baseURL} | state={pollStatus} 
+                                </p>
+                            </div>
                         )}
 
                         {pollStatus === 'expired' && (

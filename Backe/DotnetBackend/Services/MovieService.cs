@@ -84,8 +84,8 @@ public class MovieService(AppDbContext db)
     /// </summary>
     public async Task<(MovieResponse? Movie, string? Error)> CreateAsync(CreateMovieRequest request)
     {
-        // Kiểm tra thời lượng phim hợp lệ
-        if (request.Duration is not null and (< 1 or > 500))
+        // Kiểm tra thời lượng phim hợp lệ (0 = chưa nhập)
+        if (request.Duration != 0 && (request.Duration < 1 || request.Duration > 500))
             return (null, "Thời lượng phim (Duration) phải nằm trong khoảng 1–500 phút.");
 
         // Kiểm tra trùng tên phim (tránh thêm lặp lại)
@@ -124,7 +124,7 @@ public class MovieService(AppDbContext db)
         var movie = await db.Movies.FirstOrDefaultAsync(m => m.MovieId == id && !m.IsDeleted);
         if (movie is null) return (null, null); // Trả về null/null để Controller báo NotFound
 
-        if (request.Duration is not null and (< 1 or > 500))
+        if (request.Duration != 0 && (request.Duration < 1 || request.Duration > 500))
             return (null, "Thời lượng phải nằm trong khoảng 1–500 phút.");
 
         // Kiểm tra trùng tên với các phim khác (trừ chính nó)
