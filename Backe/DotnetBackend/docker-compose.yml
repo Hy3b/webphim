@@ -1,27 +1,28 @@
 version: '3.8'
 
 services:
-  mysql:
+  # MySQL Database Service
+  webphim-mysql:
     image: mysql:8.0
-    container_name: Cinema_DB
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: webphim
+    container_name: webphim-mysql
+    restart: unless-stopped
     ports:
-      - "3307:3306"
+      - "${DB_PORT:-3307}:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-webphim}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
-    restart: always
 
-  redis:
+  # Redis Cache Service
+  webphim-redis:
     image: redis:7.2-alpine
     container_name: webphim-redis
     ports:
       - "6380:6379"
-    command: redis-server --requirepass webphim-secret-redis
     volumes:
       - redis_data:/data
-    restart: always
+    command: redis-server --save 60 1 --loglevel warning --requirepass ${REDIS_PASSWORD:-dxh1234}
 
 volumes:
   mysql_data:

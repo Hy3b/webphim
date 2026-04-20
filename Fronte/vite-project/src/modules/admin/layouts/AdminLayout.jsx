@@ -14,8 +14,10 @@ import {
     Moon,
     Sun,
     MonitorPlay,
-    UserCircle
+    UserCircle,
+    Scan
 } from 'lucide-react';
+
 import './AdminLayout.css';
 
 const AdminLayout = () => {
@@ -116,7 +118,15 @@ const AdminLayout = () => {
                                 <span>Tạo vé</span>
                             </NavLink>
                         </li>
+
+                        <li>
+                            <NavLink to="/admin/scan" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+                                <Scan size={18} />
+                                <span>Soát vé</span>
+                            </NavLink>
+                        </li>
                     </ul>
+
                 </nav>
             </aside>
 
@@ -134,8 +144,8 @@ const AdminLayout = () => {
                             <button className="icon-btn">
                                 <MonitorPlay size={18} />
                             </button>
-                            <button className="icon-btn">
-                                <Maximize size={18} />
+                            <button className="icon-btn" onClick={() => navigate('/admin/scan')} title="Truy cập nhanh Soát vé">
+                                <Scan size={18} />
                             </button>
                             <button className="icon-btn" onClick={toggleTheme} title={isDarkMode ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}>
                                 {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}

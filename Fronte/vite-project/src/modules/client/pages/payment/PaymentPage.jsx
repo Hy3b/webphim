@@ -24,13 +24,13 @@ const PaymentPage = () => {
     // bookingId thật từ DB (được trả về sau POST /api/bookings)
     const resolvedBookingId = bookingId ?? null;
 
-    // Lấy config SePay từ biến môi trường Vite (.env)
-    // Lưu ý: Trong Vite, các biến cần có tiền tố VITE_ để truy cập được ở frontend bằng import.meta.env
-    const sepayAccount = import.meta.env.VITE_SEPAY_BANK_ACCOUNT;
+    // Config SePay từ biến môi trường Vite (.env)
     const sepayBank = import.meta.env.VITE_SEPAY_BANK_NAME;
+    // Quay lại dùng Tài khoản ảo (VA) để nhận Webhook ngay lập tức
+    const sepayVA = import.meta.env.VITE_SEPAY_VA_ACCOUNT;
 
-    // Sử dụng API QR chính thức của SePay để đảm bảo App ngân hàng (như Techcombank, Vietcombank) luôn tự động điền đúng Nội dung chuyển khoản (des)
-    const qrUrl = `https://qr.sepay.vn/img?acc=${sepayAccount}&bank=${sepayBank}&amount=${totalPrice}&des=${orderCode}`;
+    // QR dùng VA -> SePay tự động nhận giao dịch và gửi webhook về backend của bạn
+    const qrUrl = `https://qr.sepay.vn/img?acc=${sepayVA}&bank=${sepayBank}&amount=${totalPrice}&des=${orderCode}`;
 
     const [pollStatus, setPollStatus] = useState('idle');   // idle | polling | paid | error
     const [dotCount, setDotCount] = useState(0);
@@ -47,46 +47,50 @@ const PaymentPage = () => {
         return () => clearInterval(dotRef.current);
     }, [pollStatus]);
 
-    // Polling: gọi API mỗi 3 giây
+    // Polling: dùng setTimeout đệ quy để tránh chồng chéo và bền bỉ hơn
     const startPolling = () => {
-        if (intervalRef.current) return;
-        setPollStatus('polling');
-        console.log('[Payment] Bắt đầu polling orderCode:', orderCode);
+        if (pollStatus === 'paid' || pollStatus === 'expired') return;
 
-        intervalRef.current = setInterval(async () => {
+        const checkStatus = async () => {
             try {
                 // Thêm query timestamp để tránh trình duyệt cache kết quả HTTP GET báo pending liên tục
                 const res = await api.get(`/payment/status/${orderCode}?_t=${Date.now()}`);
                 const data = res.data;
-                console.log('[Payment] Poll result:', data);
 
-                if (data.paid) {
-                    clearInterval(intervalRef.current);
-                    intervalRef.current = null;
+                const isPaid = data.paid === true || data.Paid === true || data.status === 'paid' || data.Status === 'paid';
+
+                if (isPaid) {
+                    console.log('%c[Payment] ✅ THANH TOÁN THÀNH CÔNG!', 'color: #28a745; font-weight: bold;');
                     setPollStatus('paid');
 
-                    // Delay nhỏ để user thấy "Đã thanh toán!" trước khi chuyển trang
-                    setTimeout(() => {
-                        navigate('/ticket', {
-                            state: {
-                                movie,
-                                selectedSeats,
-                                totalPrice,
-                                orderCode,
-                                bookingId: resolvedBookingId,
-                                paidAt: new Date().toISOString()
-                            }
-                        });
-                    }, 1200);
-                } else if (data.status === 'expired' || data.status === 'cancelled') {
-                    clearInterval(intervalRef.current);
-                    intervalRef.current = null;
-                    setPollStatus('expired');
+                    const finalBookingId = data.bookingId || data.BookingId || resolvedBookingId;
+
+                    const nextState = {
+                        movie, selectedSeats, totalPrice, orderCode,
+                        bookingId: finalBookingId,
+                        paidAt: new Date().toISOString()
+                    };
+
+                    // Chỉnh hướng
+                    navigate('/ticket', { state: nextState });
+                    return; // Kết thúc đệ quy
                 }
+
+                if (data.status === 'cancelled' || data.status === 'expired') {
+                    setPollStatus('expired');
+                    return;
+                }
+
+                // Nếu chưa trả, đợi 3s rồi check tiếp
+                intervalRef.current = setTimeout(checkStatus, 3000);
             } catch (err) {
-                console.warn('[Payment] Poll lỗi:', err.message);
+                console.warn('[Payment] Tín hiệu yếu, đang thử lại...', err.message);
+                intervalRef.current = setTimeout(checkStatus, 5000); // Lỗi thì đợi lâu hơn chút
             }
-        }, 3000);
+        };
+
+        setPollStatus('polling');
+        checkStatus();
     };
 
     // [FIX LOG] Dọn interval khi component thực sự unmount
@@ -112,8 +116,8 @@ const PaymentPage = () => {
         if (pollStatus === 'idle' || pollStatus === 'polling') {
             startPolling();
         }
-        
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state, pollStatus]);
 
     if (!location.state) return null; // Ẩn giao diện trong lúc bị đuổi về
@@ -194,8 +198,8 @@ const PaymentPage = () => {
                         {pollStatus === 'polling' && (
                             <div className="poll-hint">
                                 <p>Hệ thống đang tự động kiểm tra mỗi 5 giây. Vui lòng chờ...</p>
-                                <p style={{fontSize: '11px', color: '#666', marginTop: '10px'}}>
-                                    Debug Info: baseURL={api.defaults.baseURL} | state={pollStatus} 
+                                <p style={{ fontSize: '11px', color: '#666', marginTop: '10px' }}>
+                                    Debug Info: baseURL={api.defaults.baseURL} | state={pollStatus}
                                 </p>
                             </div>
                         )}

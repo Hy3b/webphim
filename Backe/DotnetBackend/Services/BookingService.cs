@@ -26,7 +26,7 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
             .FirstOrDefaultAsync(s => s.ShowtimeId == request.ShowtimeId)
             ?? throw new KeyNotFoundException("Suất chiếu không tồn tại");
 
-        if (showtime.StartTime < DateTime.UtcNow)
+        if (showtime.StartTime < DateTime.Now)
         {
             throw new ArgumentException("Suất chiếu này đã bắt đầu hoặc đã kết thúc, không thể đặt vé.");
         }
@@ -77,7 +77,7 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
 
             // ── 5. Calculate price ──────────────────────────────────────
             var totalAmount = seats.Sum(s => showtime.BasePrice + s.SeatType.Surcharge);
-            var expiredAt = DateTime.UtcNow.AddMinutes(BookingTtlMinutes);
+            var expiredAt = DateTime.Now.AddMinutes(BookingTtlMinutes);
 
             // ── 6. Save Order ───────────────────────────────────────────
             var order = new Order
@@ -89,8 +89,8 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
                 Status = OrderStatus.pending,
                 PaymentMethod = "QR",
                 ExpiredAt = expiredAt,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
             db.Orders.Add(order);

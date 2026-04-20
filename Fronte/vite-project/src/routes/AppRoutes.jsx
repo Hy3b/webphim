@@ -15,8 +15,11 @@ import AdminRoute from './AdminRoute';
 import AdminDashboard from '../modules/admin/pages/AdminDashboard/AdminDashboard';
 import MovieManager from '../modules/admin/pages/MovieManager/MovieManager';
 import ShowtimeManager from '../modules/admin/pages/ShowtimeManager/ShowtimeManager';
+import TicketManager from '../modules/admin/pages/TicketManager/TicketManager';
+import TicketScanner from '../modules/admin/pages/TicketScanner/TicketScanner';
 import RoomManager from '../modules/admin/pages/RoomManager/RoomManager';
 import SeatMapManager from '../modules/admin/pages/SeatMapManager/SeatMapManager';
+
 
 const AppRoutes = () => {
     return (
@@ -37,12 +40,13 @@ const AppRoutes = () => {
             <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
-                
+
                 <Route path="rooms" element={<RoomManager />} />
                 <Route path="rooms/:roomId/seats" element={<SeatMapManager />} />
                 <Route path="movies" element={<MovieManager />} />
                 <Route path="showtimes" element={<ShowtimeManager />} />
-                <Route path="tickets" element={<div>Bán vé trực tiếp</div>} />
+                <Route path="tickets" element={<TicketManager />} />
+                <Route path="scan" element={<TicketScanner />} />
             </Route>
         </Routes>
     );
