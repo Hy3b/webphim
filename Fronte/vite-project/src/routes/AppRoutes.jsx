@@ -16,6 +16,10 @@ import AdminRoute from './AdminRoute';
 import AdminDashboard from '../modules/admin/pages/AdminDashboard/AdminDashboard';
 import MovieManager from '../modules/admin/pages/MovieManager/MovieManager';
 import ShowtimeManager from '../modules/admin/pages/ShowtimeManager/ShowtimeManager';
+import TicketManager from '../modules/admin/pages/TicketManager/TicketManager';
+import TicketScanner from '../modules/admin/pages/TicketScanner/TicketScanner';
+
+
 
 const AppRoutes = () => {
     return (
@@ -42,7 +46,8 @@ const AppRoutes = () => {
                 <Route path="seats" element={<div>Quản lý sơ đồ ghế</div>} />
                 <Route path="movies" element={<MovieManager />} />
                 <Route path="showtimes" element={<ShowtimeManager />} />
-                <Route path="tickets" element={<div>Bán vé trực tiếp</div>} />
+                <Route path="tickets" element={<TicketManager />} />
+                <Route path="scan" element={<TicketScanner />} />
             </Route>
         </Routes>
     );
