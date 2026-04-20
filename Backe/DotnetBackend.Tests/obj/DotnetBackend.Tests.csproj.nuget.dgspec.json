@@ -1,34 +1,40 @@
 {
   "format": 1,
   "restore": {
-    "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend.Tests/DotnetBackend.Tests.csproj": {}
+    "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend.Tests\\DotnetBackend.Tests.csproj": {}
   },
   "projects": {
-    "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend.Tests/DotnetBackend.Tests.csproj": {
+    "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend.Tests\\DotnetBackend.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend.Tests/DotnetBackend.Tests.csproj",
+        "projectUniqueName": "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend.Tests\\DotnetBackend.Tests.csproj",
         "projectName": "DotnetBackend.Tests",
-        "projectPath": "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend.Tests/DotnetBackend.Tests.csproj",
-        "packagesPath": "/Users/nguyenhoangduong/.nuget/packages/",
-        "outputPath": "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend.Tests/obj/",
+        "projectPath": "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend.Tests\\DotnetBackend.Tests.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend.Tests\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/nguyenhoangduong/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/local/share/dotnet/library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend/WebPhimApi.csproj": {
-                "projectPath": "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend/WebPhimApi.csproj"
+              "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend\\WebPhimApi.csproj": {
+                "projectPath": "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend\\WebPhimApi.csproj"
               }
             }
           }
@@ -43,7 +49,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -94,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -372,23 +378,29 @@
         }
       }
     },
-    "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend/WebPhimApi.csproj": {
+    "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend\\WebPhimApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend/WebPhimApi.csproj",
+        "projectUniqueName": "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend\\WebPhimApi.csproj",
         "projectName": "WebPhimApi",
-        "projectPath": "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend/WebPhimApi.csproj",
-        "packagesPath": "/Users/nguyenhoangduong/.nuget/packages/",
-        "outputPath": "/Users/nguyenhoangduong/webphim/Backe/DotnetBackend/obj/",
+        "projectPath": "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend\\WebPhimApi.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Documents\\code\\webphimCS\\Backe\\DotnetBackend\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/nguyenhoangduong/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/local/share/dotnet/library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -407,7 +419,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -467,7 +479,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

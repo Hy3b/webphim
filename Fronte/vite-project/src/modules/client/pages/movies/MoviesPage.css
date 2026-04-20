@@ -1,0 +1,120 @@
+/* Container chính của trang phim */
+.moviespage-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 16px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Header khu vực lọc và tìm kiếm */
+.movies-header {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 48px;
+    border-bottom: 2px solid #E5E7EB;
+    padding-bottom: 24px;
+}
+
+/* Thanh Navigation Tab */
+.movies-tab-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+}
+
+/* Nút Tab */
+.movies-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 20px;
+    font-weight: 700;
+    color: #6B7280;
+    padding: 0 16px 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+}
+
+.movies-tab-btn:hover {
+    color: #111827;
+}
+
+.movies-tab-btn.active {
+    color: #D11515;
+    border-bottom-color: #D11515;
+}
+
+/* Thanh tìm kiếm */
+.movies-search-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.movies-search-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 24px;
+    border: 2px solid #E5E7EB;
+    border-radius: 9999px;
+    font-size: 16px;
+    color: #111827;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: #F9FAFB;
+}
+
+.movies-search-input:focus {
+    border-color: #D11515;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(209, 21, 21, 0.1);
+}
+
+.movies-search-input::placeholder {
+    color: #9CA3AF;
+}
+
+/* Lưới hiển thị danh sách phim */
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 36px;
+}
+
+/* Không tìm thấy phim */
+.no-movies-found {
+    text-align: center;
+    color: #6B7280;
+    font-size: 18px;
+    padding: 48px 0;
+    grid-column: 1 / -1;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .moviespage-container {
+        padding: 24px 16px;
+    }
+
+    .movies-header {
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+    }
+
+    .movies-tab-btn {
+        font-size: 16px;
+        gap: 16px;
+        padding: 0 8px 8px 8px;
+    }
+    
+    .movies-search-input {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+
+    .movies-grid {
+        gap: 24px;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+    }
+}
