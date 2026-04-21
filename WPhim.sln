@@ -1,0 +1,42 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "webphim-Hanh", "webphim-Hanh", "{CB7D419B-A4C3-1A6C-460B-5E15132FC537}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backe", "Backe", "{28E222F1-29B3-0DFF-DB93-5BC609BB8CA9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DotnetBackend", "DotnetBackend", "{9B3EB3D5-07AA-8CF7-BB89-B81CFB879091}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPhimApi", "webphim-Hanh\Backe\DotnetBackend\WebPhimApi.csproj", "{AA0DD0FF-639B-7453-0CCD-B45EAEA1F4FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetBackend.Tests", "webphim-Hanh\Backe\DotnetBackend.Tests\DotnetBackend.Tests.csproj", "{21E776C0-CAFB-5EAE-6EB6-75F3DF3D526A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA0DD0FF-639B-7453-0CCD-B45EAEA1F4FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA0DD0FF-639B-7453-0CCD-B45EAEA1F4FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA0DD0FF-639B-7453-0CCD-B45EAEA1F4FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA0DD0FF-639B-7453-0CCD-B45EAEA1F4FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21E776C0-CAFB-5EAE-6EB6-75F3DF3D526A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21E776C0-CAFB-5EAE-6EB6-75F3DF3D526A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21E776C0-CAFB-5EAE-6EB6-75F3DF3D526A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21E776C0-CAFB-5EAE-6EB6-75F3DF3D526A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{28E222F1-29B3-0DFF-DB93-5BC609BB8CA9} = {CB7D419B-A4C3-1A6C-460B-5E15132FC537}
+		{9B3EB3D5-07AA-8CF7-BB89-B81CFB879091} = {28E222F1-29B3-0DFF-DB93-5BC609BB8CA9}
+		{AA0DD0FF-639B-7453-0CCD-B45EAEA1F4FF} = {9B3EB3D5-07AA-8CF7-BB89-B81CFB879091}
+		{21E776C0-CAFB-5EAE-6EB6-75F3DF3D526A} = {28E222F1-29B3-0DFF-DB93-5BC609BB8CA9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6970AF6D-DEE1-46B0-B0ED-7CDC7B0554B4}
+	EndGlobalSection
+EndGlobal
