@@ -228,6 +228,60 @@
     color: #991b1b;
 }
 
+.ts-alert-unpaid {
+    background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 100%);
+    border: 2px solid #f97316;
+    color: #7c2d12;
+    border-radius: 16px;
+    padding: 32px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: slideIn 0.3s ease-out;
+}
+
+.ts-alert-unpaid svg {
+    color: #ef4444;
+    margin-bottom: 12px;
+}
+
+.ts-alert-unpaid h2 {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+    color: #c2410c;
+}
+
+.ts-alert-unpaid p {
+    font-size: 15px;
+    margin: 0 0 6px 0;
+    color: #7c2d12;
+}
+
+.ts-alert-sub {
+    font-size: 13px !important;
+    color: #9a3412 !important;
+    opacity: 0.85;
+}
+
+.ts-alert-unpaid .ts-btn-retry {
+    margin-top: 20px;
+    padding: 10px 28px;
+    background: #c2410c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ts-alert-unpaid .ts-btn-retry:hover {
+    background: #9a3412;
+}
+
 .ts-btn-retry {
     margin-top: 12px;
     padding: 8px 16px;

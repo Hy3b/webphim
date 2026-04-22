@@ -24,6 +24,7 @@ const TicketScanner = () => {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
+    const [paymentError, setPaymentError] = useState(null); // unpaid/cancelled orders
     const [isScanning, setIsScanning] = useState(true);
     const [cameraError, setCameraError] = useState(null);
     const inputRef = useRef(null);
@@ -103,15 +104,26 @@ const TicketScanner = () => {
 
         setLoading(true);
         setError(null);
+        setPaymentError(null);
         setResult(null);
 
         try {
             const res = await adminTicketApi.scanTicket({ orderCode: code.trim() });
             setResult(res.data);
-            setOrderCode(''); 
-            setIsScanning(false); // Stop scanning mode when showing result
+            setOrderCode('');
+            setIsScanning(false);
         } catch (err) {
-            setError(err.response?.data?.message || 'Lỗi khi soát vé. Vui lòng kiểm tra lại mã đơn hàng.');
+            const message = err.response?.data?.message || '';
+            // Detect unpaid/cancelled orders from backend message
+            const isUnpaid = message.toLowerCase().includes('chưa được thanh toán')
+                || message.toLowerCase().includes('pending')
+                || message.toLowerCase().includes('cancel');
+
+            if (isUnpaid) {
+                setPaymentError(message);
+            } else {
+                setError(message || 'Lỗi khi soát vé. Vui lòng kiểm tra lại mã đơn hàng.');
+            }
             setIsScanning(false);
         } finally {
             setLoading(false);
@@ -127,6 +139,7 @@ const TicketScanner = () => {
     const handleReset = () => {
         setResult(null);
         setError(null);
+        setPaymentError(null);
         setOrderCode('');
         setCameraError(null);
         setIsScanning(true);
@@ -200,6 +213,18 @@ const TicketScanner = () => {
                     <div className="ts-result-section">
                         {loading && <div className="ts-loader">Đang kiểm tra dữ liệu...</div>}
 
+                        {paymentError && (
+                            <div className="ts-alert ts-alert-unpaid">
+                                <XCircle size={48} />
+                                <div className="ts-alert-content">
+                                    <h2>VÉ CHƯA THANH TOÁN</h2>
+                                    <p>Đơn hàng này <strong>chưa được thanh toán</strong> hoặc đã bị huỷ.</p>
+                                    <p className="ts-alert-sub">Không thể soát vé cho đơn hàng có trạng thái <strong>pending</strong> hoặc <strong>cancelled</strong>.</p>
+                                    <button className="ts-btn-retry" onClick={handleReset}>Quét lại</button>
+                                </div>
+                            </div>
+                        )}
+
                         {error && (
                             <div className="ts-alert ts-alert-error">
                                 <XCircle size={24} />
@@ -211,7 +236,7 @@ const TicketScanner = () => {
                             </div>
                         )}
 
-                        {!result && !loading && !error && (
+                        {!result && !loading && !error && !paymentError && (
                             <div className="ts-empty-state">
                                 <div className="ts-empty-icon">
                                     <Ticket size={48} />
