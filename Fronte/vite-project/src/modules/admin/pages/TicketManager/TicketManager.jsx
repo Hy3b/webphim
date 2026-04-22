@@ -141,6 +141,162 @@ const TicketManager = () => {
         setError(null);
     };
 
+    const handlePrint = () => {
+        const orderCode = successData?.orderCode || 'UNKNOWN';
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(orderCode)}`;
+        const showtimeStr = selectedShowtime
+            ? new Date(selectedShowtime.startTime).toLocaleString('vi-VN')
+            : '';
+        const totalStr = calculateTotal().toLocaleString() + 'đ';
+        const seatsStr = selectedSeats.join(', ');
+
+        const printContent = `
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vé Xem Phim - ${orderCode}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px;
+    }
+    .ticket {
+      width: 340px;
+      border: 2px dashed #333;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+    .ticket-header {
+      background: #1a1a2e;
+      color: #fff;
+      text-align: center;
+      padding: 16px 12px 12px;
+    }
+    .ticket-header h1 { font-size: 20px; letter-spacing: 2px; }
+    .ticket-header p { font-size: 11px; opacity: 0.7; margin-top: 4px; }
+    .ticket-body { padding: 20px 24px; }
+    .movie-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #444;
+    }
+    .row .label { font-weight: 600; color: #222; }
+    .divider {
+      border: none;
+      border-top: 1px dashed #ccc;
+      margin: 14px 0;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+    .status-badge {
+      display: inline-block;
+      background: #22c55e;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      letter-spacing: 1px;
+    }
+    .qr-section {
+      text-align: center;
+      padding: 16px 0 20px;
+    }
+    .qr-section img {
+      width: 180px;
+      height: 180px;
+      border: 4px solid #1a1a2e;
+      border-radius: 8px;
+    }
+    .qr-label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+    }
+    .order-code {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+    .ticket-footer {
+      background: #f5f5f5;
+      text-align: center;
+      padding: 10px;
+      font-size: 11px;
+      color: #888;
+      border-top: 1px dashed #ccc;
+    }
+    @media print {
+      body { padding: 0; }
+      .ticket { box-shadow: none; border-color: #999; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket">
+    <div class="ticket-header">
+      <h1>🎬 CINEMA</h1>
+      <p>Vé Xem Phim Chính Thức</p>
+    </div>
+    <div class="ticket-body">
+      <div class="movie-title">${selectedMovie?.title || ''}</div>
+      <div class="row"><span class="label">Suất chiếu:</span><span>${showtimeStr}</span></div>
+      <div class="row"><span class="label">Phòng:</span><span>${selectedShowtime?.roomName || ''}</span></div>
+      <div class="row"><span class="label">Ghế:</span><span>${seatsStr}</span></div>
+      <hr class="divider" />
+      <div class="total-row"><span>Tổng tiền:</span><span>${totalStr}</span></div>
+      <div class="row"><span class="label">Thanh toán:</span><span><span class="status-badge">ĐÃ THANH TOÁN</span></span></div>
+    </div>
+    <div class="qr-section">
+      <img src="${qrUrl}" alt="QR Code" />
+      <div class="qr-label">Mã đơn hàng</div>
+      <div class="order-code">${orderCode}</div>
+    </div>
+    <div class="ticket-footer">Cảm ơn quý khách! Vui lòng giữ vé để đối chiếu.</div>
+  </div>
+  <script>
+    window.onload = function() {
+      window.focus();
+      window.print();
+      setTimeout(function() { window.close(); }, 1000);
+    };
+  <\/script>
+</body>
+</html>`;
+
+        const printWin = window.open('', '_blank', 'width=420,height=650,scrollbars=no,menubar=no,toolbar=no');
+        if (printWin) {
+            printWin.document.write(printContent);
+            printWin.document.close();
+        } else {
+            alert('Vui lòng cho phép popup để in vé!');
+        }
+    };
+
     const renderSteps = () => (
         <div className="tm-steps">
             {[1, 2, 3].map(i => (
@@ -337,7 +493,7 @@ const TicketManager = () => {
                             </div>
 
                             <div className="tm-success-actions">
-                                <button className="tm-btn-print" onClick={() => window.print()}>
+                                <button className="tm-btn-print" onClick={handlePrint}>
                                     In hóa đơn / vé
                                 </button>
                                 <button className="tm-btn-new" onClick={resetFlow}>
