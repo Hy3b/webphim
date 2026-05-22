@@ -10,7 +10,6 @@ import PaymentPage from '../modules/client/pages/payment/PaymentPage';
 import MovieDetail from '../modules/client/pages/movie/MovieDetail';
 import TicketPage from '../modules/client/pages/ticket/TicketPage';
 
-// Admin Imports
 import AdminLayout from '../modules/admin/layouts/AdminLayout';
 import AdminRoute from './AdminRoute';
 import AdminDashboard from '../modules/admin/pages/AdminDashboard/AdminDashboard';
@@ -18,13 +17,9 @@ import MovieManager from '../modules/admin/pages/MovieManager/MovieManager';
 import ShowtimeManager from '../modules/admin/pages/ShowtimeManager/ShowtimeManager';
 import TicketManager from '../modules/admin/pages/TicketManager/TicketManager';
 import TicketScanner from '../modules/admin/pages/TicketScanner/TicketScanner';
-<<<<<<< HEAD
-
-
-=======
 import RoomManager from '../modules/admin/pages/RoomManager/RoomManager';
 import SeatMapManager from '../modules/admin/pages/SeatMapManager/SeatMapManager';
->>>>>>> 6350b36 (gop code vs Hiep xong)
+import MoviesPage from '../modules/client/pages/movies/MoviesPage';
 
 
 const AppRoutes = () => {
@@ -40,22 +35,15 @@ const AppRoutes = () => {
                 <Route path="payment" element={<PaymentPage />} />
                 <Route path="ticket" element={<TicketPage />} />
                 <Route path="movie/:id" element={<MovieDetail />} />
+                <Route path="phim" element={<MoviesPage />} />
             </Route>
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
-<<<<<<< HEAD
-                
-                {/* Placeholders for future pages */}
-                <Route path="rooms" element={<div>Quản lý phòng rạp</div>} />
-                <Route path="seats" element={<div>Quản lý sơ đồ ghế</div>} />
-=======
-
                 <Route path="rooms" element={<RoomManager />} />
                 <Route path="rooms/:roomId/seats" element={<SeatMapManager />} />
->>>>>>> 6350b36 (gop code vs Hiep xong)
                 <Route path="movies" element={<MovieManager />} />
                 <Route path="showtimes" element={<ShowtimeManager />} />
                 <Route path="tickets" element={<TicketManager />} />

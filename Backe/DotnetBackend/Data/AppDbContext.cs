@@ -61,13 +61,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .Property(o => o.Status)
             .HasConversion<string>();
 
-        // Auto-update timestamps
-        modelBuilder.Entity<Order>()
-            .Property(o => o.CreatedAt)
-            .ValueGeneratedOnAdd();
-
-        modelBuilder.Entity<Order>()
-            .Property(o => o.UpdatedAt)
-            .ValueGeneratedOnAddOrUpdate();
+        // Model generation for timestamps removed
+        // because we manually assign them in the service.
     }
 }

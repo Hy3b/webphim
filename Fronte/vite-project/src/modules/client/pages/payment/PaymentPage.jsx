@@ -49,37 +49,40 @@ const PaymentPage = () => {
 
     // Polling: dùng setTimeout đệ quy để tránh chồng chéo và bền bỉ hơn
     const startPolling = () => {
-        if (intervalRef.current) return;
-        setPollStatus('polling');
-        console.log('[Payment] Bắt đầu polling orderCode:', orderCode);
+        if (pollStatus === 'paid' || pollStatus === 'expired') return;
 
-        intervalRef.current = setInterval(async () => {
+        const checkStatus = async () => {
             try {
-                console.log(`[Payment] 🛰️ Kiểm tra đơn ${orderCode}...`);
-                const res = await api.get(`/payment/status/${orderCode}`);
+                // Thêm query timestamp để tránh trình duyệt cache kết quả HTTP GET báo pending liên tục
+                const res = await api.get(`/payment/status/${orderCode}?_t=${Date.now()}`);
                 const data = res.data;
                 console.log('[Payment] Poll result:', data);
+
+                const isPaid = data.paid === true || data.Paid === true || data.status === 'paid' || data.Status === 'paid';
 
                 if (isPaid) {
                     console.log('%c[Payment] ✅ THANH TOÁN THÀNH CÔNG!', 'color: #28a745; font-weight: bold;');
                     setPollStatus('paid');
 
+                    const finalBookingId = data.bookingId || data.BookingId || resolvedBookingId;
+
+                    const nextState = {
+                        movie,
+                        selectedSeats,
+                        totalPrice,
+                        orderCode,
+                        bookingId: finalBookingId,
+                        paidAt: new Date().toISOString()
+                    };
+
                     // Delay nhỏ để user thấy "Đã thanh toán!" trước khi chuyển trang
                     setTimeout(() => {
-                        navigate('/ticket', {
-                            state: {
-                                movie,
-                                selectedSeats,
-                                totalPrice,
-                                orderCode,
-                                bookingId: resolvedBookingId,
-                                paidAt: new Date().toISOString()
-                            }
-                        });
+                        navigate('/ticket', { state: nextState });
                     }, 1200);
-                } else if (data.status === 'expired' || data.status === 'cancelled') {
-                    clearInterval(intervalRef.current);
-                    intervalRef.current = null;
+                    return; // Kết thúc đệ quy
+                }
+
+                if (data.status === 'cancelled' || data.status === 'expired') {
                     setPollStatus('expired');
                     return;
                 }
@@ -87,30 +90,36 @@ const PaymentPage = () => {
                 // Nếu chưa trả, đợi 3s rồi check tiếp
                 intervalRef.current = setTimeout(checkStatus, 3000);
             } catch (err) {
-                console.warn('[Payment] Poll lỗi:', err.message);
+                console.warn('[Payment] Tín hiệu yếu, đang thử lại...', err.message);
+                intervalRef.current = setTimeout(checkStatus, 5000); // Lỗi thì đợi lâu hơn chút
             }
-        }, 3000);
+        };
+
+        if (intervalRef.current) return;
+        setPollStatus('polling');
+        console.log('[Payment] Bắt đầu polling orderCode:', orderCode);
+        checkStatus();
     };
 
-    // [FIX LOG] Dọn interval khi component thực sự unmount
-    // Lý do: Sửa lỗi React 18 Strict Mode. Khi Strict Mode giả vờ unmount component để test, 
-    // lệnh xóa khoảng thời gian (clearInterval) được gọi để hủy vòng lặp cũ.
-    // Tuy nhiên, nếu ta không cập nhật intervalRef.current = null, 
-    // thì khi component bật lại (remount), biến intervalRef này vẫn còn giữ thẻ ID cũ 
-    // khiến hàm startPolling() nghĩ rằng vòng lặp chưa bị hủy và cứ thế Return (không quét mạng).
+    // [FIX LOG] Dọn timeout khi component thực sự unmount
     useEffect(() => {
         return () => {
-            if (intervalRef.current) clearTimeout(intervalRef.current);
+            if (intervalRef.current) {
+                clearTimeout(intervalRef.current);
+                intervalRef.current = null;
+            }
         };
     }, []);
 
-    // Kích hoạt tự động
+    // TỰ ĐỘNG BẬT RADAR QUÉT THANH TOÁN KHI MỞ TRANG HOẶC KHI REMOUNT (Strict Mode)
     useEffect(() => {
-        if (location.state && pollStatus === 'idle') {
+        if (!location.state) return;
+
+        // Nếu status đang là idle hoặc polling, thì luôn đảm bảo interval đang chạy
+        if (pollStatus === 'idle' || pollStatus === 'polling') {
             startPolling();
         }
-        
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state, pollStatus]);
 
     if (!location.state) return null; // Ẩn giao diện trong lúc bị đuổi về
@@ -191,8 +200,8 @@ const PaymentPage = () => {
                         {pollStatus === 'polling' && (
                             <div className="poll-hint">
                                 <p>Hệ thống đang tự động kiểm tra mỗi 5 giây. Vui lòng chờ...</p>
-                                <p style={{fontSize: '11px', color: '#666', marginTop: '10px'}}>
-                                    Debug Info: baseURL={api.defaults.baseURL} | state={pollStatus} 
+                                <p style={{ fontSize: '11px', color: '#666', marginTop: '10px' }}>
+                                    Debug Info: baseURL={api.defaults.baseURL} | state={pollStatus}
                                 </p>
                             </div>
                         )}

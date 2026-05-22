@@ -142,7 +142,7 @@ public class ShowtimeService(AppDbContext db, IConnectionMultiplexer redis)
         if (room is null) return (null, "Phòng chiếu không tồn tại.");
 
         // Tính giờ kết thúc = Giờ bắt đầu + Thời lượng phim + Thời gian nghỉ/dọn dẹp
-        var duration = (movie.Duration ?? 90) + req.BufferTimeMinutes;
+        var duration = (movie.Duration > 0 ? movie.Duration : 90) + req.BufferTimeMinutes;
         var endTime  = req.StartTime.AddMinutes(duration);
 
         // Kiểm tra xem phòng chiếu này có bị trùng (overlap) với suất khác không
@@ -188,7 +188,7 @@ public class ShowtimeService(AppDbContext db, IConnectionMultiplexer redis)
         var room = await db.Rooms.FindAsync(req.RoomId);
         if (room is null) return (null, "Phòng không tồn tại");
 
-        var duration = (movie.Duration ?? 90) + req.BufferTimeMinutes;
+        var duration = (movie.Duration > 0 ? movie.Duration : 90) + req.BufferTimeMinutes;
         var endTime  = req.StartTime.AddMinutes(duration);
 
         var overlapError = await CheckOverlapAsync(req.RoomId, req.StartTime, endTime, excludeId: id);
@@ -253,7 +253,7 @@ public class ShowtimeService(AppDbContext db, IConnectionMultiplexer redis)
         var movie = await db.Movies.FindAsync(req.MovieId);
         if (movie is null) return (new AutoGenerateResult(0, []), "Phim không tồn tại.");
 
-        var movieDuration = movie.Duration ?? 90;
+        var movieDuration = movie.Duration > 0 ? movie.Duration : 90;
         var created = 0;
         var conflicts = new List<string>();
 

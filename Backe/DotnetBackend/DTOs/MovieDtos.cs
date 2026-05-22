@@ -9,7 +9,7 @@ public record MovieResponse(
     [property: JsonPropertyName("id")] int MovieId,
     string Title,
     string? Description,
-    int? Duration, // Thời lượng phim (phút)
+    int Duration, // Thời lượng phim (phút)
     string? Poster,
     string? Banner,
     string Genre,
@@ -39,7 +39,7 @@ public record MoviePagedResponse(
 public record CreateMovieRequest(
     string Title,
     string? Description,
-    int? Duration,
+    int Duration,
     string? Poster,
     string? Banner,
     string Genre = "Chưa cập nhật",

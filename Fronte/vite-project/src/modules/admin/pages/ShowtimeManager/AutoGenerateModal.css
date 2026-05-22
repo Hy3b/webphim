@@ -90,3 +90,49 @@
 }
 .agm-btn-generate:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(245,158,11,0.45); }
 .agm-btn-generate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* =========================================
+   LIGHT MODE OVERRIDES
+   ========================================= */
+.admin-container:not(.dark-theme) .agm-modal {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+}
+.admin-container:not(.dark-theme) .agm-header {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+.admin-container:not(.dark-theme) .agm-header h2 { color: #1e293b; }
+
+.admin-container:not(.dark-theme) .agm-field label { color: #64748b; }
+.admin-container:not(.dark-theme) .agm-field input,
+.admin-container:not(.dark-theme) .agm-field select {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #334155;
+}
+
+.admin-container:not(.dark-theme) .agm-room-check {
+    background: #f8f9fc;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+.admin-container:not(.dark-theme) .agm-room-check:hover {
+    border-color: #388bfd;
+    color: #1e293b;
+}
+.admin-container:not(.dark-theme) .agm-room-check.checked {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.admin-container:not(.dark-theme) .agm-btn-ghost {
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+.admin-container:not(.dark-theme) .agm-btn-ghost:hover {
+    border-color: #94a3b8;
+    color: #1e293b;
+}

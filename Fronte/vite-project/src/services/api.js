@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// Ưu tiên chạy URL từ .env, nếu không có thì mặc định dùng public API của Cloudflare
-const baseURL = import.meta.env?.VITE_API_BASE_URL || 'https://backe-live.hanhfine.id.vn/api';
+// [FIX LOG] Đã bỏ dấu `?.` ở import.meta.env
+// Lý do: Trình biên dịch của Vite không nhận dạng được `?.` khi thay thế biến môi trường nội bộ.
+// Nếu giữ `?.`, biến sẽ đọc thất bại và luôn fallback về URL Production, khiến web tìm nhầm Database.
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://payment.dvanlong1102.id.vn/api';
 
 const api = axios.create({
     baseURL: baseURL,

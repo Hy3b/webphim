@@ -63,14 +63,11 @@ const TicketManager = () => {
 
     // Step 2 -> Step 3: Handle Showtime Selection
     const handleSelectShowtime = async (showtime) => {
-<<<<<<< HEAD
         // Prevent selecting past showtimes
         if (new Date(showtime.startTime) <= new Date()) {
             setError('Suất chiếu đã hết thời gian và không thể tạo vé.');
             return;
         }
-=======
->>>>>>> 6350b36 (gop code vs Hiep xong)
         setSelectedShowtime(showtime);
         setLoading(true);
         setError(null);
@@ -223,7 +220,6 @@ const TicketManager = () => {
                         
                         <div className="tm-showtime-list">
                             <h3>Chọn suất chiếu</h3>
-<<<<<<< HEAD
                             {showtimes.filter(st => new Date(st.startTime) > new Date()).length === 0 ? (
                                 <p className="tm-empty">Không có suất chiếu nào khả dụng.</p>
                             ) : (
@@ -246,24 +242,6 @@ const TicketManager = () => {
                                                 </div>
                                             </button>
                                         ))}
-=======
-                            {showtimes.length === 0 ? (
-                                <p className="tm-empty">Không có suất chiếu nào khả dụng.</p>
-                            ) : (
-                                <div className="tm-showtime-grid">
-                                    {showtimes.map(st => (
-                                        <button key={st.showtimeId} className="tm-showtime-item" onClick={() => handleSelectShowtime(st)}>
-                                            <div className="tm-st-time">
-                                                <Clock size={16} />
-                                                <span>{new Date(st.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
-                                            </div>
-                                            <div className="tm-st-details">
-                                                <span>{new Date(st.startTime).toLocaleDateString('vi-VN')}</span>
-                                                <span className="tm-st-room">{st.roomName}</span>
-                                            </div>
-                                        </button>
-                                    ))}
->>>>>>> 6350b36 (gop code vs Hiep xong)
                                 </div>
                             )}
                         </div>

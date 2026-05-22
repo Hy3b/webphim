@@ -95,7 +95,7 @@ export default function Header() {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/"
+                                <Link to="/phim"
                                     className={`tab-btn ${activeTab === 'phim' ? 'active' : ''}`}
                                     onClick={() => setActiveTab('phim')}>
                                     PHIM
