@@ -17,6 +17,7 @@ const BookingPage = () => {
 
     const [isCreatingBooking, setIsCreatingBooking] = useState(false);
     const [bookingError, setBookingError] = useState(null);
+    const [pointsToUse, setPointsToUse] = useState(0);
 
     // Countdown Timer Logic
     useEffect(() => {
@@ -126,7 +127,8 @@ const BookingPage = () => {
             userId: user.id, // Lấy ID của user đang đăng nhập
             showtimeId: parseInt(id),
             seatIds: selectedSeats,
-            totalAmount: calculateTotal()
+            totalAmount: calculateTotal(),
+            pointsToUse: pointsToUse
         };
 
         try {
@@ -214,6 +216,9 @@ const BookingPage = () => {
                         onConfirm={handleConfirmBooking}
                         isLoading={isCreatingBooking}
                         error={bookingError}
+                        user={user}
+                        pointsToUse={pointsToUse}
+                        setPointsToUse={setPointsToUse}
                     />
                 </div>
             </div>

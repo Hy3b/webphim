@@ -44,6 +44,20 @@ public partial class PaymentService(
         {
             order.Status = OrderStatus.paid;
             order.UpdatedAt = DateTime.Now;
+
+            // ── Calculate and Add Earned Points ──
+            var user = await db.Users.FindAsync(order.UserId);
+            if (user != null)
+            {
+                int earnedPoints = (int)Math.Floor(order.FinalAmount * 0.05m / 1000m) * 1000 / 1000;
+                // Hoặc đơn giản là FinalAmount * 5% nhưng tính theo số nguyên
+                earnedPoints = (int)(order.FinalAmount * 0.05m / 1000m); // Vi du 100k -> 5 diem
+                
+                order.PointsEarned = earnedPoints;
+                user.Points += earnedPoints;
+                db.Users.Update(user);
+            }
+
             await db.SaveChangesAsync();
 
             logger.LogInformation("✅ Order '{OrderCode}' thanh toán THÀNH CÔNG.", order.OrderCode);

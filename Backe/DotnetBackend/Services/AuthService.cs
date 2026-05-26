@@ -53,7 +53,20 @@ public class AuthService(AppDbContext db, JwtService jwtService)
 
         return new UserInfoResponse(
             user.UserId, user.Username, user.Email,
-            user.FullName, user.PhoneNumber, user.Role.ToString()
+            user.FullName, user.PhoneNumber, user.Role.ToString(),
+            user.Points
         );
+    }
+
+    public virtual async Task<(bool success, string? error)> UpdateProfileAsync(int userId, UpdateProfileRequest request)
+    {
+        var user = await db.Users.FindAsync(userId);
+        if (user is null) return (false, "Người dùng không tồn tại");
+
+        user.FullName = request.FullName;
+        user.PhoneNumber = request.PhoneNumber;
+
+        await db.SaveChangesAsync();
+        return (true, null);
     }
 }

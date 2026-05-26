@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using WebPhimApi.DTOs;
 using WebPhimApi.Services;
 
+using System.Security.Claims;
+
 namespace WebPhimApi.Controllers;
 
 [ApiController]
@@ -32,5 +34,16 @@ public class BookingController(BookingService bookingService) : ControllerBase
             logger.LogError(ex, "Lỗi khi tạo booking");
             return StatusCode(500, new { message = ex.Message, stack = ex.StackTrace });
         }
+    }
+
+    [HttpGet("history")]
+    public async Task<IActionResult> GetBookingHistory()
+    {
+        var userIdStr = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdStr, out var userId))
+            return Unauthorized();
+
+        var history = await bookingService.GetBookingHistoryAsync(userId);
+        return Ok(history);
     }
 }

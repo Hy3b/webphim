@@ -61,6 +61,22 @@ public class AuthController(AuthService authService) : ControllerBase
         return user is null ? NotFound() : Ok(user);
     }
 
+    [HttpPut("update-profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdStr, out var userId))
+            return Unauthorized();
+
+        var (success, error) = await authService.UpdateProfileAsync(userId, request);
+        if (!success) return BadRequest(new { message = error });
+
+        return Ok(new { message = "Cập nhật thông tin thành công" });
+    }
+
     [HttpPost("logout")]
     public IActionResult Logout()
     {

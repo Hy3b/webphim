@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebPhimApi.Data;
 
@@ -11,9 +12,11 @@ using WebPhimApi.Data;
 namespace WebPhimApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260522195406_AddMovieDuration")]
+    partial class AddMovieDuration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,14 +197,6 @@ namespace WebPhimApi.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)")
                         .HasColumnName("payment_method");
-
-                    b.Property<int>("PointsEarned")
-                        .HasColumnType("int")
-                        .HasColumnName("points_earned");
-
-                    b.Property<int>("PointsUsed")
-                        .HasColumnType("int")
-                        .HasColumnName("points_used");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -400,10 +395,6 @@ namespace WebPhimApi.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("varchar(15)")
                         .HasColumnName("phone_number");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("int")
-                        .HasColumnName("points");
 
                     b.Property<string>("Role")
                         .IsRequired()

@@ -9,6 +9,8 @@ import BookingPage from '../modules/client/pages/booking/BookingPage/BookingPage
 import PaymentPage from '../modules/client/pages/payment/PaymentPage';
 import MovieDetail from '../modules/client/pages/movie/MovieDetail';
 import TicketPage from '../modules/client/pages/ticket/TicketPage';
+import ProfilePage from '../modules/client/pages/Profile/ProfilePage';
+import PromotionPage from '../modules/client/pages/Promotion/PromotionPage';
 
 import AdminLayout from '../modules/admin/layouts/AdminLayout';
 import AdminRoute from './AdminRoute';
@@ -36,6 +38,8 @@ const AppRoutes = () => {
                 <Route path="ticket" element={<TicketPage />} />
                 <Route path="movie/:id" element={<MovieDetail />} />
                 <Route path="phim" element={<MoviesPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="khuyen-mai" element={<PromotionPage />} />
             </Route>
 
             {/* Admin Routes */}

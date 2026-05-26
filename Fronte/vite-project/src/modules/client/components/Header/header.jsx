@@ -66,11 +66,10 @@ export default function Header() {
                                 )}
                             </div>
                         ) : (
-                            <>
-                                <Link to="/login">Đăng nhập</Link>
-                                <span className="divider">|</span>
-                                <Link to="/register">Đăng ký</Link>
-                            </>
+                            <div className="auth-action-group">
+                                <Link to="/login" className="btn-login">Đăng nhập</Link>
+                                <Link to="/register" className="btn-register">Đăng ký</Link>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -102,24 +101,10 @@ export default function Header() {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/"
-                                    className={`tab-btn ${activeTab === 'gia_ve' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('gia_ve')}>
-                                    GIÁ VÉ
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/"
-                                    className={`tab-btn ${activeTab === 'nhuong_quyen' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('nhuong_quyen')}>
-                                    NHƯỢNG QUYỀN
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/"
-                                    className={`tab-btn ${activeTab === 'thanh_vien' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('thanh_vien')}>
-                                    THÀNH VIÊN
+                                <Link to="/khuyen-mai"
+                                    className={`tab-btn ${activeTab === 'khuyen_mai' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('khuyen_mai')}>
+                                    KHUYẾN MÃI
                                 </Link>
                             </li>
                         </ul>

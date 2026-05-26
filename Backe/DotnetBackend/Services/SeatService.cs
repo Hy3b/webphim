@@ -111,7 +111,7 @@ public class SeatService(AppDbContext db)
             await db.SaveChangesAsync();
             return (processedCount, null);
         } catch (Exception ex) {
-            return (0, "Không thể xoá ghế vì có dữ liệu ràng buộc (đã được đặt vé) hoặc lỗi hệ thống.");
+            return (0, "Không thể xoá ghế vì có dữ liệu ràng buộc (đã được đặt vé) hoặc lỗi hệ thống." + ex.Message);
         }
     }
 

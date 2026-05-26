@@ -39,6 +39,9 @@ public class User
 
     // Navigation
     public ICollection<Order> Orders { get; set; } = [];
+
+    [Column("points")]
+    public int Points { get; set; } = 0;
 }
 
 public enum UserRole { admin, staff, customer }

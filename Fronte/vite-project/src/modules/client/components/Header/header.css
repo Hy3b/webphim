@@ -39,18 +39,45 @@ a {
     align-items: center;
 }
 
-.auth-links a {
+.auth-action-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-login {
     color: white;
-    font-weight: bold;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: transparent;
+    transition: all 0.3s ease;
 }
 
-.auth-links a:hover {
-    text-decoration: underline;
+.btn-login:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
 }
 
-.auth-links .divider {
-    margin: 0 10px;
-    opacity: 0.7;
+.btn-register {
+    color: white;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #FF6600;
+    border: 1px solid #FF6600;
+    box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-register:hover {
+    background: #ff771a;
+    border-color: #ff771a;
+    box-shadow: 0 6px 15px rgba(255, 102, 0, 0.5);
+    transform: translateY(-2px);
+    text-decoration: none;
 }
 
 /* Main Header Styling */
@@ -85,8 +112,6 @@ a {
 .main-nav ul {
     display: flex;
     gap: 30px;
-    padding-right: 300px;
-
 }
 
 .main-nav a {
@@ -122,7 +147,7 @@ a {
 }
 
 .logo {
-    margin-right: auto;
+    margin-right: 50px;
 }
 
 /* ── User Menu (đã đăng nhập) ── */

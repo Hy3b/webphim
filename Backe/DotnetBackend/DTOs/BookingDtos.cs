@@ -7,7 +7,8 @@ namespace WebPhimApi.DTOs;
 public record BookingRequest(
     [Required] int UserId,
     [Required] int ShowtimeId,
-    [Required][MinLength(1)] List<string> SeatIds
+    [Required][MinLength(1)] List<string> SeatIds,
+    int PointsToUse = 0
 );
 
 public record CreateBookingResponse(
@@ -20,6 +21,18 @@ public record BookingStatusResponse(
     int? BookingId,
     string Status,
     bool Paid
+);
+
+public record BookingHistoryItemResponse(
+    string OrderCode,
+    string Status,
+    string MovieTitle,
+    string MoviePoster,
+    DateTime Showtime,
+    string Room,
+    decimal TotalAmount,
+    List<string> Seats,
+    DateTime CreatedAt
 );
 
 // ── Admin / Staff ─────────────────────────────────────────────────────────────

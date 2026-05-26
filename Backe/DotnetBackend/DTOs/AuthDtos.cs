@@ -31,5 +31,11 @@ public record UserInfoResponse(
     string Email,
     string? FullName,
     string? PhoneNumber,
-    string Role
+    string Role,
+    int Points
+);
+
+public record UpdateProfileRequest(
+    [Required] string FullName,
+    string? PhoneNumber
 );

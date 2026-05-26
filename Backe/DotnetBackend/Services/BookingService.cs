@@ -77,6 +77,23 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
 
             // ── 5. Calculate price ──────────────────────────────────────
             var totalAmount = seats.Sum(s => showtime.BasePrice + s.SeatType.Surcharge);
+
+            // ── Calculate Points Discount ──
+            int pointsToUse = request.PointsToUse;
+            if (pointsToUse > 0)
+            {
+                if (user.Points < pointsToUse)
+                    throw new InvalidOperationException("Số điểm muốn sử dụng vượt quá số dư hiện tại");
+
+                // Giảm luôn điểm ở DB
+                user.Points -= pointsToUse;
+                db.Users.Update(user);
+            }
+
+            var discountAmount = pointsToUse * 1000m; // 1 điểm = 1000 VND
+            var finalAmount = totalAmount - discountAmount;
+            if (finalAmount < 0) finalAmount = 0;
+
             var expiredAt = DateTime.Now.AddMinutes(BookingTtlMinutes);
 
             // ── 6. Save Order ───────────────────────────────────────────
@@ -85,7 +102,10 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
                 OrderCode = "TEMP",
                 UserId = user.UserId,
                 TotalAmount = totalAmount,
-                FinalAmount = totalAmount,
+                DiscountAmount = discountAmount,
+                PointsUsed = pointsToUse,
+                PointsEarned = 0, // Sẽ tính sau khi thanh toán thành công
+                FinalAmount = finalAmount,
                 Status = OrderStatus.pending,
                 PaymentMethod = "QR",
                 ExpiredAt = expiredAt,
@@ -136,5 +156,40 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
             foreach (var lockKey in acquiredLocks)
                 await Cache.KeyDeleteAsync(lockKey);
         }
+    }
+    public async Task<List<BookingHistoryItemResponse>> GetBookingHistoryAsync(int userId)
+    {
+        var orders = await db.Orders
+            .Include(o => o.Bookings).ThenInclude(b => b.Showtime).ThenInclude(s => s.Movie)
+            .Include(o => o.Bookings).ThenInclude(b => b.Showtime).ThenInclude(s => s.Room)
+            .Include(o => o.Bookings).ThenInclude(b => b.BookingSeats).ThenInclude(bs => bs.Seat)
+            .Where(o => o.UserId == userId && o.Status == OrderStatus.paid)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+
+        var history = new List<BookingHistoryItemResponse>();
+
+        foreach (var order in orders)
+        {
+            if (order.Bookings == null || order.Bookings.Count == 0) continue;
+            var booking = order.Bookings.First();
+            var showtime = booking.Showtime;
+            
+            var seats = booking.BookingSeats?.Select(bs => $"{bs.Seat.RowName}{bs.Seat.SeatNumber}").ToList() ?? new List<string>();
+
+            history.Add(new BookingHistoryItemResponse(
+                order.OrderCode,
+                order.Status.ToString(),
+                showtime.Movie.Title,
+                showtime.Movie.Poster ?? "",
+                showtime.StartTime,
+                showtime.Room.Name,
+                order.FinalAmount,
+                seats,
+                order.CreatedAt
+            ));
+        }
+
+        return history;
     }
 }

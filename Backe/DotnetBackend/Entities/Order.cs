@@ -25,6 +25,12 @@ public class Order
     [Column("discount_amount", TypeName = "decimal(10,2)")]
     public decimal DiscountAmount { get; set; } = 0;
 
+    [Column("points_used")]
+    public int PointsUsed { get; set; } = 0;
+
+    [Column("points_earned")]
+    public int PointsEarned { get; set; } = 0;
+
     [Required]
     [Column("final_amount", TypeName = "decimal(10,2)")]
     public decimal FinalAmount { get; set; }
