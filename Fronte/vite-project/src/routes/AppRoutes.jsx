@@ -22,6 +22,7 @@ import TicketScanner from '../modules/admin/pages/TicketScanner/TicketScanner';
 import RoomManager from '../modules/admin/pages/RoomManager/RoomManager';
 import SeatMapManager from '../modules/admin/pages/SeatMapManager/SeatMapManager';
 import MoviesPage from '../modules/client/pages/movies/MoviesPage';
+import InvoiceManager from '../modules/admin/pages/InvoiceManager/InvoiceManager';
 
 
 const AppRoutes = () => {
@@ -52,6 +53,7 @@ const AppRoutes = () => {
                 <Route path="showtimes" element={<ShowtimeManager />} />
                 <Route path="tickets" element={<TicketManager />} />
                 <Route path="scan" element={<TicketScanner />} />
+                <Route path="invoices" element={<InvoiceManager />} />
             </Route>
         </Routes>
     );

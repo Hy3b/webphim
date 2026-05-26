@@ -164,3 +164,121 @@ public class AdminTicketService(AppDbContext db, ILogger<AdminTicketService> log
         );
     }
 }
+
+public class AdminReportService(AppDbContext db)
+{
+    public async Task<List<AdminInvoiceResponse>> GetPaidInvoicesAsync(
+        DateTime? fromDate = null,
+        DateTime? toDate = null,
+        string? searchTerm = null,
+        decimal? minAmount = null,
+        decimal? maxAmount = null)
+    {
+        var query = db.Orders
+            .AsNoTracking()
+            .Where(o => o.Status == OrderStatus.paid);
+
+        if (fromDate.HasValue)
+            query = query.Where(o => o.UpdatedAt >= fromDate.Value);
+        if (toDate.HasValue)
+            query = query.Where(o => o.UpdatedAt <= toDate.Value);
+        if (minAmount.HasValue)
+            query = query.Where(o => o.FinalAmount >= minAmount.Value);
+        if (maxAmount.HasValue)
+            query = query.Where(o => o.FinalAmount <= maxAmount.Value);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim();
+            query = query.Where(o =>
+                EF.Functions.Like(o.OrderCode, $"%{term}%") ||
+                (o.User != null && (
+                    (o.User.FullName != null && EF.Functions.Like(o.User.FullName, $"%{term}%")) ||
+                    EF.Functions.Like(o.User.Email, $"%{term}%")
+                )));
+        }
+
+        return await query
+            .OrderByDescending(o => o.UpdatedAt)
+            .Select(order => new AdminInvoiceResponse(
+                order.OrderId,
+                order.OrderCode,
+                order.TotalAmount,
+                order.FinalAmount,
+                order.Status.ToString(),
+                order.PaymentMethod,
+                order.UpdatedAt,
+                order.User != null ? order.User.FullName : null,
+                order.User != null ? order.User.Email : null,
+                order.User != null ? order.User.PhoneNumber : null,
+                order.Bookings
+                    .OrderBy(b => b.BookingId)
+                    .Select(b => b.Showtime.Movie.Title)
+                    .FirstOrDefault() ?? "Không xác định",
+                order.Bookings
+                    .OrderBy(b => b.BookingId)
+                    .Select(b => (DateTime?)b.Showtime.StartTime)
+                    .FirstOrDefault() ?? order.CreatedAt,
+                order.Bookings
+                    .OrderBy(b => b.BookingId)
+                    .Select(b => b.Showtime.Room.Name)
+                    .FirstOrDefault() ?? "Không xác định",
+                order.Bookings
+                    .SelectMany(b => b.BookingSeats)
+                    .OrderBy(bs => bs.Seat.RowName)
+                    .ThenBy(bs => bs.Seat.SeatNumber)
+                    .Select(bs => new AdminInvoiceSeatResponse(
+                        bs.Seat.RowName + bs.Seat.SeatNumber,
+                        bs.Seat.SeatType.Name,
+                        bs.Price
+                    ))
+                    .ToList()
+            ))
+            .ToListAsync();
+    }
+
+    public async Task<AdminOverviewStatsResponse> GetOverviewAsync(DateTime? from = null, DateTime? to = null)
+    {
+        var paidOrders = db.Orders.AsNoTracking().Where(o => o.Status == OrderStatus.paid);
+        if (from.HasValue) paidOrders = paidOrders.Where(o => o.CreatedAt >= from.Value);
+        if (to.HasValue) paidOrders = paidOrders.Where(o => o.CreatedAt <= to.Value);
+
+        var totalRevenue = await paidOrders.SumAsync(o => (decimal?)o.FinalAmount) ?? 0;
+        var totalTicketsSold = await db.BookingSeats
+            .AsNoTracking()
+            .CountAsync(bs => bs.Booking.Order.Status == OrderStatus.paid
+                && (!from.HasValue || bs.Booking.Order.CreatedAt >= from.Value)
+                && (!to.HasValue || bs.Booking.Order.CreatedAt <= to.Value));
+
+        var now = DateTime.UtcNow;
+        var monthStart = new DateTime(now.Year, now.Month, 1);
+        var newCustomersThisMonth = await db.Users
+            .AsNoTracking()
+            .CountAsync(u => u.Role == UserRole.customer && u.CreatedAt.HasValue && u.CreatedAt.Value >= monthStart);
+
+        var dailyRevenueRaw = await paidOrders
+            .GroupBy(o => o.CreatedAt.Date)
+            .Select(g => new { Date = g.Key, Revenue = g.Sum(x => x.FinalAmount) })
+            .OrderBy(x => x.Date)
+            .ToListAsync();
+
+        var recentInvoices = await GetPaidInvoicesAsync(from, to);
+        var recentCustomers = await db.Users
+            .AsNoTracking()
+            .Where(u => u.Role == UserRole.customer)
+            .OrderByDescending(u => u.CreatedAt)
+            .Take(6)
+            .Select(u => new RecentCustomerResponse(u.UserId, u.FullName, u.Email, u.CreatedAt))
+            .ToListAsync();
+
+        return new AdminOverviewStatsResponse(
+            totalRevenue,
+            totalTicketsSold,
+            newCustomersThisMonth,
+            dailyRevenueRaw.Select(x => new RevenuePointResponse(DateOnly.FromDateTime(x.Date), x.Revenue)).ToList(),
+            recentInvoices.Take(6).ToList(),
+            recentCustomers
+        );
+    }
+}
+

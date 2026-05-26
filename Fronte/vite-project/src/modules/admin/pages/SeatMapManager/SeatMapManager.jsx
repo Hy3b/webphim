@@ -14,7 +14,7 @@ const TYPE_COLORS = [
     { bg: 'rgba(245,158,11,0.18)', border: 'rgba(245,158,11,0.5)',   text: '#fcd34d',  activeBg: '#d97706' },   // VIP → Amber
     { bg: 'rgba(236,72,153,0.18)', border: 'rgba(236,72,153,0.5)',   text: '#f9a8d4',  activeBg: '#db2777' },   // Couple → Pink
     { bg: 'rgba(16,185,129,0.18)', border: 'rgba(16,185,129,0.5)',   text: '#6ee7b7',  activeBg: '#059669' },   // Extra 1 → Emerald
-    { bg: 'rgba(139,92,246,0.18)', border: 'rgba(139,92,246,0.5)',   text: '#c4b5fd',  activeBg: '#7c3aed' },   // Extra 2 → Purple
+    { bg: 'rgba(20,184,166,0.18)', border: 'rgba(20,184,166,0.5)',   text: '#99f6e4',  activeBg: '#0d9488' },   // Extra 2 → Teal
 ];
 
 const ERASER_TYPE_ID = -1;

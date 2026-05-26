@@ -54,3 +54,35 @@ public class AdminTicketController(AdminTicketService adminTicketService) : Cont
         }
     }
 }
+
+[ApiController]
+[Route("api/admin/invoices")]
+[Authorize(Roles = "admin,staff")]
+public class AdminInvoiceController(AdminReportService adminReportService) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> GetPaidInvoices(
+        [FromQuery] string? searchTerm,
+        [FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate,
+        [FromQuery] decimal? minAmount,
+        [FromQuery] decimal? maxAmount)
+    {
+        var invoices = await adminReportService.GetPaidInvoicesAsync(fromDate, toDate, searchTerm, minAmount, maxAmount);
+        return Ok(invoices);
+    }
+}
+
+[ApiController]
+[Route("api/admin/reports")]
+[Authorize(Roles = "admin,staff")]
+public class AdminReportController(AdminReportService adminReportService) : ControllerBase
+{
+    [HttpGet("overview")]
+    public async Task<IActionResult> GetOverview([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+    {
+        var stats = await adminReportService.GetOverviewAsync(from, to);
+        return Ok(stats);
+    }
+}
+

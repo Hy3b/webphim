@@ -15,7 +15,8 @@ import {
     Sun,
     MonitorPlay,
     UserCircle,
-    Scan
+    Scan,
+    ReceiptText
 } from 'lucide-react';
 
 import './AdminLayout.css';
@@ -77,7 +78,7 @@ const AdminLayout = () => {
                         </li>
 
                         {/* Fake thong ke */}
-                        <li className={`nav-item-dropdown ${openSubmenu.cinema ? 'open' : ''}`}>
+                        <li className={`nav-dropdown ${openSubmenu.cinema ? 'open' : ''}`}>
                             <div className="nav-link" onClick={() => toggleSubmenu('cinema')}>
                                 <Building2 size={18} />
                                 <span>Hệ thống rạp</span>
@@ -92,7 +93,7 @@ const AdminLayout = () => {
                             </ul>
                         </li>
 
-                        <li className={`nav-item-dropdown ${openSubmenu.movie ? 'open' : ''}`}>
+                        <li className={`nav-dropdown ${openSubmenu.movie ? 'open' : ''}`}>
                             <div className="nav-link" onClick={() => toggleSubmenu('movie')}>
                                 <Film size={18} />
                                 <span>Phim và Xuất Chiếu</span>
@@ -125,6 +126,13 @@ const AdminLayout = () => {
                                 <span>Soát vé</span>
                             </NavLink>
                         </li>
+
+                        <li>
+                            <NavLink to="/admin/invoices" className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+                                <ReceiptText size={18} />
+                                <span>Hóa đơn</span>
+                            </NavLink>
+                        </li>
                     </ul>
 
                 </nav>
@@ -133,7 +141,7 @@ const AdminLayout = () => {
             {/* Main Content Area */}
             <div className={`admin-main ${!isMenuOpen ? 'expanded' : ''}`}>
                 {/* Header */}
-                <header className="admin-header">
+                <div className="admin-header" role="banner">
                     <div className="header-left">
                         <button className="toggle-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                             <Menu size={20} />
@@ -162,7 +170,7 @@ const AdminLayout = () => {
                             </div>
                         </div>
                     </div>
-                </header>
+                </div>
 
                 {/* Page Content */}
                 <main className="admin-content">

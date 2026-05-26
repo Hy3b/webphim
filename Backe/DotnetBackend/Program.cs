@@ -120,6 +120,7 @@ builder.Services.AddScoped<WebPhimApi.Services.BookingService>();
 builder.Services.AddScoped<WebPhimApi.Services.PaymentService>();
 builder.Services.AddScoped<WebPhimApi.Services.AdminBookingService>();
 builder.Services.AddScoped<WebPhimApi.Services.AdminTicketService>();
+builder.Services.AddScoped<WebPhimApi.Services.AdminReportService>();
 builder.Services.AddScoped<WebPhimApi.Services.RoomService>();
 builder.Services.AddScoped<WebPhimApi.Services.SeatService>();
 
