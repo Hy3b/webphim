@@ -32,10 +32,12 @@ public record UserInfoResponse(
     string? FullName,
     string? PhoneNumber,
     string Role,
-    int Points
+    int Points,
+    string? AvatarUrl
 );
 
 public record UpdateProfileRequest(
     [Required] string FullName,
-    string? PhoneNumber
+    string? PhoneNumber,
+    string? AvatarUrl
 );

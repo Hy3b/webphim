@@ -136,6 +136,8 @@ var app = builder.Build();
 
 app.UseCors("WebPhimPolicy");
 
+app.UseStaticFiles();
+
 // Simple Request Logging Middleware for Debugging Webhooks
 app.Use(async (context, next) =>
 {
@@ -150,14 +152,5 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    try {
-        db.Database.ExecuteSqlRaw("ALTER TABLE movies MODIFY COLUMN Status ENUM('draft', 'showing', 'coming') NOT NULL DEFAULT 'draft';");
-        db.Database.ExecuteSqlRaw("ALTER TABLE showtimes MODIFY COLUMN status ENUM('draft','active','cancelled','completed') NOT NULL DEFAULT 'draft';");
-    } catch {}
-}
 
 app.Run();

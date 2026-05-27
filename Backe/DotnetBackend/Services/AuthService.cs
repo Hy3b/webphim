@@ -54,7 +54,7 @@ public class AuthService(AppDbContext db, JwtService jwtService)
         return new UserInfoResponse(
             user.UserId, user.Username, user.Email,
             user.FullName, user.PhoneNumber, user.Role.ToString(),
-            user.Points
+            user.Points, user.AvatarUrl
         );
     }
 
@@ -65,6 +65,7 @@ public class AuthService(AppDbContext db, JwtService jwtService)
 
         user.FullName = request.FullName;
         user.PhoneNumber = request.PhoneNumber;
+        user.AvatarUrl = request.AvatarUrl;
 
         await db.SaveChangesAsync();
         return (true, null);
