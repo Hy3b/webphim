@@ -41,7 +41,11 @@ export default function Header() {
                                     onClick={() => setDropdownOpen(!dropdownOpen)}
                                 >
                                     <span className="user-avatar">
-                                        {(user.fullName || user.username).charAt(0).toUpperCase()}
+                                        {user.avatarUrl ? (
+                                            <img src={user.avatarUrl} alt="Avatar" className="user-avatar-img-small" />
+                                        ) : (
+                                            (user.fullName || user.username).charAt(0).toUpperCase()
+                                        )}
                                     </span>
                                     <span className="user-name">{user.fullName || user.username}</span>
                                     <span className="chevron">{dropdownOpen ? '▲' : '▼'}</span>

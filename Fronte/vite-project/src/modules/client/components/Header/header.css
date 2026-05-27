@@ -188,19 +188,27 @@ a {
     font-size: 13px;
     color: white;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
+
+
 .user-name {
-    font-weight: bold;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
     max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #dce3ec !important;
+    /* Cường chế màu xám trắng để tránh bị extension hoặc trình duyệt tự động ghi đè */
 }
 
 .chevron {
     font-size: 10px;
     opacity: 0.8;
+    color: #8a93a0 !important;
 }
 
 /* ── Dropdown ── */

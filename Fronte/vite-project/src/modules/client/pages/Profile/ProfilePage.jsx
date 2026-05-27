@@ -11,8 +11,9 @@ export default function ProfilePage() {
     
     // Edit state
     const [isEditing, setIsEditing] = useState(false);
-    const [editForm, setEditForm] = useState({ fullName: '', phoneNumber: '' });
+    const [editForm, setEditForm] = useState({ fullName: '', phoneNumber: '', avatarUrl: '' });
     const [isSaving, setIsSaving] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
     
     // UI state
     const [activeQR, setActiveQR] = useState(null);
@@ -41,7 +42,11 @@ export default function ProfilePage() {
         };
 
         if (user) {
-            setEditForm({ fullName: user.fullName || '', phoneNumber: user.phoneNumber || '' });
+            setEditForm({ 
+                fullName: user.fullName || '', 
+                phoneNumber: user.phoneNumber || '',
+                avatarUrl: user.avatarUrl || ''
+            });
             fetchHistory();
         } else {
             // Give context some time to load or redirect if absolutely null
@@ -69,6 +74,79 @@ export default function ProfilePage() {
         }
     };
 
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validations
+        if (!['image/jpeg', 'image/png'].includes(file.type)) {
+            alert('Vui lòng chọn ảnh định dạng JPG hoặc PNG.');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            alert('Kích thước ảnh tối đa là 5MB.');
+            return;
+        }
+
+        setUploadingImage(true);
+
+        try {
+            // Read and compress image
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            await new Promise((resolve) => {
+                img.onload = resolve;
+            });
+
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800;
+            const MAX_HEIGHT = 800;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convert to JPEG blob (quality 0.8)
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+
+            // Create form data and upload
+            const formData = new FormData();
+            formData.append('file', blob, 'avatar.jpg');
+
+            // Send to backend endpoint
+            const response = await api.post('/upload/image', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            // Update edit form state
+            setEditForm({...editForm, avatarUrl: response.data.url});
+            alert('Tải ảnh lên thành công!');
+        } catch (error) {
+            console.error('Lỗi upload ảnh:', error);
+            alert('Đã xảy ra lỗi khi tải ảnh lên.');
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     if (!user || loading) return <div className="profile-loading">Đang tải thông tin...</div>;
 
     return (
@@ -78,7 +156,11 @@ export default function ProfilePage() {
                 <div className="profile-card">
                     <div className="profile-header">
                         <div className="profile-avatar-large">
-                            {(user.fullName || user.username).charAt(0).toUpperCase()}
+                            {user.avatarUrl ? (
+                                <img src={user.avatarUrl} alt="Avatar" className="user-avatar-img-large" />
+                            ) : (
+                                (user.fullName || user.username).charAt(0).toUpperCase()
+                            )}
                         </div>
                         <h2 className="profile-username">{user.fullName || user.username}</h2>
                         <span className="profile-role">{user.role}</span>
@@ -103,6 +185,7 @@ export default function ProfilePage() {
                                     <span className="info-label">Số điện thoại</span>
                                     <span className="info-value">{user.phoneNumber || 'Chưa cập nhật'}</span>
                                 </div>
+
                                 <div className="info-item" style={{ gridColumn: '1 / -1', background: 'linear-gradient(to right, #034EA2, #00B1FF)', padding: '15px', borderRadius: '8px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>⭐ Điểm tích lũy</span>
                                     <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{user.points || 0} Điểm</span>
@@ -143,6 +226,21 @@ export default function ProfilePage() {
                                         onChange={(e) => setEditForm({...editForm, phoneNumber: e.target.value})}
                                         placeholder="Nhập số điện thoại"
                                     />
+                                </div>
+                                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                    <label>Ảnh đại diện</label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                        <label className="secondary-btn" style={{ cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', margin: 0 }}>
+                                            {uploadingImage ? 'Đang tải...' : 'Tải ảnh lên từ máy'}
+                                            <input 
+                                                type="file" 
+                                                accept="image/png, image/jpeg" 
+                                                onChange={handleFileChange}
+                                                style={{ display: 'none' }}
+                                                disabled={uploadingImage}
+                                            />
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div className="form-actions">

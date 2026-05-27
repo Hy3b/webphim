@@ -12,7 +12,7 @@ const Footer = () => {
             <h2 className="logo-text-footer">MY<span className="logo-highlight-footer">CINEMAS</span></h2>
           </div>
           <ul className="footer-links">
-            <li><a href="#">Tuyện dụng</a></li>
+            <li><a href="#">Tuyển dụng</a></li>
             <li><a href="#">Giới thiệu</a></li>
             <li><a href="#">Liên hệ</a></li>
             <li><a href="#">F.A.Q</a></li>
@@ -26,26 +26,26 @@ const Footer = () => {
           <div className="footer-app-section">
             <h3 className="column-title">TẢI ỨNG DỤNG</h3>
             <ul className="footer-links">
-              <li><a href="#">Beta Cinemas cho iOS</a></li>
-              <li><a href="#">Beta Cinemas cho Android</a></li>
+              <li><a href="#">MyCinema cho iOS</a></li>
+              <li><a href="#">MyCinema cho Android</a></li>
             </ul>
           </div>
         </div>
 
         {/* Column 2: Cinema Locations */}
         <div className="footer-column">
-          <h3 className="column-title">CỤM RẠP BETA</h3>
+          <h3 className="column-title">CỤM RẠP MYCINEMA</h3>
           <ul className="footer-links cinema-list">
-            <li><a href="#">&gt; Beta Cinemas Xuân Thủy, Hà Nội</a></li>
-            <li><a href="#">&gt; Beta Cinemas Tây Sơn, Hà Nội</a></li>
-            <li><a href="#">&gt; Beta Cinemas Vinh Yên, Phú Thọ</a></li>
-            <li><a href="#">&gt; Beta Cinemas Ung Văn Khiêm, TP HCM</a></li>
-            <li><a href="#">&gt; Beta Cinemas Lào Cai</a></li>
-            <li><a href="#">&gt; Beta Cinemas Trần Quang Khải, TP HCM</a></li>
-            <li><a href="#">&gt; Beta Cinemas TrMall Phú Quốc</a></li>
-            <li><a href="#">&gt; Beta Cinemas Empire Bình Dương</a></li>
-            <li><a href="#">&gt; Beta Cinemas Quang Trung, TP HCM</a></li>
-            <li><a href="#">&gt; Beta Cinemas Giải Phóng, Hà Nội</a></li>
+            <li><a href="#">&gt; MyCinema Xuân Thủy, Hà Nội</a></li>
+            <li><a href="#">&gt; MyCinema Tây Sơn, Hà Nội</a></li>
+            <li><a href="#">&gt; MyCinema Vinh Yên, Phú Thọ</a></li>
+            <li><a href="#">&gt; MyCinema Ung Văn Khiêm, TP HCM</a></li>
+            <li><a href="#">&gt; MyCinema Lào Cai</a></li>
+            <li><a href="#">&gt; MyCinema Trần Quang Khải, TP HCM</a></li>
+            <li><a href="#">&gt; MyCinema TrMall Phú Quốc</a></li>
+            <li><a href="#">&gt; MyCinema Empire Bình Dương</a></li>
+            <li><a href="#">&gt; MyCinema Quang Trung, TP HCM</a></li>
+            <li><a href="#">&gt; MyCinema Giải Phóng, Hà Nội</a></li>
             {/* Add more as needed */}
           </ul>
         </div>
@@ -54,20 +54,20 @@ const Footer = () => {
         <div className="footer-column">
           <h3 className="column-title">LIÊN HỆ</h3>
           <div className="contact-info">
-            <p><strong>CÔNG TY CỔ PHẦN BETA MEDIA</strong></p>
+            <p><strong>CÔNG TY CỔ PHẦN MYCINEMA</strong></p>
             <p>Giấy chứng nhận ĐKKD số: 0106633482 - Đăng ký lần đầu ngày 08/09/2014 tại Sở Kế hoạch và Đầu tư Thành phố Hà Nội</p>
             <p>Địa chỉ trụ sở: Tầng 3, số 595, đường Giải Phóng, Phường Tương Mai, Thành phố Hà Nội, Việt Nam</p>
             
             <div className="contact-detail">
               <p><strong>LIÊN HỆ CHĂM SÓC KHÁCH HÀNG:</strong></p>
               <p>Hotline: 1900 636807</p>
-              <p>Email: mkt@betacinemas.vn</p>
+              <p>Email: cskh@mycinema.vn</p>
             </div>
 
             <div className="contact-detail">
               <p><strong>LIÊN HỆ QUẢNG CÁO:</strong></p>
               <p>Hotline: 0934 632 682</p>
-              <p>Email: ad@betagroup.vn</p>
+              <p>Email: ads@mycinema.vn</p>
             </div>
           </div>
 

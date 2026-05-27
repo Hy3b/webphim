@@ -1,4 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 .promotion-page {
+    font-family: 'Inter', sans-serif;
     background-color: var(--background);
     color: var(--text-color);
     padding: 40px 20px;
@@ -76,6 +79,21 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
+.promo-image-link {
+    display: block;
+    width: 100%;
+}
+
+.promo-title-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+.promo-title-link:hover .promo-title {
+    color: var(--primary-color);
+}
+
 .promo-content {
     padding: 20px;
     display: flex;
@@ -86,6 +104,7 @@
     font-size: 1.3rem;
     margin-bottom: 10px;
     color: white;
+    transition: color 0.3s ease;
 }
 
 .promo-desc {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import {
@@ -13,7 +13,6 @@ import {
     Maximize,
     Moon,
     Sun,
-    MonitorPlay,
     UserCircle,
     Scan,
     ReceiptText
@@ -24,6 +23,10 @@ import './AdminLayout.css';
 const AdminLayout = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = "MyCinema - admin";
+    }, []);
 
     const [isMenuOpen, setIsMenuOpen] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -149,9 +152,6 @@ const AdminLayout = () => {
                     </div>
                     <div className="header-right">
                         <div className="header-icons">
-                            <button className="icon-btn">
-                                <MonitorPlay size={18} />
-                            </button>
                             <button className="icon-btn" onClick={() => navigate('/admin/scan')} title="Truy cập nhanh Soát vé">
                                 <Scan size={18} />
                             </button>
@@ -162,7 +162,11 @@ const AdminLayout = () => {
 
                         <div className="user-profile">
                             <div className="user-avatar" onClick={handleLogout} style={{ cursor: 'pointer' }} title="Click để đăng xuất">
-                                <UserCircle size={36} color="#465b8a" />
+                                {user?.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="Avatar" />
+                                ) : (
+                                    <UserCircle size={36} color="#465b8a" />
+                                )}
                             </div>
                             <div className="user-info">
                                 <span className="user-role">{user?.role || 'Admin'}</span>

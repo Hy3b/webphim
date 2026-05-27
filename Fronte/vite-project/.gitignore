@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 **/application.yaml
 .agent/
+
+# Local env files
+.env
+.env.*
+!.env.example

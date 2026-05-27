@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Film } from 'lucide-react';
+import { X, Save, Film, Search, DownloadCloud } from 'lucide-react';
+import { tmdbService } from '../../../../services/tmdbService';
 import './MovieFormModal.css';
 
 const EMPTY_FORM = {
@@ -15,6 +16,12 @@ const MovieFormModal = ({ mode, movie, onSave, onClose }) => {
     const [form, setForm] = useState(EMPTY_FORM);
     const [errors, setErrors] = useState({});
     const [saving, setSaving] = useState(false);
+
+    // TMDB Search State
+    const [showTmdbSearch, setShowTmdbSearch] = useState(false);
+    const [tmdbQuery, setTmdbQuery] = useState('');
+    const [tmdbResults, setTmdbResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         if (mode === 'edit' && movie) {
@@ -62,6 +69,58 @@ const MovieFormModal = ({ mode, movie, onSave, onClose }) => {
         setSaving(false);
     };
 
+    const handleSearchTmdb = async () => {
+        if (!tmdbQuery.trim()) return;
+        setIsSearching(true);
+        try {
+            // Support searching by ID directly if query is a number
+            if (/^\d+$/.test(tmdbQuery.trim())) {
+                const movie = await tmdbService.getMovieById(tmdbQuery.trim());
+                setTmdbResults([movie]);
+            } else {
+                const results = await tmdbService.searchMovies(tmdbQuery);
+                setTmdbResults(results);
+            }
+        } catch (error) {
+            alert('Lỗi tìm kiếm TMDB. Vui lòng kiểm tra API Key.');
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const handleSelectTmdbMovie = async (tmdbId) => {
+        setIsSearching(true);
+        try {
+            const movieDetails = await tmdbService.getMovieById(tmdbId);
+            
+            const director = movieDetails.credits?.crew?.find(c => c.job === 'Director')?.name || '';
+            const cast = movieDetails.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || '';
+            const genresStr = movieDetails.genres?.map(g => g.name).join(', ') || '';
+            const mappedGenre = GENRES.find(g => genresStr.includes(g)) || 'Chưa cập nhật';
+            
+            setForm(f => ({
+                ...f,
+                title: movieDetails.title || movieDetails.original_title || '',
+                description: movieDetails.overview || '',
+                duration: movieDetails.runtime ? String(movieDetails.runtime) : '',
+                releaseDate: movieDetails.release_date || '',
+                poster: movieDetails.poster_path ? `https://image.tmdb.org/t/p/w500${movieDetails.poster_path}` : '',
+                banner: movieDetails.backdrop_path ? `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` : '',
+                director: director,
+                castMembers: cast,
+                genre: mappedGenre
+            }));
+            
+            setShowTmdbSearch(false);
+            setTmdbResults([]);
+            setTmdbQuery('');
+        } catch (error) {
+            alert('Lỗi khi lấy chi tiết phim.');
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
     return (
         <div className="mfm-overlay" onClick={onClose}>
             <div className="mfm-modal" onClick={e => e.stopPropagation()}>
@@ -70,9 +129,52 @@ const MovieFormModal = ({ mode, movie, onSave, onClose }) => {
                     <div className="mfm-header-left">
                         <Film size={18} className="mfm-icon" />
                         <h2>{mode === 'edit' ? 'Chỉnh Sửa Phim' : 'Thêm Phim Mới'}</h2>
+                        <button 
+                            type="button" 
+                            className="mfm-tmdb-btn"
+                            onClick={() => setShowTmdbSearch(!showTmdbSearch)}
+                        >
+                            <DownloadCloud size={16} /> Nhập từ TMDB
+                        </button>
                     </div>
                     <button className="mfm-close" onClick={onClose}><X size={18} /></button>
                 </div>
+
+                {/* TMDB Search Panel */}
+                {showTmdbSearch && (
+                    <div className="mfm-tmdb-panel">
+                        <div className="tmdb-search-bar">
+                            <input 
+                                type="text" 
+                                placeholder="Nhập tên phim hoặc ID TMDB..." 
+                                value={tmdbQuery}
+                                onChange={e => setTmdbQuery(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSearchTmdb())}
+                            />
+                            <button type="button" onClick={handleSearchTmdb} disabled={isSearching}>
+                                {isSearching ? 'Đang tìm...' : <Search size={16} />}
+                            </button>
+                        </div>
+                        
+                        {tmdbResults.length > 0 && (
+                            <div className="tmdb-results">
+                                {tmdbResults.map(m => (
+                                    <div key={m.id} className="tmdb-result-item" onClick={() => handleSelectTmdbMovie(m.id)}>
+                                        {m.poster_path ? (
+                                            <img src={`https://image.tmdb.org/t/p/w92${m.poster_path}`} alt={m.title} />
+                                        ) : (
+                                            <div className="tmdb-no-image">Không ảnh</div>
+                                        )}
+                                        <div className="tmdb-result-info">
+                                            <h4>{m.title}</h4>
+                                            <p>{m.release_date ? m.release_date.substring(0, 4) : 'N/A'}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Form */}
                 <form className="mfm-form" onSubmit={handleSubmit}>

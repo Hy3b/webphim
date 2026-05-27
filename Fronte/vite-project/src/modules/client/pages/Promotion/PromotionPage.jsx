@@ -8,22 +8,17 @@ const PromotionPage = () => {
             id: 1,
             title: "Ưu đãi 5% khi tích điểm thành viên",
             description: "Thanh toán ngay nhận liền tay 5% giá trị quy đổi thành điểm thưởng.",
-            imageUrl: "https://www.bhdstar.vn/wp-content/uploads/2024/08/BHD-Star-Mmember.jpg",
+            imageUrl: "https://lh3.googleusercontent.com/d/1btt2Uo9SBD5aNpf_69biAfMCtdnli726",
+            linkUrl: "https://drive.google.com/file/d/1btt2Uo9SBD5aNpf_69biAfMCtdnli726/view?usp=drive_link",
             tag: "Nổi bật"
         },
         {
             id: 2,
             title: "Thứ 2 vui vẻ - Đồng giá vé 65K",
             description: "Đồng giá vé 65K cho mọi suất chiếu vào thứ 2 hàng tuần (trừ ngày Lễ/Tết).",
-            imageUrl: "https://www.bhdstar.vn/wp-content/uploads/2023/10/U22.jpg",
+            imageUrl: "https://lh3.googleusercontent.com/d/1L75Z63pv-BhvDPRrxawk8DdKbo7zcsfy",
+            linkUrl: "https://drive.google.com/file/d/1L75Z63pv-BhvDPRrxawk8DdKbo7zcsfy/view?usp=drive_link",
             tag: "Hàng tuần"
-        },
-        {
-            id: 3,
-            title: "Combo sinh viên - Chỉ 99K",
-            description: "Bao gồm 1 vé xem phim và 1 nước ngọt (Cỡ vừa) dành cho HSSV có thẻ.",
-            imageUrl: "https://www.bhdstar.vn/wp-content/uploads/2023/08/C-MONDAY.jpg",
-            tag: "Ưu đãi HS-SV"
         }
     ];
 
