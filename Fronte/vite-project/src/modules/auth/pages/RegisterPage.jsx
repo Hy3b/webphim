@@ -15,9 +15,32 @@ const RegisterPage = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isResending, setIsResending] = useState(false);
+    const [resendStatus, setResendStatus] = useState('');
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleResendEmail = async () => {
+        setIsResending(true);
+        setResendStatus('');
+        try {
+            const response = await api.post('/auth/resend-activation', {
+                email: form.email.trim()
+            });
+            setResendStatus(response.data?.message || 'Đã gửi lại email kích hoạt.');
+        } catch (error) {
+            console.error("Lỗi gửi lại:", error);
+            if (error.response) {
+                setResendStatus(error.response.data?.message || 'Không thể gửi lại email kích hoạt.');
+            } else {
+                setResendStatus('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
+            }
+        } finally {
+            setIsResending(false);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -39,8 +62,7 @@ const RegisterPage = () => {
             });
 
             if (response.status === 200) {
-                alert('Đăng ký thành công!');
-                navigate('/login');
+                setIsSubmitted(true);
             } else {
                 setErrorMessage('Dữ liệu không hợp lệ, vui lòng kiểm tra lại!');
             }
@@ -57,6 +79,59 @@ const RegisterPage = () => {
 
     const passwordMatch = form.confirmPassword && form.password === form.confirmPassword;
     const passwordNotMatch = form.confirmPassword && form.password !== form.confirmPassword;
+
+    if (isSubmitted) {
+        return (
+            <div className="login-page">
+                <div className="login-container" style={{ textAlign: 'center', padding: '40px 30px' }}>
+                    <div className="auth-header">
+                        <div style={{ fontSize: '64px', marginBottom: '20px' }}>📧</div>
+                        <h2 style={{ display: 'block', marginBottom: '12px' }}>Đăng Ký Thành Công</h2>
+                        <p style={{ marginTop: '15px', lineHeight: '1.6', color: '#444' }}>
+                            Chúng tôi đã gửi một email xác minh đến hộp thư: <br />
+                            <strong style={{ color: '#FF6600', fontSize: '1.15em', wordBreak: 'break-all' }}>{form.email}</strong>
+                        </p>
+                        <p style={{ fontSize: '13px', color: '#777', marginTop: '12px' }}>
+                            Vui lòng nhấp vào liên kết trong email để kích hoạt tài khoản của bạn.
+                        </p>
+                    </div>
+
+                    <div style={{ margin: '25px 0' }}>
+                        <button 
+                            onClick={handleResendEmail} 
+                            className="btn-submit" 
+                            disabled={isResending}
+                            style={{ backgroundColor: '#FF6600', width: '100%', marginBottom: '12px' }}
+                        >
+                            {isResending ? 'ĐANG GỬI LẠI...' : 'GỬI LẠI EMAIL KÍCH HOẠT'}
+                        </button>
+                        
+                        {resendStatus && (
+                            <div style={{ 
+                                color: resendStatus.includes('lỗi') || resendStatus.includes('thất bại') || resendStatus.includes('không') ? '#e74c3c' : '#2ecc71', 
+                                fontSize: '13px', 
+                                marginBottom: '12px',
+                                fontWeight: '600'
+                            }}>
+                                {resendStatus}
+                            </div>
+                        )}
+
+                        <Link to="/login" className="btn-submit" style={{ display: 'block', textDecoration: 'none', lineHeight: '45px', height: '45px', padding: 0, backgroundColor: '#034EA2' }}>
+                            ĐI TỚI ĐĂNG NHẬP
+                        </Link>
+                    </div>
+
+                    <p className="switch-auth">
+                        Nhập sai email?{' '}
+                        <span style={{ color: '#FF6600', cursor: 'pointer', fontWeight: '600', textDecoration: 'underline' }} onClick={() => setIsSubmitted(false)}>
+                            Quay lại sửa thông tin
+                        </span>
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="login-page">

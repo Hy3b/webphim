@@ -31,7 +31,7 @@ export const tmdbService = {
         try {
             const response = await tmdbApi.get(`/movie/${id}`, {
                 params: {
-                    append_to_response: 'credits',
+                    append_to_response: 'credits,release_dates',
                 },
             });
             return response.data;

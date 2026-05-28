@@ -27,8 +27,8 @@ const ShowtimeFormModal = ({ showtime, movies, rooms, date, onSave, onClose }) =
 
     const validate = () => {
         const e = {};
-        if (!form.movieId)   e.movieId   = 'Vui lòng chọn phim.';
-        if (!form.roomId)    e.roomId    = 'Vui lòng chọn phòng.';
+        if (!form.movieId) e.movieId = 'Vui lòng chọn phim.';
+        if (!form.roomId) e.roomId = 'Vui lòng chọn phòng.';
         if (!form.startTime) e.startTime = 'Vui lòng chọn giờ bắt đầu.';
         if (!form.basePrice || +form.basePrice <= 0) e.basePrice = 'Giá vé phải lớn hơn 0.';
         const h = new Date(form.startTime).getHours();

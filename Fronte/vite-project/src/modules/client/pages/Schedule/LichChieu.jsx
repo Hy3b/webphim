@@ -70,12 +70,13 @@ const LichChieu = () => {
                                                 id: st.showtimeId,
                                                 time: st.startTime.split('T')[1].substring(0, 5),
                                                 fullTime: st.startTime, // Cung cấp thời gian thực để chặn bấm khi quá giờ
-                                                seats: '25'
+                                                seats: '25',
+                                                roomName: st.roomName
                                             }));
 
                                         if (movieShowtimes.length === 0) return null; // Không chiếu ngày này thì hide phim
 
-                                        return <MovieItem key={movie.id} movie={{ ...movie, showtimes: movieShowtimes, type: '2D PHỤ ĐỀ' }} />;
+                                        return <MovieItem key={movie.id} movie={movie} dateValue={item.dateValue} />;
                                     })
                                 ) : (
                                     <div className="empty-state">Đang tải phim...</div>

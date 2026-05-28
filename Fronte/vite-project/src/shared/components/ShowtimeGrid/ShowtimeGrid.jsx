@@ -35,6 +35,11 @@ const ShowtimeGrid = ({ showtimes }) => {
                             style={{ background: 'none', border: 'none', padding: 0, cursor: isExpired ? 'not-allowed' : 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: isExpired ? 0.5 : 1, filter: isExpired ? 'grayscale(100%)' : 'none' }}
                         >
                             <span className="showtime-time" style={{ textDecoration: isExpired ? 'line-through' : 'none' }}>{item.time}</span>
+                            {item.roomName && (
+                                <span className="showtime-room" style={{ fontSize: '12px', fontWeight: 'bold', color: '#ff9800', marginTop: '2px' }}>
+                                    {item.roomName}
+                                </span>
+                            )}
                             <span className="showtime-seats" style={{ color: isExpired ? '#999' : '' }}>
                                 {isExpired ? 'Đã chiếu' : `${item.seats} ghế trống`}
                             </span>

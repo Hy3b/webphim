@@ -127,6 +127,14 @@ builder.Services.AddScoped<WebPhimApi.Services.SeatService>();
 // Khởi chạy Daemon dọn rạp 
 builder.Services.AddHostedService<WebPhimApi.Services.BookingCleanupService>();
 
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<Resend.ResendClient>();
+builder.Services.Configure<Resend.ResendClientOptions>(options =>
+{
+    options.ApiToken = Environment.GetEnvironmentVariable("RESEND_API_KEY") ?? builder.Configuration["Resend:ApiKey"] ?? "";
+});
+builder.Services.AddTransient<Resend.IResend, Resend.ResendClient>();
+
 builder.Services.AddControllers();
 
 // ──────────────────────────────────────────────
@@ -152,5 +160,7 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapGet("/hello", () => "Backend is healthy!");
 
 app.Run();

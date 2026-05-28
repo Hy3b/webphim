@@ -92,6 +92,12 @@ public class BookingService(AppDbContext db, IConnectionMultiplexer redis, ILogg
 
             var discountAmount = pointsToUse * 1000m; // 1 điểm = 1000 VND
             var finalAmount = totalAmount - discountAmount;
+            
+            if (pointsToUse > 0 && finalAmount < 1000m)
+            {
+                throw new InvalidOperationException("Tiền hoá đơn sau khi giảm phải lớn hơn hoặc bằng 1,000 VND");
+            }
+            
             if (finalAmount < 0) finalAmount = 0;
 
             var expiredAt = DateTime.Now.AddMinutes(BookingTtlMinutes);

@@ -139,7 +139,7 @@ const BookingPage = () => {
                 state: {
                     movie,
                     selectedSeats,
-                    totalPrice: calculateTotal(),
+                    totalPrice: calculateTotal() - (pointsToUse * 1000),
                     bookingInfo: data,
                     bookingId: data?.bookingId,
                     orderCode: data?.orderCode
@@ -198,7 +198,7 @@ const BookingPage = () => {
                         <div className="price-timer-container">
                             <div className="total-price-block">
                                 <span className="label">Tổng tiền</span>
-                                <span className="value">{calculateTotal().toLocaleString()} vnđ</span>
+                                <span className="value">{(calculateTotal() - (pointsToUse * 1000)).toLocaleString()} vnđ</span>
                             </div>
                             <div className="timer-block">
                                 <span className="label">Thời gian còn lại</span>

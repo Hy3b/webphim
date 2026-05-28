@@ -95,8 +95,25 @@ const MovieFormModal = ({ mode, movie, onSave, onClose }) => {
             
             const director = movieDetails.credits?.crew?.find(c => c.job === 'Director')?.name || '';
             const cast = movieDetails.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || '';
-            const genresStr = movieDetails.genres?.map(g => g.name).join(', ') || '';
-            const mappedGenre = GENRES.find(g => genresStr.includes(g)) || 'Chưa cập nhật';
+            const genresStr = movieDetails.genres?.map(g => g.name.toLowerCase()).join(', ') || '';
+            const mappedGenre = GENRES.find(g => genresStr.includes(g.toLowerCase())) || 'Chưa cập nhật';
+            
+            let mappedAgeRating = 'P';
+            if (movieDetails.release_dates?.results) {
+                const vnRelease = movieDetails.release_dates.results.find(r => r.iso_3166_1 === 'VN');
+                const usRelease = movieDetails.release_dates.results.find(r => r.iso_3166_1 === 'US');
+                
+                let cert = vnRelease?.release_dates?.find(d => d.certification)?.certification || '';
+                if (!cert) cert = usRelease?.release_dates?.find(d => d.certification)?.certification || '';
+                
+                if (cert) {
+                    const certUpper = cert.toUpperCase();
+                    if (['P', 'G', 'PG'].includes(certUpper)) mappedAgeRating = 'P';
+                    else if (['C13', 'PG-13'].includes(certUpper) || certUpper.includes('13')) mappedAgeRating = 'C13';
+                    else if (['C16', '16', 'R'].includes(certUpper) || certUpper.includes('16')) mappedAgeRating = 'C16';
+                    else if (['C18', '18', 'NC-17'].includes(certUpper) || certUpper.includes('18')) mappedAgeRating = 'C18';
+                }
+            }
             
             setForm(f => ({
                 ...f,
@@ -108,7 +125,8 @@ const MovieFormModal = ({ mode, movie, onSave, onClose }) => {
                 banner: movieDetails.backdrop_path ? `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` : '',
                 director: director,
                 castMembers: cast,
-                genre: mappedGenre
+                genre: mappedGenre,
+                ageRating: mappedAgeRating
             }));
             
             setShowTmdbSearch(false);

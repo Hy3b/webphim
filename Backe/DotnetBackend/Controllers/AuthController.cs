@@ -6,6 +6,9 @@ using WebPhimApi.Services;
 
 namespace WebPhimApi.Controllers;
 
+public record VerifyEmailRequest(string Token);
+public record ResendActivationRequest(string Email);
+
 [ApiController]
 [Route("api/auth")]
 public class AuthController(AuthService authService) : ControllerBase
@@ -35,7 +38,18 @@ public class AuthController(AuthService authService) : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var (token, error) = await authService.RegisterAsync(request);
+        var (token, message, error) = await authService.RegisterAsync(request);
+        if (error is not null) return BadRequest(new { message = error });
+
+        return Ok(new { message = message });
+    }
+
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Token)) return BadRequest(new { message = "Token không hợp lệ" });
+
+        var (token, error) = await authService.VerifyEmailAsync(request.Token);
         if (error is not null) return BadRequest(new { message = error });
 
         Response.Cookies.Append("jwt", token!.AccessToken, new CookieOptions
@@ -47,6 +61,17 @@ public class AuthController(AuthService authService) : ControllerBase
         });
 
         return Ok(token);
+    }
+
+    [HttpPost("resend-activation")]
+    public async Task<IActionResult> ResendActivation([FromBody] ResendActivationRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Email)) return BadRequest(new { message = "Email không hợp lệ" });
+
+        var (success, error) = await authService.ResendActivationEmailAsync(request.Email);
+        if (!success) return BadRequest(new { message = error });
+
+        return Ok(new { message = "Email kích hoạt đã được gửi lại. Vui lòng kiểm tra hòm thư." });
     }
 
     [HttpGet("me")]

@@ -4,6 +4,7 @@ import ClientLayout from '../modules/client/layouts/ClientLayout';
 import HomePage from '../modules/client/pages/home/HomePage';
 import LoginPage from '../modules/auth/pages/LoginPage';
 import RegisterPage from '../modules/auth/pages/RegisterPage';
+import VerifyEmailPage from '../modules/auth/pages/VerifyEmailPage';
 import LichChieu from '../modules/client/pages/Schedule/LichChieu';
 import BookingPage from '../modules/client/pages/booking/BookingPage/BookingPage';
 import PaymentPage from '../modules/client/pages/payment/PaymentPage';
@@ -33,6 +34,7 @@ const AppRoutes = () => {
                 <Route index element={<HomePage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
+                <Route path="verify-email" element={<VerifyEmailPage />} />
                 <Route path="lichchieu" element={<LichChieu />} />
                 <Route path="booking/:id" element={<BookingPage />} />
                 <Route path="payment" element={<PaymentPage />} />

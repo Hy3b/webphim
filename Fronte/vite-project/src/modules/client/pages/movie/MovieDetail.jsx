@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import MovieCard from '../../../../shared/components/movie_card/movie_card.jsx';
 import DateSelector from '../Schedule/components/DateSelector/DateSelector';
 import ShowtimeGrid from '../../../../shared/components/ShowtimeGrid/ShowtimeGrid';
@@ -8,6 +8,8 @@ import './MovieDetail.css';
 
 const MovieDetail = () => {
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
+    const queryDate = searchParams.get('date');
 
     const [movie, setMovie] = useState(null);
     const [relatedMovies, setRelatedMovies] = useState([]);
@@ -44,12 +46,19 @@ const MovieDetail = () => {
         };
     });
 
-    // Auto-select first date tab when data arrives
+    // Auto-select date tab when data arrives
     useEffect(() => {
         if (days.length > 0 && !activeTab) {
+            if (queryDate) {
+                const matchedDay = days.find(d => d.dateValue === queryDate);
+                if (matchedDay) {
+                    setActiveTab(matchedDay.id);
+                    return;
+                }
+            }
             setActiveTab(days[0].id);
         }
-    }, [days, activeTab]);
+    }, [days, activeTab, queryDate]);
 
     const selectedDate = days.find(d => d.id === activeTab)?.dateValue;
     const showtimes = rawShowtimes
@@ -58,8 +67,29 @@ const MovieDetail = () => {
             id: st.showtimeId,
             time: st.startTime.split('T')[1].substring(0, 5),
             fullTime: st.startTime, // Cung cấp thời gian thực
-            seats: '25' // Default to 25 seats total
+            seats: '25', // Default to 25 seats total
+            roomName: st.roomName
         }));
+
+    // Phân loại phòng chiếu dựa trên tên phòng
+    const getShowtimeType = (roomName) => {
+        if (!roomName) return '2D';
+        const nameUpper = roomName.toUpperCase();
+        if (nameUpper.includes('IMAX')) return 'IMAX';
+        if (nameUpper.includes('3D')) return '3D';
+        return '2D';
+    };
+
+    // Nhóm các suất chiếu theo loại phòng
+    const groupedShowtimes = showtimes.reduce((acc, st) => {
+        const t = getShowtimeType(st.roomName);
+        if (!acc[t]) acc[t] = [];
+        acc[t].push(st);
+        return acc;
+    }, {});
+
+    // Sắp xếp thứ tự hiển thị: 2D -> 3D -> IMAX
+    const sortedTypes = ['2D', '3D', 'IMAX'].filter(t => groupedShowtimes[t] && groupedShowtimes[t].length > 0);
 
     if (!movie) {
         return <div style={{ textAlign: 'center', padding: '100px', color: '#fff' }}>Đang tải dữ liệu phim...</div>;
@@ -99,7 +129,7 @@ const MovieDetail = () => {
                 {/* 3. Nội dung phim */}
                 <div className="movie-plot">
                     <h3 className="section-title">NỘI DUNG PHIM</h3>
-                    <p>{movie.plot}</p>
+                    <p>{movie.description}</p>
                 </div>
 
                 {/* 4. Lịch chiếu */}
@@ -112,7 +142,14 @@ const MovieDetail = () => {
                             onTabChange={setActiveTab}
                         />
 
-                        <ShowtimeGrid showtimes={showtimes} />
+                        {sortedTypes.map(t => (
+                            <div key={t} style={{ marginTop: '20px' }}>
+                                <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#e50914', borderBottom: '1px solid #eee', paddingBottom: '6px', marginBottom: '10px' }}>
+                                    PHÒNG {t}
+                                </h4>
+                                <ShowtimeGrid showtimes={groupedShowtimes[t]} />
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <div className="showtimes-container">

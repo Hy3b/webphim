@@ -61,8 +61,8 @@ const BookingSummary = ({ movie, selectedSeats, totalPrice, onConfirm, isLoading
                             onChange={(e) => {
                                 let val = parseInt(e.target.value) || 0;
                                 if (val > user.points) val = user.points;
-                                // Không cho nhập điểm quá tổng tiền (1đ = 1000vnd)
-                                const maxPointsForPrice = Math.ceil(totalPrice / 1000);
+                                // Không cho nhập điểm để hoá đơn dưới 1,000 vnd (1đ = 1000vnd)
+                                const maxPointsForPrice = Math.max(0, Math.floor((totalPrice - 1000) / 1000));
                                 if (val > maxPointsForPrice) val = maxPointsForPrice;
                                 setPointsToUse(val);
                             }}

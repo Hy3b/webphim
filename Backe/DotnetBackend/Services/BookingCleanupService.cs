@@ -34,8 +34,9 @@ public class BookingCleanupService(IServiceProvider services, ILogger<BookingCle
         var redis = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>();
         var cache = redis.GetDatabase();
 
+        var now = DateTime.Now;
         var expiredOrders = await db.Orders
-            .Where(o => o.Status == OrderStatus.pending && o.ExpiredAt < DateTime.Now)
+            .Where(o => o.Status == OrderStatus.pending && o.ExpiredAt < now)
             .ToListAsync(cancellationToken);
 
         if (expiredOrders.Count == 0) return;
@@ -44,6 +45,17 @@ public class BookingCleanupService(IServiceProvider services, ILogger<BookingCle
         {
             order.Status = OrderStatus.cancelled;
             order.UpdatedAt = DateTime.Now;
+
+            if (order.PointsUsed > 0)
+            {
+                var user = await db.Users.FindAsync(new object[] { order.UserId }, cancellationToken);
+                if (user != null)
+                {
+                    user.Points += order.PointsUsed;
+                    logger.LogInformation("🔄 Đã hoàn lại {Points} điểm cho user {UserId} (Đơn {OrderCode})", 
+                        order.PointsUsed, order.UserId, order.OrderCode);
+                }
+            }
 
             var bookings = await db.Bookings
                 .Where(b => b.OrderId == order.OrderId)

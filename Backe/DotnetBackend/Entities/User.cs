@@ -46,6 +46,9 @@ public class User
     [MaxLength(255)]
     [Column("avatar_url")]
     public string? AvatarUrl { get; set; }
+
+    [Column("is_active")]
+    public bool IsActive { get; set; } = false;
 }
 
 public enum UserRole { admin, staff, customer }
