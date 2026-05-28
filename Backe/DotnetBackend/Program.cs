@@ -12,18 +12,26 @@ DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Explicitly register SEPAY_WEBHOOK_SECRET into configuration if found in env
+// Explicitly register SEPAY_WEBHOOK_SECRET and FRONTEND_URL into configuration if found in env
 var sepaySecret = Environment.GetEnvironmentVariable("SEPAY_WEBHOOK_SECRET");
 if (!string.IsNullOrEmpty(sepaySecret))
 {
     builder.Configuration["SepayWebhookSecret"] = sepaySecret;
 }
 
+var frontendUrlEnv = Environment.GetEnvironmentVariable("FRONTEND_URL");
+if (!string.IsNullOrEmpty(frontendUrlEnv))
+{
+    builder.Configuration["App:FrontendUrl"] = frontendUrlEnv;
+}
+
 // ──────────────────────────────────────────────
 // 1. CORS  (tương đương CorsConfig.java)
 // ──────────────────────────────────────────────
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? ["http://localhost:5173"];
+var allowedOriginsEnv = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+var allowedOrigins = !string.IsNullOrEmpty(allowedOriginsEnv)
+    ? allowedOriginsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    : (builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:5173"]);
 
 builder.Services.AddCors(options =>
 {
@@ -144,7 +152,15 @@ var app = builder.Build();
 
 app.UseCors("WebPhimPolicy");
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, OPTIONS");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    }
+});
 
 // Simple Request Logging Middleware for Debugging Webhooks
 app.Use(async (context, next) =>

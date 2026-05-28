@@ -12,7 +12,7 @@ import {
     MapPin,
     CreditCard
 } from 'lucide-react';
-import api from '../../../../services/api';
+import api, { getImageUrl } from '../../../../services/api';
 import { adminTicketApi } from '../../../../services/adminTicketApi';
 import SeatMap from '../../../client/pages/booking/SeatMap/SeatMap';
 import './TicketManager.css';
@@ -193,7 +193,7 @@ const TicketManager = () => {
                         {movies.map(movie => (
                             <div key={movie.id} className="tm-movie-card" onClick={() => handleSelectMovie(movie)}>
                                 <div className="tm-movie-poster">
-                                    <img src={movie.poster} alt={movie.title} />
+                                    <img src={getImageUrl(movie.poster)} alt={movie.title} />
                                     <div className="tm-movie-overlay">
                                         <button className="tm-btn-select">Chọn Phim <ChevronRight size={16} /></button>
                                     </div>
@@ -211,7 +211,7 @@ const TicketManager = () => {
                 {step === 2 && (
                     <div className="tm-showtime-view">
                         <div className="tm-selected-movie-info">
-                            <img src={selectedMovie.poster} alt={selectedMovie.title} />
+                            <img src={getImageUrl(selectedMovie.poster)} alt={selectedMovie.title} />
                             <div>
                                 <h2>{selectedMovie.title}</h2>
                                 <p>{selectedMovie.genre} | {selectedMovie.duration} phút</p>

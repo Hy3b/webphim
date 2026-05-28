@@ -5,6 +5,8 @@ import HomePage from '../modules/client/pages/home/HomePage';
 import LoginPage from '../modules/auth/pages/LoginPage';
 import RegisterPage from '../modules/auth/pages/RegisterPage';
 import VerifyEmailPage from '../modules/auth/pages/VerifyEmailPage';
+import ForgotPasswordPage from '../modules/auth/pages/ForgotPasswordPage';
+import ResetPasswordPage from '../modules/auth/pages/ResetPasswordPage';
 import LichChieu from '../modules/client/pages/Schedule/LichChieu';
 import BookingPage from '../modules/client/pages/booking/BookingPage/BookingPage';
 import PaymentPage from '../modules/client/pages/payment/PaymentPage';
@@ -35,6 +37,8 @@ const AppRoutes = () => {
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
                 <Route path="verify-email" element={<VerifyEmailPage />} />
+                <Route path="forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="reset-password" element={<ResetPasswordPage />} />
                 <Route path="lichchieu" element={<LichChieu />} />
                 <Route path="booking/:id" element={<BookingPage />} />
                 <Route path="payment" element={<PaymentPage />} />

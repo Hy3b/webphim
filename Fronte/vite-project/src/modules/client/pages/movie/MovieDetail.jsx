@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import MovieCard from '../../../../shared/components/movie_card/movie_card.jsx';
 import DateSelector from '../Schedule/components/DateSelector/DateSelector';
 import ShowtimeGrid from '../../../../shared/components/ShowtimeGrid/ShowtimeGrid';
-import api from '../../../../services/api';
+import api, { getImageUrl } from '../../../../services/api';
 import './MovieDetail.css';
 
 const MovieDetail = () => {
@@ -101,14 +101,14 @@ const MovieDetail = () => {
             <div className="main-content">
                 {/* 1. Banner & Play Button */}
                 <div className="hero-banner">
-                    <img src={movie.banner} alt="Banner" />
+                    <img src={getImageUrl(movie.banner)} alt="Banner" />
                     <div className="play-button">▶</div>
                 </div>
 
                 {/* 2. Thông tin phim (Poster + Details) */}
                 <div className="movie-info-section">
                     <div className="poster-box">
-                        <img src={movie.poster} alt={movie.name} />
+                        <img src={getImageUrl(movie.poster)} alt={movie.name} />
                     </div>
                     <div className="info-box">
                         <h1 className="movie-title">

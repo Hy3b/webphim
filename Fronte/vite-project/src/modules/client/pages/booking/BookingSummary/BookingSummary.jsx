@@ -1,11 +1,12 @@
 import React from 'react';
 import './BookingSummary.css';
+import { getImageUrl } from '../../../../../services/api';
 
 const BookingSummary = ({ movie, selectedSeats, totalPrice, onConfirm, isLoading, error, user, pointsToUse, setPointsToUse }) => {
     return (
         <div className="booking-summary">
             <div className="summary-header">
-                <img src={movie.moviePoster || movie.poster} alt={movie.title} className="movie-poster" />
+                <img src={getImageUrl(movie.moviePoster || movie.poster)} alt={movie.title} className="movie-poster" />
                 <div className="movie-details">
                     <h3 className="movie-title">{movie.title}</h3>
                     <div className="movie-format">{movie.type}</div>

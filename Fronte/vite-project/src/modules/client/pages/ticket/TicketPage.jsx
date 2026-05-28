@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import './TicketPage.css';
+import { getImageUrl } from '../../../../services/api';
 
 const TicketPage = () => {
     const location = useLocation();
@@ -49,7 +50,7 @@ const TicketPage = () => {
                     {/* Poster + tên phim */}
                     <div className="ticket-movie-section">
                         <img
-                            src={movie.poster}
+                            src={getImageUrl(movie.poster)}
                             alt={movie.title}
                             className="ticket-poster"
                         />

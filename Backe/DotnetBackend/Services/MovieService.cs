@@ -101,8 +101,8 @@ public class MovieService(AppDbContext db)
             Title       = request.Title,
             Description = request.Description,
             Duration    = request.Duration,
-            Poster      = request.Poster,
-            Banner      = request.Banner,
+            Poster      = Helpers.UrlHelper.MakeRelativePath(request.Poster),
+            Banner      = Helpers.UrlHelper.MakeRelativePath(request.Banner),
             Genre       = request.Genre,
             ReleaseDate = request.ReleaseDate,
             Director    = request.Director,
@@ -138,8 +138,8 @@ public class MovieService(AppDbContext db)
         movie.Title       = request.Title;
         movie.Description = request.Description;
         movie.Duration    = request.Duration;
-        movie.Poster      = request.Poster;
-        movie.Banner      = request.Banner;
+        movie.Poster      = Helpers.UrlHelper.MakeRelativePath(request.Poster);
+        movie.Banner      = Helpers.UrlHelper.MakeRelativePath(request.Banner);
         movie.Genre       = request.Genre;
         movie.ReleaseDate = request.ReleaseDate;
         movie.Director    = request.Director;

@@ -20,7 +20,10 @@ export const AuthProvider = ({ children }) => {
                 setUser(null);
             }
         } catch (error) {
-            console.error("Lỗi kiểm tra trạng thái đăng nhập:", error);
+            // 401 là hành vi bình thường khi chưa đăng nhập, không cần log lỗi
+            if (error.response?.status !== 401) {
+                console.error("Lỗi kiểm tra trạng thái đăng nhập:", error);
+            }
             setUser(null);
         } finally {
             setLoading(false);

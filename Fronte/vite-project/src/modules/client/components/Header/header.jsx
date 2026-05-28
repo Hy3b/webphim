@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'; // 1. Import useStat
 import { Link, useNavigate } from 'react-router-dom';
 import './header.css';
 import { useAuth } from '../../../../context/AuthContext';
+import { getImageUrl } from '../../../../services/api';
 
 export default function Header() {
     // 2. Khởi tạo biến Active Tab
@@ -42,7 +43,7 @@ export default function Header() {
                                 >
                                     <span className="user-avatar">
                                         {user.avatarUrl ? (
-                                            <img src={user.avatarUrl} alt="Avatar" className="user-avatar-img-small" />
+                                            <img src={getImageUrl(user.avatarUrl)} alt="Avatar" className="user-avatar-img-small" />
                                         ) : (
                                             (user.fullName || user.username).charAt(0).toUpperCase()
                                         )}

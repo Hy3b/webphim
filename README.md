@@ -193,6 +193,31 @@ npm run dev
 
 ---
 
+## 💻 Hướng dẫn cấu hình khi Clone sang máy tính khác (Laptop Setup)
+
+Khi clone dự án sang một máy tính/laptop mới, nếu bạn muốn chạy dự án bằng **tên miền Cloudflare riêng** (ví dụ: `https://webphim.laptop.id.vn` và backend tại `https://www.laptop.id.vn`), bạn chỉ cần làm theo các bước sau mà không cần chỉnh sửa trực tiếp mã nguồn:
+
+### 1. Cấu hình Backend (.NET)
+Tạo file `.env` tại thư mục `Backe/DotnetBackend/` (hoặc sao chép từ `.env.example`) và cập nhật 2 biến sau để backend tự nhận diện tên miền mới:
+* **`FRONTEND_URL`**: Trỏ tới tên miền frontend của bạn (dùng làm link kích hoạt tài khoản qua Email).
+  ```env
+  FRONTEND_URL=https://webphim.laptop.id.vn
+  ```
+* **`CORS_ALLOWED_ORIGINS`**: Thêm domain frontend của bạn vào danh sách cho phép gọi API (phân cách bởi dấu phẩy).
+  ```env
+  CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,https://webphim.laptop.id.vn,https://www.laptop.id.vn
+  ```
+
+### 2. Cấu hình Frontend (React)
+Tạo file `.env.production.local` tại thư mục `Fronte/vite-project/` (file này đã được cấu hình trong `.gitignore` để không bị đẩy lên Git) và cập nhật API base URL trỏ về tên miền backend của bạn trên máy mới:
+```env
+VITE_API_BASE_URL=https://www.laptop.id.vn/api
+```
+
+*(Lưu ý: Nếu bạn chỉ chạy dưới localhost để dev, các cấu hình mặc định trong `.env` và proxy của Vite đã tự động hỗ trợ mà không cần cấu hình thêm)*
+
+---
+
 ## 🔐 Authentication & Phân quyền
 
 - Hệ thống sử dụng JWT Token **lưu trong HttpOnly Cookie** (không expose ra Frontend).

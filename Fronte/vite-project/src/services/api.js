@@ -3,7 +3,30 @@ import axios from 'axios';
 // [FIX LOG] Đã bỏ dấu `?.` ở import.meta.env
 // Lý do: Trình biên dịch của Vite không nhận dạng được `?.` khi thay thế biến môi trường nội bộ.
 // Nếu giữ `?.`, biến sẽ đọc thất bại và luôn fallback về URL Production, khiến web tìm nhầm Database.
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://payment.dvanlong1102.id.vn/api';
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://www.dxhiep.id.vn/api';
+
+export const getImageUrl = (path) => {
+    if (!path) return '';
+
+    // Xử lý trường hợp URL bị lưu cứng domain cũ trong DB (như localhost:8080)
+    let normalizedPath = path;
+    if (normalizedPath.startsWith('http://localhost:8080')) {
+        normalizedPath = normalizedPath.replace('http://localhost:8080', '');
+    } else if (normalizedPath.startsWith('https://www.dxhiep.id.vn')) {
+        normalizedPath = normalizedPath.replace('https://www.dxhiep.id.vn', '');
+    } else if (normalizedPath.startsWith('https://payment.dvanlong1102.id.vn')) {
+        normalizedPath = normalizedPath.replace('https://payment.dvanlong1102.id.vn', '');
+    }
+
+    if (normalizedPath.startsWith('http://') || normalizedPath.startsWith('https://')) {
+        return normalizedPath;
+    }
+
+    // relative path
+    const isProd = import.meta.env.PROD;
+    const backendHost = isProd ? 'https://www.dxhiep.id.vn' : '';
+    return `${backendHost}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
+};
 
 const api = axios.create({
     baseURL: baseURL,

@@ -26,11 +26,11 @@ const PaymentPage = () => {
 
     // Config SePay từ biến môi trường Vite (.env)
     const sepayBank = import.meta.env.VITE_SEPAY_BANK_NAME;
-    // Quay lại dùng Tài khoản ảo (VA) để nhận Webhook ngay lập tức
-    const sepayVA = import.meta.env.VITE_SEPAY_VA_ACCOUNT;
+    // Sử dụng tài khoản thật theo yêu cầu
+    const sepayAcc = import.meta.env.VITE_SEPAY_BANK_ACCOUNT;
 
-    // QR dùng VA -> SePay tự động nhận giao dịch và gửi webhook về backend của bạn
-    const qrUrl = `https://qr.sepay.vn/img?acc=${sepayVA}&bank=${sepayBank}&amount=${totalPrice}&des=${orderCode}`;
+    // QR dùng tài khoản thật
+    const qrUrl = `https://qr.sepay.vn/img?acc=${sepayAcc}&bank=${sepayBank}&amount=${totalPrice}&des=${orderCode}`;
 
     const [pollStatus, setPollStatus] = useState('idle');   // idle | polling | paid | error
     const [dotCount, setDotCount] = useState(0);

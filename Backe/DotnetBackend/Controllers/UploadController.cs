@@ -64,9 +64,7 @@ namespace WebPhimApi.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            var request = Request;
-            var baseUrl = $"{request.Scheme}://{request.Host}";
-            var fileUrl = $"{baseUrl}/uploads/{fileName}";
+            var fileUrl = $"/uploads/{fileName}";
 
             return Ok(new { url = fileUrl });
         }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Film, Search, DownloadCloud } from 'lucide-react';
 import { tmdbService } from '../../../../services/tmdbService';
+import { getImageUrl } from '../../../../services/api';
 import './MovieFormModal.css';
 
 const EMPTY_FORM = {
@@ -287,7 +288,7 @@ const MovieFormModal = ({ mode, movie, onSave, onClose }) => {
                                 placeholder="https://..."
                             />
                             {form.poster && (
-                                <img src={form.poster} alt="preview" className="mfm-poster-preview" />
+                                <img src={getImageUrl(form.poster)} alt="preview" className="mfm-poster-preview" />
                             )}
                         </div>
 

@@ -114,4 +114,26 @@ public class AuthController(AuthService authService) : ControllerBase
         });
         return Ok(new { message = "Đăng xuất thành công" });
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var (success, error) = await authService.SendForgotPasswordEmailAsync(request.Email);
+        if (!success) return BadRequest(new { message = error });
+
+        return Ok(new { message = "Liên kết đặt lại mật khẩu đã được gửi đến email của bạn." });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var (success, error) = await authService.ResetPasswordWithTokenAsync(request.Token, request.NewPassword);
+        if (!success) return BadRequest(new { message = error });
+
+        return Ok(new { message = "Mật khẩu của bạn đã được thay đổi thành công." });
+    }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import './movie_card.css';
 import { Link } from 'react-router-dom';
 import Button from '../Button/Button'; // Import Button Component
+import { getImageUrl } from '../../../services/api';
 
 
 const MovieCard = ({movie}) => {
@@ -9,7 +10,7 @@ const MovieCard = ({movie}) => {
         <div className="movie-card">
             {/* Phần ảnh poster */}
             <div className="movie-poster">
-                <img src={movie.poster} alt={movie.name} />
+                <img src={getImageUrl(movie.poster)} alt={movie.name} />
                 
                 {/* Lớp phủ đen (Overlay) */}
                 <div className="overlay">

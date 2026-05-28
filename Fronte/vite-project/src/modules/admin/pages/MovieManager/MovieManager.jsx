@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Film, Plus, Search, Edit2, Trash2, ChevronLeft, ChevronRight, X, Save, AlertTriangle } from 'lucide-react';
 import { adminMovieApi } from '../../../../services/adminMovieApi';
 import MovieFormModal from './MovieFormModal';
+import { getImageUrl } from '../../../../services/api';
 import './MovieManager.css';
 
 const STATUS_LABELS = {
@@ -170,7 +171,7 @@ const MovieManager = () => {
                                 <tr key={m.id} className="mm-row">
                                     <td>
                                         {m.poster
-                                            ? <img src={m.poster} alt={m.title} className="mm-poster" />
+                                            ? <img src={getImageUrl(m.poster)} alt={m.title} className="mm-poster" />
                                             : <div className="mm-poster-placeholder"><Film size={20} /></div>
                                         }
                                     </td>

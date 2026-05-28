@@ -14,6 +14,13 @@ export default defineConfig({
         secure: false,
         proxyTimeout: 10000,
         timeout: 10000,
+      },
+      '/uploads': {
+        target: 'http://127.0.0.1:8080',
+        changeOrigin: true,
+        secure: false,
+        proxyTimeout: 10000,
+        timeout: 10000,
       }
     }
   }

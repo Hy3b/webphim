@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './BannerSlider.css';
+import { getImageUrl } from '../../../../../../services/api';
 
 const BannerSlider = ({ movies }) => {
     // Chỉ lấy những phim ĐANG CHIẾU để làm Slide
@@ -39,7 +40,7 @@ const BannerSlider = ({ movies }) => {
                 {trendingMovies.map((movie) => (
                     <div className="slide-item" key={movie.id}>
                         {/* Nếu có banner thì dùng banner, không thì dùng poster tạm (nhưng poster sẽ bị vỡ hình nếu kéo ngang) */}
-                        <img src={movie.banner || movie.poster} alt={movie.name} />
+                        <img src={getImageUrl(movie.banner || movie.poster)} alt={movie.name} />
                         
                         {/* Thông tin phim đè lên ảnh (nếu muốn) */}
                         <div className="slide-caption">

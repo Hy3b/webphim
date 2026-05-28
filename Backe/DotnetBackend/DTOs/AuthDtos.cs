@@ -41,3 +41,17 @@ public record UpdateProfileRequest(
     string? PhoneNumber,
     string? AvatarUrl
 );
+
+public record ForgotPasswordRequest(
+    [Required(ErrorMessage = "Email không được để trống")]
+    [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+    string Email
+);
+
+public record ResetPasswordRequest(
+    [Required(ErrorMessage = "Token không được để trống")]
+    string Token,
+    [Required(ErrorMessage = "Mật khẩu mới không được để trống")]
+    [MinLength(6, ErrorMessage = "Mật khẩu phải từ 6 ký tự trở lên")]
+    string NewPassword
+);

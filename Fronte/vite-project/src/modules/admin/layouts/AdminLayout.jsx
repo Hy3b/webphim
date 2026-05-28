@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { getImageUrl } from '../../../services/api';
 import {
     LayoutDashboard,
     Building2,
@@ -163,7 +164,7 @@ const AdminLayout = () => {
                         <div className="user-profile">
                             <div className="user-avatar" onClick={handleLogout} style={{ cursor: 'pointer' }} title="Click để đăng xuất">
                                 {user?.avatarUrl ? (
-                                    <img src={user.avatarUrl} alt="Avatar" />
+                                    <img src={getImageUrl(user.avatarUrl)} alt="Avatar" />
                                 ) : (
                                     <UserCircle size={36} color="#465b8a" />
                                 )}

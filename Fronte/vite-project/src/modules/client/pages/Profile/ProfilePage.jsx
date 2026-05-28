@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../context/AuthContext';
-import api from '../../../../services/api';
+import api, { getImageUrl } from '../../../../services/api';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -157,7 +157,7 @@ export default function ProfilePage() {
                     <div className="profile-header">
                         <div className="profile-avatar-large">
                             {user.avatarUrl ? (
-                                <img src={user.avatarUrl} alt="Avatar" className="user-avatar-img-large" />
+                                <img src={getImageUrl(user.avatarUrl)} alt="Avatar" className="user-avatar-img-large" />
                             ) : (
                                 (user.fullName || user.username).charAt(0).toUpperCase()
                             )}
